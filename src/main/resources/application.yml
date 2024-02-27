@@ -1,0 +1,26 @@
+
+server:
+  servlet:
+    context-path: /api
+  port: 8084
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cardmanager
+    username: cardmanager
+    password: cardmanager
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+  liquibase:
+    database-change-log-lock-table: database_change_lock
+    database-change-log-table: database_change_log
+    enabled: false
+
+logging:
+  level:
+    com.teknokote: DEBUG
+    org.apache: DEBUG
+    org.apache.tomcat.util.net.NioEndpoint: ERROR
+    org.springframework.security.web: DEBUG
+
