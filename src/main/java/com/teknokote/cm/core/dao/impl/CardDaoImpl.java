@@ -14,10 +14,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Getter
 @Setter
-public class CardDaoImpl extends JpaGenericDao<Long,CardDto, Card> implements CardDao
+public class CardDaoImpl extends JpaGenericDao<Long, CardDto, Card> implements CardDao
 {
-    @Autowired
-    private CardMapper mapper;
-    @Autowired
-    private CardRepository repository;
+   @Autowired
+   private CardMapper mapper;
+   @Autowired
+   private CardRepository repository;
 }

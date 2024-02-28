@@ -14,10 +14,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Getter
 @Setter
-public class CustomerDaoImpl extends JpaGenericDao<Long,CustomerDto, Customer> implements CustomerDao
+public class CustomerDaoImpl extends JpaGenericDao<Long, CustomerDto, Customer> implements CustomerDao
 {
-    @Autowired
-    private CustomerMapper mapper;
-    @Autowired
-    private CustomerRepository repository;
+   @Autowired
+   private CustomerMapper mapper;
+   @Autowired
+   private CustomerRepository repository;
 }

@@ -16,31 +16,37 @@ import java.util.List;
 @CrossOrigin("*")
 @AllArgsConstructor
 @RequestMapping(EndPoints.PRODUCT_ROOT)
-public class ProductController {
-@Autowired
-private ProductService productService;
+public class ProductController
+{
+   @Autowired
+   private ProductService productService;
 
 
-@PostMapping(EndPoints.ADD)
-public ResponseEntity<ProductDto> addProduct(@RequestBody ProductDto dto) {
-    ProductDto savedProduct = productService.create(dto);
-    return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
-    }
+   @PostMapping(EndPoints.ADD)
+   public ResponseEntity<ProductDto> addProduct(@RequestBody ProductDto dto)
+   {
+      ProductDto savedProduct = productService.create(dto);
+      return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+   }
 
 
-    @PutMapping(EndPoints.UPDATE)
-    public ResponseEntity<ProductDto> updateProduct(@RequestBody ProductDto dto) {
-        ProductDto savedProduct = productService.update(dto);
-        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
-    }
-    @GetMapping(EndPoints.INFO)
-    public ResponseEntity<ProductDto> getProduct(@PathVariable Long id)
-    {
-        ProductDto foundProduct = productService.checkedFindById(id);
-        return new ResponseEntity<>(foundProduct, HttpStatus.CREATED);
-    }
-    @GetMapping
-    public List<ProductDto> listProduct() {
-        return productService.findAll();
-    }
+   @PutMapping(EndPoints.UPDATE)
+   public ResponseEntity<ProductDto> updateProduct(@RequestBody ProductDto dto)
+   {
+      ProductDto savedProduct = productService.update(dto);
+      return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+   }
+
+   @GetMapping(EndPoints.INFO)
+   public ResponseEntity<ProductDto> getProduct(@PathVariable Long id)
+   {
+      ProductDto foundProduct = productService.checkedFindById(id);
+      return new ResponseEntity<>(foundProduct, HttpStatus.CREATED);
+   }
+
+   @GetMapping
+   public List<ProductDto> listProduct()
+   {
+      return productService.findAll();
+   }
 }

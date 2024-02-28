@@ -14,10 +14,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Getter
 @Setter
-public class MovementDaoImpl extends JpaGenericDao<Long,MovementDto, Movement> implements MovementDao
+public class MovementDaoImpl extends JpaGenericDao<Long, MovementDto, Movement> implements MovementDao
 {
-    @Autowired
-    private MovementMapper mapper;
-    @Autowired
-    private MovementRepository repository;
+   @Autowired
+   private MovementMapper mapper;
+   @Autowired
+   private MovementRepository repository;
 }

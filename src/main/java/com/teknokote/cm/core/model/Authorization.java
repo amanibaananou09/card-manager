@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "cm_authorization")
-public class Authorization extends ESSEntity<Long,User>
+public class Authorization extends ESSEntity<Long, User>
 {
    @Serial
    private static final long serialVersionUID = -4849769892990810892L;

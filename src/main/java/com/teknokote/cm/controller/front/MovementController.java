@@ -16,31 +16,37 @@ import java.util.List;
 @CrossOrigin("*")
 @AllArgsConstructor
 @RequestMapping(EndPoints.MOVEMENT_ROOT)
-public class MovementController {
-@Autowired
-private MovementService movementService;
+public class MovementController
+{
+   @Autowired
+   private MovementService movementService;
 
 
-@PostMapping(EndPoints.ADD)
-public ResponseEntity<MovementDto> addMovement(@RequestBody MovementDto dto) {
-    MovementDto savedMovement = movementService.create(dto);
-    return new ResponseEntity<>(savedMovement, HttpStatus.CREATED);
-    }
+   @PostMapping(EndPoints.ADD)
+   public ResponseEntity<MovementDto> addMovement(@RequestBody MovementDto dto)
+   {
+      MovementDto savedMovement = movementService.create(dto);
+      return new ResponseEntity<>(savedMovement, HttpStatus.CREATED);
+   }
 
 
-    @PutMapping(EndPoints.UPDATE)
-    public ResponseEntity<MovementDto> updateMovement(@RequestBody MovementDto dto) {
-        MovementDto savedMovement = movementService.update(dto);
-        return new ResponseEntity<>(savedMovement, HttpStatus.CREATED);
-    }
-    @GetMapping(EndPoints.INFO)
-    public ResponseEntity<MovementDto> getMovement(@PathVariable Long id)
-    {
-        MovementDto foundMovement = movementService.checkedFindById(id);
-        return new ResponseEntity<>(foundMovement, HttpStatus.CREATED);
-    }
-    @GetMapping
-    public List<MovementDto> listMovement() {
-        return movementService.findAll();
-    }
+   @PutMapping(EndPoints.UPDATE)
+   public ResponseEntity<MovementDto> updateMovement(@RequestBody MovementDto dto)
+   {
+      MovementDto savedMovement = movementService.update(dto);
+      return new ResponseEntity<>(savedMovement, HttpStatus.CREATED);
+   }
+
+   @GetMapping(EndPoints.INFO)
+   public ResponseEntity<MovementDto> getMovement(@PathVariable Long id)
+   {
+      MovementDto foundMovement = movementService.checkedFindById(id);
+      return new ResponseEntity<>(foundMovement, HttpStatus.CREATED);
+   }
+
+   @GetMapping
+   public List<MovementDto> listMovement()
+   {
+      return movementService.findAll();
+   }
 }

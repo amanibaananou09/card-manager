@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-public class Movement extends ESSEntity<Long,User>
+public class Movement extends ESSEntity<Long, User>
 {
    @Serial
    private static final long serialVersionUID = -1268120451180082255L;

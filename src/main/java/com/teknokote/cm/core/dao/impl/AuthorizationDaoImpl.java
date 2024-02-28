@@ -14,10 +14,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Getter
 @Setter
-public class AuthorizationDaoImpl extends JpaGenericDao<Long,AuthorizationDto, Authorization> implements AuthorizationDao
+public class AuthorizationDaoImpl extends JpaGenericDao<Long, AuthorizationDto, Authorization> implements AuthorizationDao
 {
-    @Autowired
-    private AuthorizationMapper mapper;
-    @Autowired
-    private AuthorizationRepository repository;
+   @Autowired
+   private AuthorizationMapper mapper;
+   @Autowired
+   private AuthorizationRepository repository;
 }

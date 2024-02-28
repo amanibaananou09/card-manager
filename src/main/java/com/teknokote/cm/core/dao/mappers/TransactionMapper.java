@@ -1,9 +1,9 @@
 package com.teknokote.cm.core.dao.mappers;
 
-import com.teknokote.core.config.MapperConfiguration;
-import com.teknokote.core.mappers.BidirectionalEntityDtoMapper;
 import com.teknokote.cm.core.model.Transaction;
 import com.teknokote.cm.dto.TransactionDto;
+import com.teknokote.core.config.MapperConfiguration;
+import com.teknokote.core.mappers.BidirectionalEntityDtoMapper;
 import org.mapstruct.Mapper;
 
 @Mapper(config = MapperConfiguration.class)

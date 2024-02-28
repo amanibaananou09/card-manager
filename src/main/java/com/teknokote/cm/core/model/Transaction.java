@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "cm_transaction")
-public class Transaction extends ESSEntity<Long,User>
+public class Transaction extends ESSEntity<Long, User>
 {
    @Serial
    private static final long serialVersionUID = -8894883898791331704L;

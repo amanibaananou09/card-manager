@@ -14,10 +14,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 @Getter
 @Setter
-public class TransactionDaoImpl extends JpaGenericDao<Long,TransactionDto, Transaction> implements TransactionDao
+public class TransactionDaoImpl extends JpaGenericDao<Long, TransactionDto, Transaction> implements TransactionDao
 {
-    @Autowired
-    private TransactionMapper mapper;
-    @Autowired
-    private TransactionRepository repository;
+   @Autowired
+   private TransactionMapper mapper;
+   @Autowired
+   private TransactionRepository repository;
 }

@@ -2,9 +2,9 @@ package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.ProductDao;
 import com.teknokote.cm.core.service.ProductService;
+import com.teknokote.cm.dto.ProductDto;
 import com.teknokote.core.service.ESSValidator;
 import com.teknokote.core.service.GenericCheckedService;
-import com.teknokote.cm.dto.ProductDto;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 @Getter
 public class ProductServiceImpl extends GenericCheckedService<Long, ProductDto> implements ProductService
 {
-    @Autowired
-    private ESSValidator<ProductDto> validator;
-    @Autowired
-    private ProductDao dao;
+   @Autowired
+   private ESSValidator<ProductDto> validator;
+   @Autowired
+   private ProductDao dao;
 }

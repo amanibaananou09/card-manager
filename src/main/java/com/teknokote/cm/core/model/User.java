@@ -23,6 +23,6 @@ public class User extends EssUser<Long, User>
    @ManyToOne(fetch = FetchType.LAZY)
    @JsonIgnore
    private Customer customer;
-   @Column(name="customer_id",insertable = false, updatable = false)
+   @Column(name = "customer_id", insertable = false, updatable = false)
    private Long customerId;
 }

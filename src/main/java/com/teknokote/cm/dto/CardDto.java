@@ -12,20 +12,22 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-public class CardDto extends ESSIdentifiedDto<Long>{
-    private String code;
-    private EnumCardType type;
-    private EnumCardStatus status;
-    private BigDecimal ceiling;
-    private Long accountId;
-    @Builder
-    public CardDto(Long id,Long version,String code,EnumCardType type,EnumCardStatus status,BigDecimal ceiling,Account account,Long accountId)
-    {
-        super(id,version);
-        this.code = code;
-        this.type = type;
-        this.status = status;
-        this.ceiling = ceiling;
-        this.accountId = accountId;
-    }
+public class CardDto extends ESSIdentifiedDto<Long>
+{
+   private String code;
+   private EnumCardType type;
+   private EnumCardStatus status;
+   private BigDecimal ceiling;
+   private Long accountId;
+
+   @Builder
+   public CardDto(Long id, Long version, String code, EnumCardType type, EnumCardStatus status, BigDecimal ceiling, Account account, Long accountId)
+   {
+      super(id, version);
+      this.code = code;
+      this.type = type;
+      this.status = status;
+      this.ceiling = ceiling;
+      this.accountId = accountId;
+   }
 }

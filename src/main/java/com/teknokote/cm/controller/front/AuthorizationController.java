@@ -16,31 +16,37 @@ import java.util.List;
 @CrossOrigin("*")
 @AllArgsConstructor
 @RequestMapping(EndPoints.AUTHORIZATION_ROOT)
-public class AuthorizationController {
-@Autowired
-private AuthorizationService authorizationService;
+public class AuthorizationController
+{
+   @Autowired
+   private AuthorizationService authorizationService;
 
 
-@PostMapping(EndPoints.ADD)
-public ResponseEntity<AuthorizationDto> addAuthorization(@RequestBody AuthorizationDto dto) {
-    AuthorizationDto savedAuthorization = authorizationService.create(dto);
-    return new ResponseEntity<>(savedAuthorization, HttpStatus.CREATED);
-    }
+   @PostMapping(EndPoints.ADD)
+   public ResponseEntity<AuthorizationDto> addAuthorization(@RequestBody AuthorizationDto dto)
+   {
+      AuthorizationDto savedAuthorization = authorizationService.create(dto);
+      return new ResponseEntity<>(savedAuthorization, HttpStatus.CREATED);
+   }
 
 
-    @PutMapping(EndPoints.UPDATE)
-    public ResponseEntity<AuthorizationDto> updateAuthorization(@RequestBody AuthorizationDto dto) {
-        AuthorizationDto savedAuthorization = authorizationService.update(dto);
-        return new ResponseEntity<>(savedAuthorization, HttpStatus.CREATED);
-    }
-    @GetMapping(EndPoints.INFO)
-    public ResponseEntity<AuthorizationDto> getAuthorization(@PathVariable Long id)
-    {
-        AuthorizationDto foundAuthorization = authorizationService.checkedFindById(id);
-        return new ResponseEntity<>(foundAuthorization, HttpStatus.CREATED);
-    }
-    @GetMapping
-    public List<AuthorizationDto> listAuthorization() {
-        return authorizationService.findAll();
-    }
+   @PutMapping(EndPoints.UPDATE)
+   public ResponseEntity<AuthorizationDto> updateAuthorization(@RequestBody AuthorizationDto dto)
+   {
+      AuthorizationDto savedAuthorization = authorizationService.update(dto);
+      return new ResponseEntity<>(savedAuthorization, HttpStatus.CREATED);
+   }
+
+   @GetMapping(EndPoints.INFO)
+   public ResponseEntity<AuthorizationDto> getAuthorization(@PathVariable Long id)
+   {
+      AuthorizationDto foundAuthorization = authorizationService.checkedFindById(id);
+      return new ResponseEntity<>(foundAuthorization, HttpStatus.CREATED);
+   }
+
+   @GetMapping
+   public List<AuthorizationDto> listAuthorization()
+   {
+      return authorizationService.findAll();
+   }
 }
