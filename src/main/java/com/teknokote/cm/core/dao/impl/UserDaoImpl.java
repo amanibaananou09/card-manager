@@ -11,6 +11,8 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+
 @Repository
 @Getter
 @Setter
@@ -20,4 +22,8 @@ public class UserDaoImpl extends JpaGenericDao<Long, UserDto, User> implements U
    private UserMapper mapper;
    @Autowired
    private UserRepository repository;
+
+   public void updateLastConnection(String userName, LocalDateTime connectionDate) {
+      getRepository().updateLastConnection(userName, connectionDate);
+   }
 }

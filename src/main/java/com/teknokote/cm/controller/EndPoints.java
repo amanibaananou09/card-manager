@@ -13,4 +13,5 @@ public class EndPoints
    public static final String ADD = "/add";
    public static final String UPDATE = "/update";
    public static final String INFO = "/info";
+   public static final String LOGIN = "/login";
 }

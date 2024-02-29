@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
+@Table(name = "cm_movement")
 public class Movement extends ESSEntity<Long, User>
 {
    @Serial
