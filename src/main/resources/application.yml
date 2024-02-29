@@ -10,11 +10,32 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: validate
   liquibase:
     database-change-log-lock-table: database_change_lock
     database-change-log-table: database_change_log
-    enabled: false
+    enabled: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8080/realms/ess-realm
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+      client:
+        registration:
+          oauth2-client-credentials:
+            client-id: ess
+            client-secret: TFjbzrlEu9qJEKLpwSxY0WVLMgzLhKrh
+            scope: openid, profile, roles
+            authorization-grant-type: password
+        provider:
+          keycloak:
+            realm: ess-realm
+            issuer-uri: http://localhost:8080/realms/ess-realm
+            token_endpoint: http://localhost:8080/realms/ess-realm/protocol/openid-connect/token
+            serverUrl: http://localhost:8080/
+            username: ali
+            password: ali
 
 logging:
   level:
@@ -23,3 +44,8 @@ logging:
     org.apache.tomcat.util.net.NioEndpoint: ERROR
     org.springframework.security.web: DEBUG
 
+jwt:
+  auth:
+    converter:
+      principle-attribute: preferred_username
+      resource-id: ess

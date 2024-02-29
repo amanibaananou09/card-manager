@@ -1,0 +1,61 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: "hichem"
+      changes:
+        - insert:
+            tableName: "cm_user"
+            columns:
+              - column:
+                  name: "id"
+                  valueSequenceNext: "cm_user_seq"
+              - column:
+                  name: "username"
+                  value: "essadmin"
+              - column:
+                  name: "date_status_change"
+                  value: "now()"
+              - column:
+                  name: "actif"
+                  valueBoolean: "true"
+              - column:
+                  name: "version"
+                  value: 0
+        - insert:
+            tableName: "cm_customer"
+            columns:
+              - column:
+                  name: "id"
+                  valueSequenceNext: "cm_customer_seq"
+              - column:
+                  name: "name"
+                  value: "Managing customer"
+              - column:
+                  name: "date_status_change"
+                  value: "2023-12-26"
+              - column:
+                  name: "created_date"
+                  value: "now()"
+              - column:
+                  name: "actif"
+                  valueBoolean: "true"
+              - column:
+                  name: "version"
+                  value: 0
+        - update:
+            tableName: "cm_user"
+            columns:
+              - column:
+                  name: "customer_id"
+                  valueSequenceCurrent: "cm_customer_seq"
+              - column:
+                  name: "last_connection_date"
+                  value: "now()"
+            where: "username='essadmin'"
+        - update:
+            tableName: "cm_customer"
+            columns:
+              - column:
+                  name: "parent_id"
+                  valueSequenceCurrent: "cm_customer_seq"
+            where: "id != currval('cm_customer_seq')"

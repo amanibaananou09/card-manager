@@ -2,6 +2,7 @@ package com.teknokote.cm.core.model;
 
 import com.teknokote.core.model.ActivatableEntity;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,6 +11,7 @@ import java.io.Serial;
 @Getter
 @Setter
 @Entity
+@Table(name = "cm_product")
 public class Product extends ActivatableEntity<Long, User>
 {
    @Serial

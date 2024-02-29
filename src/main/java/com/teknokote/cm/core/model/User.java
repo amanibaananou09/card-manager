@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serial;
+import java.time.LocalDateTime;
 
 @Builder
 @Getter
@@ -25,4 +26,5 @@ public class User extends EssUser<Long, User>
    private Customer customer;
    @Column(name = "customer_id", insertable = false, updatable = false)
    private Long customerId;
+   private LocalDateTime lastConnectionDate;
 }

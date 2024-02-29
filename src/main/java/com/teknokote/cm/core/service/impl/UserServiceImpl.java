@@ -8,6 +8,9 @@ import com.teknokote.core.service.GenericCheckedService;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @Getter
@@ -17,4 +20,9 @@ public class UserServiceImpl extends GenericCheckedService<Long, UserDto> implem
    private ESSValidator<UserDto> validator;
    @Autowired
    private UserDao dao;
+
+   @Transactional
+   public void updateLastConnection(String userName) {
+      getDao().updateLastConnection(userName, LocalDateTime.now());
+   }
 }

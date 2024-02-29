@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "cm_authorization")
+@Table(name = "cm_authorization",uniqueConstraints = @UniqueConstraint(columnNames = {"reference"}))
 public class Authorization extends ESSEntity<Long, User>
 {
    @Serial

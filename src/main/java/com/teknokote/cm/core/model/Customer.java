@@ -12,6 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
+@Table(name = "cm_customer")
 public class Customer extends ActivatableEntity<Long, User>
 {
    @Serial
