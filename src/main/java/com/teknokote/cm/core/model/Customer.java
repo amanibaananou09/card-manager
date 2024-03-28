@@ -20,11 +20,14 @@ public class Customer extends ActivatableEntity<Long, User>
    @Column(nullable = false)
    private String name;
    @ManyToOne(fetch = FetchType.LAZY)
-   private Customer parent;
-   @Column(name = "parent_id", insertable = false, updatable = false)
-   private Long parentId;
-   @OneToMany(mappedBy = "customer")
+   private Supplier supplier;
+   @Column(name = "supplier_id", insertable = false, updatable = false)
+   private Long supplierId;
+   @OneToMany
+   @JoinTable(name = "cm_customer_users", joinColumns = @JoinColumn(name = "customer_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
    private Set<User> users = new HashSet<>();
    @OneToMany(mappedBy = "customer")
    private Set<Account> accounts = new HashSet<>();
+   @OneToMany(mappedBy = "customer")
+   private Set<CardGroup> cardGroups = new HashSet<>();
 }

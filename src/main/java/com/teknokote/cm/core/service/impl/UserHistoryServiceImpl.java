@@ -2,9 +2,9 @@ package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.UserHistoryDao;
 import com.teknokote.cm.core.service.UserHistoryService;
+import com.teknokote.cm.dto.UserHistoryDto;
 import com.teknokote.core.service.ESSValidator;
 import com.teknokote.core.service.GenericCheckedService;
-import com.teknokote.cm.dto.UserHistoryDto;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

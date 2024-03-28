@@ -16,37 +16,42 @@ import java.util.List;
 @CrossOrigin("*")
 @AllArgsConstructor
 @RequestMapping(EndPoints.CARD_ROOT)
-public class CardController
-{
-   @Autowired
-   private CardService cardService;
+public class CardController {
+@Autowired
+private CardService cardService;
 
 
-   @PostMapping(EndPoints.ADD)
-   public ResponseEntity<CardDto> addCard(@RequestBody CardDto dto)
-   {
-      CardDto savedCard = cardService.create(dto);
-      return new ResponseEntity<>(savedCard, HttpStatus.CREATED);
-   }
+@PostMapping(EndPoints.ADD)
+public ResponseEntity<CardDto> addCard(@RequestBody CardDto dto) {
+    CardDto savedCard = cardService.create(dto);
+    return new ResponseEntity<>(savedCard, HttpStatus.CREATED);
+    }
 
 
-   @PutMapping(EndPoints.UPDATE)
-   public ResponseEntity<CardDto> updateCard(@RequestBody CardDto dto)
-   {
-      CardDto savedCard = cardService.update(dto);
-      return new ResponseEntity<>(savedCard, HttpStatus.CREATED);
-   }
+    @PutMapping(EndPoints.UPDATE)
+    public ResponseEntity<CardDto> updateCard(@RequestBody CardDto dto) {
+        CardDto savedCard = cardService.update(dto);
+        return new ResponseEntity<>(savedCard, HttpStatus.CREATED);
+    }
+    @GetMapping(EndPoints.INFO)
+    public ResponseEntity<CardDto> getCard(@PathVariable Long id)
+    {
+        CardDto foundCard = cardService.checkedFindById(id);
+        return new ResponseEntity<>(foundCard, HttpStatus.CREATED);
+    }
+    @GetMapping(EndPoints.LIST_BY_ACTIF)
+    public List<CardDto> listCardByActif(@PathVariable boolean actif) {
+         return cardService.findAllByActif(actif);
+    }
 
-   @GetMapping(EndPoints.INFO)
-   public ResponseEntity<CardDto> getCard(@PathVariable Long id)
-   {
-      CardDto foundCard = cardService.checkedFindById(id);
-      return new ResponseEntity<>(foundCard, HttpStatus.CREATED);
-   }
 
-   @GetMapping
-   public List<CardDto> listCard()
-   {
-      return cardService.findAll();
-   }
+    @PostMapping(EndPoints.DEACTIVATE)
+    public ResponseEntity<CardDto> deactivateCard(@PathVariable Long id) {
+        return ResponseEntity.ok(cardService.deactivate(id));
+    }
+
+    @PostMapping(EndPoints.ACTIVATE)
+    public ResponseEntity<CardDto> activateCard(@PathVariable Long id) {
+        return ResponseEntity.ok(cardService.activate(id));
+    }
 }

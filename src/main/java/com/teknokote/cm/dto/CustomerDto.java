@@ -1,22 +1,22 @@
 package com.teknokote.cm.dto;
 
-import com.teknokote.core.dto.ESSIdentifiedDto;
+import com.teknokote.core.dto.ESSActivatableDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
-public class CustomerDto extends ESSIdentifiedDto<Long>
-{
-   private String name;
-   private Long parentId;
-
-   @Builder
-   public CustomerDto(Long id, Long version, String name, Long parentId)
-   {
-      super(id, version);
-      this.name = name;
-      this.parentId = parentId;
-   }
+public class CustomerDto extends ESSActivatableDto<Long>{
+    private String name;
+    private Long supplierId;
+    @Builder
+    public CustomerDto(Long id, Long version, boolean actif, LocalDateTime dateStatusChange, String name,Long supplierId)
+    {
+        super(id,version,actif,dateStatusChange);
+        this.name = name;
+        this.supplierId = supplierId;
+    }
 }

@@ -25,8 +25,7 @@ public class Account extends ActivatableEntity<Long, User>
    private Customer customer;
    @Column(name = "customer_id", insertable = false, updatable = false)
    private Long customerId;
-   @OneToMany(mappedBy = "account")
-   private Set<Card> cards = new HashSet<>();
+
    @OneToMany(mappedBy = "account")
    private Set<Movement> movements = new HashSet<>();
 }
