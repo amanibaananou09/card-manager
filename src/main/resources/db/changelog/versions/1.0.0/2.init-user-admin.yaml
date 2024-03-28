@@ -19,17 +19,20 @@ databaseChangeLog:
                   name: "actif"
                   valueBoolean: "true"
               - column:
+                  name: "last_connection_date"
+                  value: "now()"
+              - column:
                   name: "version"
                   value: 0
         - insert:
-            tableName: "cm_customer"
+            tableName: "cm_supplier"
             columns:
               - column:
                   name: "id"
-                  valueSequenceNext: "cm_customer_seq"
+                  valueSequenceNext: "cm_supplier_seq"
               - column:
                   name: "name"
-                  value: "Managing customer"
+                  value: "Managing supplier"
               - column:
                   name: "date_status_change"
                   value: "2023-12-26"
@@ -42,20 +45,14 @@ databaseChangeLog:
               - column:
                   name: "version"
                   value: 0
-        - update:
-            tableName: "cm_user"
+        - insert:
+            tableName: "cm_supplier_users"
             columns:
               - column:
-                  name: "customer_id"
-                  valueSequenceCurrent: "cm_customer_seq"
+                  name: "supplier_id"
+                  valueSequenceCurrent: "cm_supplier_seq"
               - column:
-                  name: "last_connection_date"
-                  value: "now()"
-            where: "username='essadmin'"
-        - update:
-            tableName: "cm_customer"
-            columns:
-              - column:
-                  name: "parent_id"
-                  valueSequenceCurrent: "cm_customer_seq"
-            where: "id != currval('cm_customer_seq')"
+                  name: "user_id"
+                  valueSequenceCurrent: "cm_user_seq"
+
+
