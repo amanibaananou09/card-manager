@@ -12,8 +12,9 @@ spring:
     hibernate:
       ddl-auto: validate
   liquibase:
-    database-change-log-lock-table: database_change_lock
-    database-change-log-table: database_change_log
+    database-change-log-lock-table: cm_database_change_lock
+    database-change-log-table: cm_database_change_log
+
     enabled: true
   security:
     oauth2:

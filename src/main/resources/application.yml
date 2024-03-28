@@ -19,20 +19,20 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8080/realms/ess-realm
+          issuer-uri: http://localhost:8080/realms/ess_relam
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
       client:
         registration:
           oauth2-client-credentials:
             client-id: ess
-            client-secret: TFjbzrlEu9qJEKLpwSxY0WVLMgzLhKrh
+            client-secret: E9WU7uB5hKlHB3vXgaiqJBFyrifsIhhc
             scope: openid, profile, roles
             authorization-grant-type: password
         provider:
           keycloak:
-            realm: ess-realm
-            issuer-uri: http://localhost:8080/realms/ess-realm
-            token_endpoint: http://localhost:8080/realms/ess-realm/protocol/openid-connect/token
+            realm: ess_relam
+            issuer-uri: http://localhost:8080/realms/ess_relam
+            token_endpoint: http://localhost:8080/realms/ess_relam/protocol/openid-connect/token
             serverUrl: http://localhost:8080/
             username: ali
             password: ali
