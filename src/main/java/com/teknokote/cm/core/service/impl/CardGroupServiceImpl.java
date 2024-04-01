@@ -9,6 +9,9 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @Getter
 public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long, CardGroupDto> implements CardGroupService
@@ -17,4 +20,9 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
     private ESSValidator<CardGroupDto> validator;
     @Autowired
     private CardGroupDao dao;
+
+    @Override
+    public List<CardGroupDto> findAllByActif(boolean actif){
+        return getDao().findAllByActif(actif);
+    }
 }
