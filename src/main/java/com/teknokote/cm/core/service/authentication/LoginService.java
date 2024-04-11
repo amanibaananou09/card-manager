@@ -41,13 +41,16 @@ public class LoginService
    private String grantType;
    @Value("${spring.security.oauth2.client.provider.keycloak.token_endpoint}")
    private String tokenEndpoint;
-
-   @Autowired
-   private RestTemplate restTemplate;
    @Autowired
    private UserDao userDao;
    @Autowired
    private UserService userService;
+   private final RestTemplate restTemplate;
+
+   @Autowired
+   public LoginService(RestTemplate restTemplate) {
+      this.restTemplate = restTemplate;
+   }
 
    public LoginResponse login(LoginRequest loginrequest, boolean doCheckUser) {
       if(doCheckUser)

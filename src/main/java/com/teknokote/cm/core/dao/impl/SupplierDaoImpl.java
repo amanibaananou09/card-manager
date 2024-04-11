@@ -12,6 +12,8 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+
 @Repository
 @Getter
 @Setter
@@ -21,4 +23,10 @@ public class SupplierDaoImpl extends JpaActivatableGenericDao<Long,User ,Supplie
     private SupplierMapper mapper;
     @Autowired
     private SupplierRepository repository;
+    @Override
+    protected Supplier beforeCreate(Supplier supplier, SupplierDto dto) {
+        supplier.setActif(true);
+        supplier.setDateStatusChange(LocalDateTime.now());
+        return super.beforeCreate(supplier, dto);
+    }
 }
