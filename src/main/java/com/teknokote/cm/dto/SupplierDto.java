@@ -15,9 +15,10 @@ public class SupplierDto extends ESSActivatableDto<Long>{
     private String reference;
     private String name;
     private String address;
+    private String city;
     private String phone;
     @Builder
-    public SupplierDto(Long id, Long version, boolean actif, LocalDateTime dateStatusChange, EnumOriginModule origin, String reference, String name, String address, String phone)
+    public SupplierDto(Long id, Long version, boolean actif, LocalDateTime dateStatusChange, EnumOriginModule origin, String reference, String name, String address, String phone,String city)
     {
         super(id,version,actif,dateStatusChange);
         this.origin = origin;
@@ -25,5 +26,7 @@ public class SupplierDto extends ESSActivatableDto<Long>{
         this.name = name;
         this.address = address;
         this.phone = phone;
+        this.city=city;
     }
+
 }

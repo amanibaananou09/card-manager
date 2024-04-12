@@ -1,0 +1,11 @@
+databaseChangeLog:
+- changeSet:
+    id: 3
+    author: Amjed
+    changes:
+      - addColumn:
+          tableName: cm_supplier
+          columns:
+            - column:
+                name: city
+                type: varchar(255)
