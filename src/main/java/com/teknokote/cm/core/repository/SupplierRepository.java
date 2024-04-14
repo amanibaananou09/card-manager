@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SupplierRepository extends JpaActivatableRepository<Supplier, Long>
 {
+    Supplier findAllByReference(String reference);
 }

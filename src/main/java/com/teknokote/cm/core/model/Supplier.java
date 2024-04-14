@@ -23,14 +23,15 @@ public class Supplier extends ActivatableEntity<Long, User>
    private String name;
    private String address;
    private String phone;
+   private String city;
    @OneToMany(mappedBy = "supplier")
    private Set<Product> products = new HashSet<>();
-   @OneToMany(mappedBy = "supplier")
+   @OneToMany(mappedBy = "supplier",cascade = CascadeType.ALL)
    private Set<SalePoint> salePoints = new HashSet<>();
-   @OneToMany
+   @OneToMany(cascade = CascadeType.ALL)
    @JoinTable(name = "cm_supplier_users", joinColumns = @JoinColumn(name = "supplier_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
    private Set<User> users = new HashSet<>();
    // Les clients sont propres à ce module (CM)
-   @OneToMany(mappedBy = "supplier")
+   @OneToMany(mappedBy = "supplier",cascade = CascadeType.ALL)
    private Set<Customer> customers = new HashSet<>();
 }

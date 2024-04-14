@@ -27,6 +27,31 @@ public class SupplierDaoImpl extends JpaActivatableGenericDao<Long,User ,Supplie
     protected Supplier beforeCreate(Supplier supplier, SupplierDto dto) {
         supplier.setActif(true);
         supplier.setDateStatusChange(LocalDateTime.now());
-        return super.beforeCreate(supplier, dto);
+        Supplier savedSupplier = super.beforeCreate(supplier, dto);
+        if (!dto.getSalePoints().isEmpty()) {
+            savedSupplier.getSalePoints().forEach(salePoint -> salePoint.setSupplier(savedSupplier));
+        }
+        if (!dto.getUsers().isEmpty()) {
+            savedSupplier.getUsers().forEach(user -> user.setDateStatusChange(LocalDateTime.now()));
+        }
+
+        return savedSupplier;
+    }
+    @Override
+    protected Supplier beforeUpdate(Supplier supplier, SupplierDto dto) {
+        supplier.setDateStatusChange(LocalDateTime.now());
+        Supplier savedSupplier = super.beforeCreate(supplier, dto);
+        if (!dto.getSalePoints().isEmpty()) {
+            savedSupplier.getSalePoints().forEach(salePoint -> salePoint.setSupplier(savedSupplier));
+        }
+        if (!dto.getUsers().isEmpty()) {
+            savedSupplier.getUsers().forEach(user -> user.setDateStatusChange(LocalDateTime.now()));
+        }
+        return savedSupplier;
+    }
+
+    @Override
+    public SupplierDto findAllByReference(String reference) {
+        return getMapper().toDto(getRepository().findAllByReference(reference));
     }
 }
