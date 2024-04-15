@@ -45,4 +45,20 @@ public class CustomerDaoImpl extends JpaActivatableGenericDao<Long, User, Custom
         }
         return savedCustomer;
     }
+
+    @Override
+    protected Customer beforeUpdate(Customer customer, CustomerDto dto) {
+
+        Customer savedCustomer = super.beforeUpdate(customer, dto);
+
+        if (!dto.getAccounts().isEmpty()) {
+            savedCustomer.getAccounts().forEach(account -> {
+                        account.setCustomer(savedCustomer);
+                        account.setDateStatusChange(LocalDateTime.now());
+                        account.setActif(true);
+                    }
+            );
+        }
+        return savedCustomer;
+    }
 }
