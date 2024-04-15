@@ -17,4 +17,9 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
     private ESSValidator<SupplierDto> validator;
     @Autowired
     private SupplierDao dao;
+
+    @Override
+    public SupplierDto findByReference(String reference) {
+        return getDao().findAllByReference(reference);
+    }
 }

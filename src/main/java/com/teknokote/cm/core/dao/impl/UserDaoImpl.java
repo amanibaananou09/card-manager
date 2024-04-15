@@ -2,8 +2,10 @@ package com.teknokote.cm.core.dao.impl;
 
 import com.teknokote.cm.core.dao.UserDao;
 import com.teknokote.cm.core.dao.mappers.UserMapper;
+import com.teknokote.cm.core.model.Supplier;
 import com.teknokote.cm.core.model.User;
 import com.teknokote.cm.core.repository.UserRepository;
+import com.teknokote.cm.dto.SupplierDto;
 import com.teknokote.cm.dto.UserDto;
 import com.teknokote.core.dao.JpaGenericDao;
 import lombok.Getter;
@@ -22,6 +24,13 @@ public class UserDaoImpl extends JpaGenericDao<Long, UserDto, User> implements U
    private UserMapper mapper;
    @Autowired
    private UserRepository repository;
+
+   @Override
+   protected User beforeCreate(User user, UserDto dto) {
+      user.setActif(true);
+      user.setDateStatusChange(LocalDateTime.now());
+      return super.beforeCreate(user,dto);
+   }
 
    public void updateLastConnection(String userName, LocalDateTime connectionDate) {
       getRepository().updateLastConnection(userName, connectionDate);

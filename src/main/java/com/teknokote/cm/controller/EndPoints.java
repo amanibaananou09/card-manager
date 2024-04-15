@@ -22,6 +22,7 @@ public class EndPoints
    public static final String TRANSACTION_ROOT = "/transaction";
    public static final String USER_ROOT = "/user";
    public static final String INFO = "/{id}";
+   public static final String REFERENCE = "/{reference}";
    public static final String LOGIN = "/login";
    public static final String CARD_GROUP_ROOT = "/cardGroup";
    public static final String COUNTRY_ROOT = "/country";

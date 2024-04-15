@@ -27,7 +27,6 @@ public ResponseEntity<SupplierDto> addSupplier(@RequestBody SupplierDto dto) {
     return new ResponseEntity<>(savedSupplier, HttpStatus.CREATED);
     }
 
-
     @PutMapping(EndPoints.UPDATE)
     public ResponseEntity<SupplierDto> updateSupplier(@RequestBody SupplierDto dto) {
         SupplierDto savedSupplier = supplierService.update(dto);
@@ -37,6 +36,12 @@ public ResponseEntity<SupplierDto> addSupplier(@RequestBody SupplierDto dto) {
     public ResponseEntity<SupplierDto> getSupplier(@PathVariable Long id)
     {
         SupplierDto foundSupplier = supplierService.checkedFindById(id);
+        return new ResponseEntity<>(foundSupplier, HttpStatus.CREATED);
+    }
+    @GetMapping()
+    public ResponseEntity<SupplierDto> findSupplierWithReference(@RequestParam String reference)
+    {
+        SupplierDto foundSupplier = supplierService.findByReference(reference);
         return new ResponseEntity<>(foundSupplier, HttpStatus.CREATED);
     }
     @GetMapping(EndPoints.LIST_BY_ACTIF)
