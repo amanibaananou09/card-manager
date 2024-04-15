@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: Amani
+      changes:
+        - dropColumn:
+            tableName: cm_customer
+            columnName: name
+
+  - changeSet:
+      id: 3
+      author: Amani
+      changes:
+        - addColumn:
+            tableName: cm_customer
+            columns:
+              - column:
+                  name: identifier
+                  type: varchar(255)
+              - column:
+                  name: address
+                  type: varchar(255)
+              - column:
+                  name: phone
+                  type: varchar(20)
+              - column:
+                  name: email
+                  type: varchar(255)
+              - column:
+                  name: company_name
+                  type: varchar(255)

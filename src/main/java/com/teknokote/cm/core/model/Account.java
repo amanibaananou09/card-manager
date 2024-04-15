@@ -13,19 +13,21 @@ import java.util.Set;
 @Setter
 @Entity
 @Table(name = "cm_account")
-public class Account extends ActivatableEntity<Long, User>
-{
-   @Serial
-   private static final long serialVersionUID = -2606697440139107863L;
+public class Account extends ActivatableEntity<Long, User> {
+    @Serial
+    private static final long serialVersionUID = -2606697440139107863L;
 
-   private String code;
-   private String label;
-   private String description;
-   @ManyToOne(fetch = FetchType.LAZY)
-   private Customer customer;
-   @Column(name = "customer_id", insertable = false, updatable = false)
-   private Long customerId;
+    private String bankName;
+    private String code;
+    private String label;
+    private String description;
+    @Enumerated(EnumType.STRING)
+    private EnumAccountStatus status;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Customer customer;
+    @Column(name = "customer_id", insertable = false, updatable = false)
+    private Long customerId;
 
-   @OneToMany(mappedBy = "account")
-   private Set<Movement> movements = new HashSet<>();
+    @OneToMany(mappedBy = "account")
+    private Set<Movement> movements = new HashSet<>();
 }
