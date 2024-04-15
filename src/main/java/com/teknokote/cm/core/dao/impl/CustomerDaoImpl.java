@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 @Getter
@@ -60,5 +61,10 @@ public class CustomerDaoImpl extends JpaActivatableGenericDao<Long, User, Custom
             );
         }
         return savedCustomer;
+    }
+
+
+    public List<CustomerDto> findCustomerByIdentifier(String identifier) {
+        return getRepository().findCustomerByIdentifier(identifier).stream().map(getMapper()::toDto).toList();
     }
 }

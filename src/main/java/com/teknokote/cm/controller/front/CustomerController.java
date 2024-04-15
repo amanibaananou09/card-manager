@@ -55,4 +55,9 @@ public class CustomerController {
     public ResponseEntity<CustomerDto> activateCustomer(@PathVariable Long id) {
         return ResponseEntity.ok(customerService.activate(id));
     }
+
+    @GetMapping(EndPoints.LIST_BY_FILTER)
+    public List<CustomerDto> listCustomerByFilter(@RequestParam(required = false) String identifier) {
+        return customerService.findCustomerByFilter(identifier);
+    }
 }
