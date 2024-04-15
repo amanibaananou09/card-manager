@@ -4,7 +4,8 @@ import com.teknokote.cm.dto.CustomerDto;
 import com.teknokote.core.service.ActivatableEntityService;
 import com.teknokote.core.service.BaseService;
 
-public interface CustomerService extends ActivatableEntityService<Long, CustomerDto>, BaseService<Long, CustomerDto>
-{
+import java.util.List;
 
+public interface CustomerService extends ActivatableEntityService<Long, CustomerDto>, BaseService<Long, CustomerDto> {
+    List<CustomerDto> findCustomerByFilter(String identifier);
 }
