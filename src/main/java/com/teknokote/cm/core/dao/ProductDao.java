@@ -6,5 +6,6 @@ import com.teknokote.core.dao.BasicDao;
 
 public interface ProductDao extends BasicDao<Long, ProductDto>
 {
+    public ProductDto findProductWithName(String name,Long supplierId);
 }
 

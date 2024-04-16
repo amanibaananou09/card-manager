@@ -3,6 +3,7 @@ package com.teknokote.cm.core.dao.impl;
 import com.teknokote.cm.core.dao.SalePointDao;
 import com.teknokote.cm.core.dao.mappers.SalePointMapper;
 import com.teknokote.cm.core.model.SalePoint;
+import com.teknokote.cm.core.model.Supplier;
 import com.teknokote.cm.core.model.User;
 import com.teknokote.cm.core.repository.SalePointRepository;
 import com.teknokote.cm.dto.SalePointDto;
@@ -26,6 +27,7 @@ public class SalePointDaoImpl extends JpaGenericDao<Long,SalePointDto, SalePoint
     private SalePointRepository repository;
     @Override
     protected SalePoint beforeCreate(SalePoint salePoint, SalePointDto dto) {
+        salePoint.setSupplier(getEntityManager().getReference(Supplier.class,dto.getSupplierId()));
         return super.beforeCreate(salePoint,dto);
     }
 }
