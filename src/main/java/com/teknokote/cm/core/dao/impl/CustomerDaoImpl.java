@@ -57,6 +57,9 @@ public class CustomerDaoImpl extends JpaActivatableGenericDao<Long, User, Custom
                         account.setCustomer(savedCustomer);
                         account.setDateStatusChange(LocalDateTime.now());
                         account.setActif(true);
+                if (!account.getMovements().isEmpty()) {
+                    account.getMovements().forEach(movement -> movement.setAccount(account));
+                }
                     }
             );
         }
