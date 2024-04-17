@@ -28,6 +28,6 @@ public class Account extends ActivatableEntity<Long, User> {
     @Column(name = "customer_id", insertable = false, updatable = false)
     private Long customerId;
 
-    @OneToMany(mappedBy = "account")
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
     private Set<Movement> movements = new HashSet<>();
 }
