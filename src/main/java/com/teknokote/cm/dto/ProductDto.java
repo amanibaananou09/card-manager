@@ -12,6 +12,7 @@ public class ProductDto extends ESSIdentifiedDto<Long>
    private String code;
    private String name;
    private Long supplierId;
+   private String reference;
 
    @Builder
    public ProductDto(Long id, Long version, String code, String name, Long supplierId)

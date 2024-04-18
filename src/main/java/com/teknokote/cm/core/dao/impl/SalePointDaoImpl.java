@@ -2,6 +2,7 @@ package com.teknokote.cm.core.dao.impl;
 
 import com.teknokote.cm.core.dao.SalePointDao;
 import com.teknokote.cm.core.dao.mappers.SalePointMapper;
+import com.teknokote.cm.core.model.Country;
 import com.teknokote.cm.core.model.SalePoint;
 import com.teknokote.cm.core.model.Supplier;
 import com.teknokote.cm.core.model.User;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Repository
 @Getter
@@ -28,6 +30,9 @@ public class SalePointDaoImpl extends JpaGenericDao<Long,SalePointDto, SalePoint
     @Override
     protected SalePoint beforeCreate(SalePoint salePoint, SalePointDto dto) {
         salePoint.setSupplier(getEntityManager().getReference(Supplier.class,dto.getSupplierId()));
+        if (Objects.nonNull(dto.getCountryId())){
+            salePoint.setCountry(getEntityManager().getReference(Country.class,dto.getCountryId()));
+        }
         return super.beforeCreate(salePoint,dto);
     }
 }

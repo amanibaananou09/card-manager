@@ -1,6 +1,7 @@
 package com.teknokote.cm.controller.front;
 
 import com.teknokote.cm.controller.EndPoints;
+import com.teknokote.cm.core.service.SupplierService;
 import com.teknokote.cm.core.service.UserService;
 import com.teknokote.cm.dto.UserDto;
 import lombok.AllArgsConstructor;
@@ -20,12 +21,14 @@ public class UserController
 {
    @Autowired
    private UserService userService;
+   @Autowired
+   private SupplierService supplierService;
 
 
    @PostMapping(EndPoints.ADD)
    public ResponseEntity<UserDto> addUser(@RequestBody UserDto dto)
    {
-      UserDto savedUser = userService.create(dto);
+      UserDto savedUser = supplierService.createUser(dto);
       return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
    }
 

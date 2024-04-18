@@ -13,12 +13,14 @@ public class UserDto extends ESSIdentifiedDto<Long>
 {
    private String username;
    private LocalDateTime lastConnectionDate;
+   private String reference;
 
    @Builder
-   public UserDto(Long id, Long version, String username, LocalDateTime lastConnectionDate)
+   public UserDto(Long id, Long version, String username, LocalDateTime lastConnectionDate,String reference)
    {
       super(id, version);
       this.username = username;
       this.lastConnectionDate=lastConnectionDate;
+      this.reference=reference;
    }
 }
