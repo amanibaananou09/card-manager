@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Amani
+      changes:
+        - addColumn:
+            tableName: cm_account
+            columns:
+              - column:
+                  name: bank_name
+                  type: varchar(50)
+              - column:
+                  name: status
+                  type: varchar(255)
