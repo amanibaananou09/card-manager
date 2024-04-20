@@ -31,7 +31,7 @@ public ResponseEntity<SalePointDto> addSalePoint(@RequestBody SalePointDto dto) 
     }
     @PutMapping(EndPoints.UPDATE)
     public ResponseEntity<SalePointDto> updateSalePoint(@RequestBody SalePointDto dto) {
-        SalePointDto savedSalePoint = salePointService.update(dto);
+        SalePointDto savedSalePoint = supplierService.updateSalePoint(dto);
         return new ResponseEntity<>(savedSalePoint, HttpStatus.CREATED);
     }
     @GetMapping(EndPoints.INFO)

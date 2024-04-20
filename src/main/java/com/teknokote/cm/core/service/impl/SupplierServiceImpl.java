@@ -17,8 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @Getter
 public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, SupplierDto> implements SupplierService
@@ -75,6 +73,19 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
     }
     @Override
     @Transactional
+    public SalePointDto updateSalePoint(SalePointDto salePointDto) {
+        SupplierDto supplier = findByReference(salePointDto.getReference());
+        if (supplier!=null){
+            SalePointDto existingSalePoint = supplier.getSalePoints().stream().filter(salePointDto1 -> salePointDto1.getName().equals(salePointDto.getName())).toList().get(0);
+            if (existingSalePoint!=null){
+                salePointDto.setId(existingSalePoint.getId());
+                return salePointDao.update(salePointDto);
+            }
+        }
+        return null;
+    }
+    @Override
+    @Transactional
     public UserDto createUser(UserDto userDto) {
         SupplierDto supplier = findByReference(userDto.getReference());
         if (supplier!=null){
@@ -82,12 +93,27 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
         }
         return null;
     }
-
+    @Override
+    @Transactional
+    public UserDto updateUser(UserDto userDto) {
+        SupplierDto supplier = findByReference(userDto.getReference());
+        if (supplier!=null){
+            UserDto existingUser = supplier.getUsers().stream().filter(userDto1 -> userDto1.getUsername().equals(userDto.getUsername())).toList().get(0);
+            if (existingUser!=null){
+                userDto.setId(existingUser.getId());
+                return userDao.update(userDto);
+        }
+    }
+        return userDto;
+    }
     @Override
     @Transactional
     public ProductDto addProduct(ProductDto productDto) {
         SupplierDto supplier = findByReference(productDto.getReference());
         if (supplier!=null){
+            if(productDao.findProductWithName(productDto.getName(),supplier.getId())!=null){
+                return productDao.update(productDto);
+            }
             return productDao.create(productDto);
         }
         return null;

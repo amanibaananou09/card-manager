@@ -36,7 +36,7 @@ public class UserController
    @PutMapping(EndPoints.UPDATE)
    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto dto)
    {
-      UserDto savedUser = userService.update(dto);
+      UserDto savedUser = supplierService.updateUser(dto);
       return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
    }
 
