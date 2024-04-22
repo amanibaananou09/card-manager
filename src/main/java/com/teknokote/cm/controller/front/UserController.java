@@ -45,8 +45,8 @@ public class UserController
    }
 
    @GetMapping
-   public List<UserDto> listUser()
+   public List<UserDto> listUser(@PathVariable Long supplierId)
    {
-      return userService.findAll();
+      return userService.findBySupplier(supplierId);
    }
 }

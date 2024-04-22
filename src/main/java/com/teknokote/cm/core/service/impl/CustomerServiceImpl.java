@@ -29,4 +29,9 @@ public class CustomerServiceImpl extends ActivatableGenericCheckedService<Long, 
         }
         return customerList;
     }
+
+    @Override
+    public List<CustomerDto> findCustomerBySupplier(Long supplierId) {
+        return getDao().findCustomerBySupplier(supplierId);
+    }
 }

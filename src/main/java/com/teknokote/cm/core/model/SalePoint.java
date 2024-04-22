@@ -18,6 +18,8 @@ public class SalePoint extends ESSEntity<Long, User>
    private String name;
    private String city;
    private String area;
+   private String phone;
+   private boolean status;
    @ManyToOne
    private Country country;
    @ManyToOne(fetch = FetchType.LAZY)

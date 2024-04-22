@@ -40,11 +40,14 @@ public class CustomerController {
         return new ResponseEntity<>(foundCustomer, HttpStatus.CREATED);
     }
 
-    @GetMapping
+    @GetMapping(EndPoints.LIST_BY_ACTIF)
     public List<CustomerDto> listCustomerByActif(@RequestParam boolean actif) {
         return customerService.findAllByActif(actif);
     }
-
+    @GetMapping
+    public List<CustomerDto> listCustomerBySupplier(@PathVariable Long supplierId) {
+        return customerService.findCustomerBySupplier(supplierId);
+    }
 
     @PostMapping(EndPoints.DEACTIVATE)
     public ResponseEntity<CustomerDto> deactivateCustomer(@PathVariable Long id) {

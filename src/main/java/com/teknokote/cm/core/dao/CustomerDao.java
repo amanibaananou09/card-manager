@@ -8,5 +8,7 @@ import java.util.List;
 
 public interface CustomerDao extends ActivatableDao<Long, CustomerDto> {
     List<CustomerDto> findCustomerByIdentifier(String identifier);
+
+    List<CustomerDto> findCustomerBySupplier(Long supplierId);
 }
 

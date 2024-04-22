@@ -13,7 +13,8 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 @Getter
@@ -27,5 +28,10 @@ public class SalePointDaoImpl extends JpaGenericDao<Long,SalePointDto, SalePoint
     @Override
     protected SalePoint beforeCreate(SalePoint salePoint, SalePointDto dto) {
         return super.beforeCreate(salePoint,dto);
+    }
+
+    @Override
+    public List<SalePointDto> findBySupplier(Long supplierId) {
+        return getRepository().findAllBySupplierId(supplierId).stream().map(getMapper()::toDto).collect(Collectors.toList());
     }
 }

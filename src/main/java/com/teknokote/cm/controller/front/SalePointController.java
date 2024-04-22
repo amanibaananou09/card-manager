@@ -22,7 +22,7 @@ private SalePointService salePointService;
 
 
 @PostMapping(EndPoints.ADD)
-public ResponseEntity<SalePointDto> addSalePoint(@RequestBody SalePointDto dto) {
+public ResponseEntity<SalePointDto> addSalePoint(@PathVariable Long supplierId,@RequestBody SalePointDto dto) {
     SalePointDto savedSalePoint = salePointService.create(dto);
     return new ResponseEntity<>(savedSalePoint, HttpStatus.CREATED);
     }
@@ -40,7 +40,7 @@ public ResponseEntity<SalePointDto> addSalePoint(@RequestBody SalePointDto dto) 
         return new ResponseEntity<>(foundSalePoint, HttpStatus.CREATED);
     }
     @GetMapping
-    public List<SalePointDto> listSalePoint() {
-        return salePointService.findAll();
+    public List<SalePointDto> listSalePoint(@PathVariable Long supplierId) {
+        return salePointService.findBySupplier(supplierId);
     }
 }
