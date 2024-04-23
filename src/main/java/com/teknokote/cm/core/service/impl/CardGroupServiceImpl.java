@@ -25,4 +25,9 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
     public List<CardGroupDto> findAllByActif(boolean actif){
         return getDao().findAllByActif(actif);
     }
+
+    @Override
+    public List<CardGroupDto> findAllByCustomer(Long customerId) {
+        return getDao().findAllByCustomer(customerId);
+    }
 }

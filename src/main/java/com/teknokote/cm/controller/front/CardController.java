@@ -15,43 +15,41 @@ import java.util.List;
 @RestController
 @CrossOrigin("*")
 @AllArgsConstructor
-@RequestMapping(EndPoints.CARD_ROOT)
+@RequestMapping(EndPoints.CUSTOMER_CARD_ROOT)
 public class CardController {
 @Autowired
 private CardService cardService;
 
 
 @PostMapping(EndPoints.ADD)
-public ResponseEntity<CardDto> addCard(@RequestBody CardDto dto) {
+public ResponseEntity<CardDto> addCard(@PathVariable Long customerId,@RequestBody CardDto dto) {
     CardDto savedCard = cardService.create(dto);
     return new ResponseEntity<>(savedCard, HttpStatus.CREATED);
     }
 
-
     @PutMapping(EndPoints.UPDATE)
-    public ResponseEntity<CardDto> updateCard(@RequestBody CardDto dto) {
+    public ResponseEntity<CardDto> updateCard(@PathVariable Long customerId,@RequestBody CardDto dto) {
         CardDto savedCard = cardService.update(dto);
         return new ResponseEntity<>(savedCard, HttpStatus.CREATED);
     }
     @GetMapping(EndPoints.INFO)
-    public ResponseEntity<CardDto> getCard(@PathVariable Long id)
+    public ResponseEntity<CardDto> getCard(@PathVariable Long customerId,@PathVariable Long id)
     {
         CardDto foundCard = cardService.checkedFindById(id);
         return new ResponseEntity<>(foundCard, HttpStatus.CREATED);
     }
     @GetMapping(EndPoints.LIST_BY_ACTIF)
-    public List<CardDto> listCardByActif(@PathVariable boolean actif) {
+    public List<CardDto> listCardByActif(@PathVariable Long customerId,@PathVariable boolean actif) {
          return cardService.findAllByActif(actif);
     }
 
-
     @PostMapping(EndPoints.DEACTIVATE)
-    public ResponseEntity<CardDto> deactivateCard(@PathVariable Long id) {
+    public ResponseEntity<CardDto> deactivateCard(@PathVariable Long customerId,@PathVariable Long id) {
         return ResponseEntity.ok(cardService.deactivate(id));
     }
 
     @PostMapping(EndPoints.ACTIVATE)
-    public ResponseEntity<CardDto> activateCard(@PathVariable Long id) {
+    public ResponseEntity<CardDto> activateCard(@PathVariable Long customerId,@PathVariable Long id) {
         return ResponseEntity.ok(cardService.activate(id));
     }
 }
