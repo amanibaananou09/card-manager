@@ -23,7 +23,7 @@ public class SupplierDto extends ESSActivatableDto<Long>{
     private Set<SalePointDto> salePoints;
     private Set<UserDto> users;
     @Builder
-    public SupplierDto(Long id, Long version, boolean actif, LocalDateTime dateStatusChange, EnumOriginModule origin, String reference, String name, String address, String phone,String city,Set<SalePointDto> salePoints,Set<UserDto> users)
+    public SupplierDto(Long id, Long version, Boolean actif, LocalDateTime dateStatusChange, EnumOriginModule origin, String reference, String name, String address, String phone,String city,Set<SalePointDto> salePoints,Set<UserDto> users)
     {
         super(id,version,actif,dateStatusChange);
         this.origin = origin;

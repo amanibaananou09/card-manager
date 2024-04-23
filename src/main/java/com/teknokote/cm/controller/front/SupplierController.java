@@ -38,17 +38,16 @@ public ResponseEntity<SupplierDto> addSupplier(@RequestBody SupplierDto dto) {
         SupplierDto foundSupplier = supplierService.checkedFindById(id);
         return new ResponseEntity<>(foundSupplier, HttpStatus.CREATED);
     }
-    @GetMapping()
-    public ResponseEntity<SupplierDto> findSupplierWithReference(@RequestParam String reference)
+    @GetMapping(EndPoints.REFERENCE)
+    public ResponseEntity<SupplierDto> findSupplierWithReference(@PathVariable String reference)
     {
         SupplierDto foundSupplier = supplierService.findByReference(reference);
         return new ResponseEntity<>(foundSupplier, HttpStatus.CREATED);
     }
-    @GetMapping(EndPoints.LIST_BY_ACTIF)
-    public List<SupplierDto> listSupplierByActif(@PathVariable boolean actif) {
+    @GetMapping
+    public List<SupplierDto> listSupplierByActif(@RequestParam boolean actif) {
          return supplierService.findAllByActif(actif);
     }
-
 
     @PostMapping(EndPoints.DEACTIVATE)
     public ResponseEntity<SupplierDto> deactivateSupplier(@PathVariable Long id) {
