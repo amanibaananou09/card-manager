@@ -18,8 +18,10 @@ public class SalePoint extends ESSEntity<Long, User>
    private String name;
    private String city;
    private String area;
-   @ManyToOne
+   @ManyToOne(cascade = CascadeType.ALL)
    private Country country;
+   @Column(name = "country_id", insertable = false, updatable = false)
+   private Long countryId;
    @ManyToOne(fetch = FetchType.LAZY)
    private Supplier supplier;
    @Column(name = "supplier_id", insertable = false, updatable = false)

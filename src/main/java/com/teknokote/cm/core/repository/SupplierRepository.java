@@ -2,10 +2,18 @@ package com.teknokote.cm.core.repository;
 
 import com.teknokote.cm.core.model.Supplier;
 import com.teknokote.core.dao.JpaActivatableRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
-public interface SupplierRepository extends JpaActivatableRepository<Supplier, Long>
-{
-    Supplier findAllByReference(String reference);
+public interface SupplierRepository extends JpaActivatableRepository<Supplier, Long> {
+    @Query("select sp from Supplier sp WHERE sp.reference = :reference")
+    Supplier findAllByReference(@Param("reference") String reference);
+
+    @Query("select sp from Supplier sp WHERE sp.reference = :reference and sp.name = :name")
+    Supplier findByReferenceAndName(@Param("reference") String reference, @Param("name") String name);
 }
+

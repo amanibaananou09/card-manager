@@ -2,10 +2,8 @@ package com.teknokote.cm.core.dao.impl;
 
 import com.teknokote.cm.core.dao.UserDao;
 import com.teknokote.cm.core.dao.mappers.UserMapper;
-import com.teknokote.cm.core.model.Supplier;
 import com.teknokote.cm.core.model.User;
 import com.teknokote.cm.core.repository.UserRepository;
-import com.teknokote.cm.dto.SupplierDto;
 import com.teknokote.cm.dto.UserDto;
 import com.teknokote.core.dao.JpaGenericDao;
 import lombok.Getter;

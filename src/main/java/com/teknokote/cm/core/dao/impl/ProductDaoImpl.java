@@ -20,4 +20,9 @@ public class ProductDaoImpl extends JpaGenericDao<Long, ProductDto, Product> imp
    private ProductMapper mapper;
    @Autowired
    private ProductRepository repository;
+
+   @Override
+   public ProductDto findProductWithName(String name,Long supplierId) {
+      return getMapper().toDto(getRepository().findAllByNameAndSupplier(name,supplierId));
+   }
 }

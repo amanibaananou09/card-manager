@@ -17,4 +17,8 @@ public class ProductServiceImpl extends GenericCheckedService<Long, ProductDto> 
    private ESSValidator<ProductDto> validator;
    @Autowired
    private ProductDao dao;
+   @Override
+   public ProductDto findProductWithName(String name,Long supplierId) {
+      return getDao().findProductWithName(name,supplierId);
+   }
 }
