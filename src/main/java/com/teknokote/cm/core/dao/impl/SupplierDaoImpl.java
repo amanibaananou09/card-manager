@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Repository
 @Getter
@@ -28,10 +29,10 @@ public class SupplierDaoImpl extends JpaActivatableGenericDao<Long,User ,Supplie
         supplier.setActif(true);
         supplier.setDateStatusChange(LocalDateTime.now());
         Supplier savedSupplier = super.beforeCreate(supplier, dto);
-        if (!dto.getSalePoints().isEmpty()) {
+        if (Objects.nonNull(dto.getSalePoints())) {
             savedSupplier.getSalePoints().forEach(salePoint -> salePoint.setSupplier(savedSupplier));
         }
-        if (!dto.getUsers().isEmpty()) {
+        if (Objects.nonNull(dto.getUsers())) {
             savedSupplier.getUsers().forEach(user -> user.setDateStatusChange(LocalDateTime.now()));
         }
 
@@ -41,10 +42,10 @@ public class SupplierDaoImpl extends JpaActivatableGenericDao<Long,User ,Supplie
     protected Supplier beforeUpdate(Supplier supplier, SupplierDto dto) {
         supplier.setDateStatusChange(LocalDateTime.now());
         Supplier savedSupplier = super.beforeCreate(supplier, dto);
-        if (!dto.getSalePoints().isEmpty()) {
+        if (Objects.nonNull(dto.getSalePoints())) {
             savedSupplier.getSalePoints().forEach(salePoint -> salePoint.setSupplier(savedSupplier));
         }
-        if (!dto.getUsers().isEmpty()) {
+        if (Objects.nonNull(dto.getUsers())) {
             savedSupplier.getUsers().forEach(user -> user.setDateStatusChange(LocalDateTime.now()));
         }
         return savedSupplier;
@@ -53,5 +54,10 @@ public class SupplierDaoImpl extends JpaActivatableGenericDao<Long,User ,Supplie
     @Override
     public SupplierDto findAllByReference(String reference) {
         return getMapper().toDto(getRepository().findAllByReference(reference));
+    }
+
+    @Override
+    public SupplierDto findAllByReferenceAndName(String reference,String name) {
+        return getMapper().toDto(getRepository().findByReferenceAndName(reference,name));
     }
 }
