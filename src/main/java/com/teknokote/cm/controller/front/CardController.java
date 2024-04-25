@@ -42,6 +42,10 @@ public ResponseEntity<CardDto> addCard(@PathVariable Long customerId,@RequestBod
     public List<CardDto> listCardByActif(@PathVariable Long customerId,@PathVariable boolean actif) {
          return cardService.findAllByActif(actif);
     }
+    @GetMapping
+    public List<CardDto> listCardByCustomer(@PathVariable Long customerId) {
+        return cardService.findAllByCustomer(customerId);
+    }
 
     @PostMapping(EndPoints.DEACTIVATE)
     public ResponseEntity<CardDto> deactivateCard(@PathVariable Long customerId,@PathVariable Long id) {
