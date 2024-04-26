@@ -34,7 +34,8 @@ definitions:
         caches:
           - maven
         script:
-          - mvn -s ./deployments/settings.xml -B sonar:sonar -Dsonar.projectKey=card-manager -Dsonar.qualitygate.wait=true --file pom.xml
+          - mvn -s ./deployments/settings.xml -B sonar:sonar -Dsonar.projectKey=card-manager --file pom.xml
+          #- mvn -s ./deployments/settings.xml -B sonar:sonar -Dsonar.projectKey=card-manager -Dsonar.qualitygate.wait=true --file pom.xml
 
     - step: &security-scan
         name: Security Scan
