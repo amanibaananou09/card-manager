@@ -18,6 +18,8 @@ public class SalePoint extends ESSEntity<Long, User>
    private String name;
    private String city;
    private String area;
+   private String phone;
+   private boolean status;
    @ManyToOne(cascade = CascadeType.ALL)
    private Country country;
    @Column(name = "country_id", insertable = false, updatable = false)

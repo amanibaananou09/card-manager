@@ -5,18 +5,17 @@ import com.teknokote.cm.core.dao.mappers.SalePointMapper;
 import com.teknokote.cm.core.model.Country;
 import com.teknokote.cm.core.model.SalePoint;
 import com.teknokote.cm.core.model.Supplier;
-import com.teknokote.cm.core.model.User;
 import com.teknokote.cm.core.repository.SalePointRepository;
 import com.teknokote.cm.dto.SalePointDto;
-import com.teknokote.cm.dto.UserDto;
 import com.teknokote.core.dao.JpaGenericDao;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.List;
 
 @Repository
 @Getter
@@ -34,5 +33,10 @@ public class SalePointDaoImpl extends JpaGenericDao<Long,SalePointDto, SalePoint
             salePoint.setCountry(getEntityManager().getReference(Country.class,dto.getCountryId()));
         }
         return super.beforeCreate(salePoint,dto);
+    }
+
+    @Override
+    public List<SalePointDto> findBySupplier(Long supplierId) {
+        return getRepository().findAllBySupplierId(supplierId).stream().map(getMapper()::toDto).collect(Collectors.toList());
     }
 }

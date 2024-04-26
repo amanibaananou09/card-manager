@@ -19,6 +19,8 @@ public class LoginResponse {
     private String tokenType;
     @JsonProperty(value = "customer_account_id")
     private Long customerAccountId;
+    @JsonProperty(value = "supplier_id")
+    private Long supplierId;
 }
 
 

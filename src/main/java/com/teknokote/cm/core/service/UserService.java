@@ -4,8 +4,12 @@ import com.teknokote.cm.core.dao.UserDao;
 import com.teknokote.cm.dto.UserDto;
 import com.teknokote.core.service.BaseService;
 
+import java.util.List;
+
 public interface UserService extends BaseService<Long, UserDto>
 {
    UserDao getDao();
    void updateLastConnection(String userName);
+
+    List<UserDto> findBySupplier(Long supplierId);
 }

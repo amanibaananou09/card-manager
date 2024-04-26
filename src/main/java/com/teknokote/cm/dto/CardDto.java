@@ -15,15 +15,17 @@ public class CardDto extends ESSActivatableDto<Long>{
     private String tag;
     private EnumCardType type;
     private EnumCardStatus status;
+    private AccountDto account;
     private Long cardGroupId;
     private Long accountId;
     @Builder
-    public CardDto(Long id, Long version, boolean actif, LocalDateTime dateStatusChange, String tag, EnumCardType type, EnumCardStatus status,  Long cardGroupId, Long accountId)
+    public CardDto(Long id, Long version, boolean actif, LocalDateTime dateStatusChange, String tag, EnumCardType type, EnumCardStatus status,AccountDto account, Long cardGroupId, Long accountId)
     {
         super(id,version,actif,dateStatusChange);
         this.tag = tag;
         this.type = type;
         this.status = status;
+        this.account=account;
         this.cardGroupId = cardGroupId;
         this.accountId=accountId;
     }

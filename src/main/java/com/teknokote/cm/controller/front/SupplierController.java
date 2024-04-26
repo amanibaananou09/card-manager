@@ -23,13 +23,13 @@ private SupplierService supplierService;
 
 @PostMapping(EndPoints.ADD)
 public ResponseEntity<SupplierDto> addSupplier(@RequestBody SupplierDto dto) {
-    SupplierDto savedSupplier = supplierService.createSupplier(dto);
+    SupplierDto savedSupplier = supplierService.create(dto);
     return new ResponseEntity<>(savedSupplier, HttpStatus.CREATED);
     }
 
     @PutMapping(EndPoints.UPDATE)
     public ResponseEntity<SupplierDto> updateSupplier(@RequestBody SupplierDto dto) {
-        SupplierDto savedSupplier = supplierService.updateSupplier(dto);
+        SupplierDto savedSupplier = supplierService.update(dto);
         return new ResponseEntity<>(savedSupplier, HttpStatus.CREATED);
     }
     @GetMapping(EndPoints.INFO)

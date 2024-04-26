@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: 4
+      author: Amjed
+      changes:
+        - addColumn:
+            tableName: cm_sale_point
+            columns:
+              - column:
+                  name: phone
+                  type: varchar(255)
+              - column:
+                  name: status
+                  type: bool
+                  defaultOnNull: false
