@@ -13,11 +13,12 @@ public class SalePointDto extends ESSIdentifiedDto<Long>{
     private String area;
     private Long supplierId;
     private Long countryId;
+    private String countryName;
     private String reference;
     private String phone;
     private boolean status;
     @Builder
-    public SalePointDto(Long id, Long version,String name,String city,String area,Long supplierId,boolean status,Long countryId,String reference,String phone)
+    public SalePointDto(Long id, Long version,String name,String city,String area,Long supplierId,boolean status,Long countryId,String reference,String phone,String countryName)
     {
         super(id,version);
         this.name = name;
@@ -28,5 +29,6 @@ public class SalePointDto extends ESSIdentifiedDto<Long>{
         this.reference=reference;
         this.phone=phone;
         this.status=status;
+        this.countryName=countryName;
     }
 }
