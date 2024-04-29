@@ -70,4 +70,9 @@ public class CustomerDaoImpl extends JpaActivatableGenericDao<Long, User, Custom
     public List<CustomerDto> findCustomerByIdentifier(String identifier) {
         return getRepository().findCustomerByIdentifier(identifier).stream().map(getMapper()::toDto).toList();
     }
+
+    @Override
+    public List<CustomerDto> findCustomerBySupplier(Long supplierId) {
+        return getRepository().findAllBySupplierId(supplierId).stream().map(getMapper()::toDto).toList();
+    }
 }

@@ -5,5 +5,5 @@ import com.teknokote.core.service.BaseService;
 
 public interface ProductService extends BaseService<Long, ProductDto>
 {
-    ProductDto findProductWithName(String name,Long supplierId);
+
 }

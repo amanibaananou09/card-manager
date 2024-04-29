@@ -41,7 +41,7 @@ public ResponseEntity<SalePointDto> addSalePoint(@RequestBody SalePointDto dto) 
         return new ResponseEntity<>(foundSalePoint, HttpStatus.CREATED);
     }
     @GetMapping
-    public List<SalePointDto> listSalePoint() {
-        return salePointService.findAll();
+    public List<SalePointDto> listSalePoint(@PathVariable Long supplierId) {
+        return salePointService.findBySupplier(supplierId);
     }
 }

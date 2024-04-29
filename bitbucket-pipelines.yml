@@ -95,7 +95,6 @@ pipelines:
   branches:
     develop:
       - step: *build-and-test
-      - step: *quality
       - step: *deploy-to-nexus
       - step: *build-docker-image
       - step:

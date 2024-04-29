@@ -2,7 +2,6 @@ package com.teknokote.cm.controller.front;
 
 import com.teknokote.cm.controller.EndPoints;
 import com.teknokote.cm.core.service.ProductService;
-import com.teknokote.cm.core.service.SupplierService;
 import com.teknokote.cm.dto.ProductDto;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +20,12 @@ public class ProductController
 {
    @Autowired
    private ProductService productService;
-   @Autowired
-   private SupplierService supplierService;
 
 
    @PostMapping(EndPoints.ADD)
    public ResponseEntity<ProductDto> addProduct(@RequestBody ProductDto dto)
    {
-      ProductDto savedProduct = supplierService.addProduct(dto);
+      ProductDto savedProduct = productService.create(dto);
       return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
    }
 

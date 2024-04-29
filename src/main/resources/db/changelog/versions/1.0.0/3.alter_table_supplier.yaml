@@ -9,3 +9,13 @@ databaseChangeLog:
             - column:
                 name: city
                 type: varchar(255)
+- changeSet:
+    id: 4
+    author: Amjed
+    changes:
+      - addColumn:
+          tableName: cm_supplier
+          columns:
+            - column:
+                name: status
+                type: varchar(255)

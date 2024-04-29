@@ -2,7 +2,9 @@ package com.teknokote.cm.core.service.authentication;
 
 import com.teknokote.cm.authentification.model.LoginRequest;
 import com.teknokote.cm.authentification.model.LoginResponse;
+import com.teknokote.cm.core.dao.SupplierDao;
 import com.teknokote.cm.core.dao.UserDao;
+import com.teknokote.cm.core.model.Supplier;
 import com.teknokote.cm.core.model.User;
 import com.teknokote.cm.core.service.UserService;
 import lombok.Getter;
@@ -44,6 +46,8 @@ public class LoginService
    @Autowired
    private UserDao userDao;
    @Autowired
+   private SupplierDao supplierDao;
+   @Autowired
    private UserService userService;
    private final RestTemplate restTemplate;
 
@@ -79,6 +83,14 @@ public class LoginService
       if(response.hasBody()){
          userService.updateLastConnection(loginrequest.getUsername());
          log.info("{} -> logged in",loginrequest.getUsername());
+         final Optional<User> optionalUser = getUserDao().getRepository().findAllByUsernameIgnoreCase(loginrequest.getUsername());
+         if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            Optional<Supplier> optionalSupplier = getSupplierDao().getRepository().findSupplierByUser(user.getUsername());
+            if (optionalSupplier.isPresent()){
+               response.getBody().setSupplierId(optionalSupplier.get().getId());
+            }
+         }
       }else{
          log.info("{} -> Failed to log in, result:{}",loginrequest.getUsername(), response.getBody());
       }

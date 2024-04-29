@@ -8,6 +8,7 @@ import com.teknokote.core.service.ESSValidator;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 @Getter
@@ -17,4 +18,9 @@ public class CardServiceImpl extends ActivatableGenericCheckedService<Long, Card
     private ESSValidator<CardDto> validator;
     @Autowired
     private CardDao dao;
+
+    @Override
+    public List<CardDto> findAllByCustomer(Long customerId) {
+        return getDao().findAllByCustomer(customerId);
+    }
 }

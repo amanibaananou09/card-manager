@@ -9,6 +9,8 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Getter
 public class SalePointServiceImpl extends GenericCheckedService<Long, SalePointDto> implements SalePointService
@@ -17,4 +19,9 @@ public class SalePointServiceImpl extends GenericCheckedService<Long, SalePointD
     private ESSValidator<SalePointDto> validator;
     @Autowired
     private SalePointDao dao;
+
+    @Override
+    public List<SalePointDto> findBySupplier(Long supplierId) {
+        return getDao().findBySupplier(supplierId);
+    }
 }

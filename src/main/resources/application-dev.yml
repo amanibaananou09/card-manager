@@ -1,26 +1,29 @@
+server:
+  port: 8201
+
 spring:
   datasource:
-    url: jdbc:postgresql://postgres:8400/cardmanager
+    url: jdbc:postgresql://localhost:8400/cardmanager
     username: cardmanager
     password: cardmanager
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloack:8080/realms/ess-realm
+          issuer-uri: http://localhost:8300/realms/ess-realm
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
       client:
         registration:
           oauth2-client-credentials:
             client-id: ess
-            client-secret: S9polUdTFJvrdx56DjuyTtyLwreTqBKU
+            client-secret: x8VFOcBjbqF65sXCrjXVVjQDPI7T7B41
             scope: openid, profile, roles
             authorization-grant-type: password
         provider:
           keycloak:
             realm: ess-realm
-            issuer-uri: http://keycloack:8080/realms/ess-realm
-            token_endpoint: http://keycloack:8080/realms/ess-realm/protocol/openid-connect/token
-            serverUrl: http://keycloack:8080/
+            issuer-uri: http://localhost:8300/realms/ess-realm
+            token_endpoint: http://localhost:8300/realms/ess-realm/protocol/openid-connect/token
+            serverUrl: http://localhost:8300/
             username: ali
             password: ali
