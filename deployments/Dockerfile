@@ -4,6 +4,6 @@ COPY target/*.jar app.jar
 
 VOLUME /home/essrecette/ess/photos
 
-EXPOSE 8080-8200
+EXPOSE 8080
 
 ENTRYPOINT ["java","-jar","/app.jar"]
