@@ -1,8 +1,6 @@
 package com.teknokote.cm.core.model;
 
-import jakarta.persistence.DiscriminatorValue;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,4 +15,9 @@ public class Ceiling extends Counter
    @Serial
    private static final long serialVersionUID = 2460709192312470325L;
    private String condition;
+   @Enumerated(EnumType.STRING)
+   private EnumCeilingType ceilingType;
+   @Enumerated(EnumType.STRING)
+   private EnumCeilingLimitType limitType;
+
 }

@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: you
+      changes:
+        - addColumn:
+            tableName: cm_counter
+            columns:
+              - column:
+                  name: ceiling_type
+                  type: varchar(255)
+              - column:
+                  name: limit_type
+                  type: varchar(255)
