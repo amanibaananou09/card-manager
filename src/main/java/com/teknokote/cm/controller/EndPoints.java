@@ -29,7 +29,6 @@ public class EndPoints {
     public static final String USER_ROOT = SUPPLIER_ROOT + "/{supplierId}/user";
     public static final String CUSTOMER_ROOT = SUPPLIER_ROOT + "/{supplierId}/customer";
     public static final String LIST_PRODUCT_BY_SUPPLIER = SUPPLIER_ROOT + "/{supplierId}";
-
     public static final String BONUS_ROOT = "/bonus";
     public static final String CEILING_ROOT = "/ceiling";
     public static final String CUSTOMER_BASE_ROOT = "/customer/{customerId}";

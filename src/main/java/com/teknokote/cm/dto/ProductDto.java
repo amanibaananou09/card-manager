@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
-
 @Getter
 @Setter
 public class ProductDto extends ESSIdentifiedDto<Long> {
@@ -15,15 +13,13 @@ public class ProductDto extends ESSIdentifiedDto<Long> {
     private Double price;
     private Long supplierId;
     private String reference;
-    private LocalDateTime lastModifiedDate;
 
     @Builder
-    public ProductDto(Long id, Long version, String code, String name, Long supplierId, Double price, LocalDateTime lastModifiedDate) {
+    public ProductDto(Long id, Long version, String code, String name, Long supplierId, Double price) {
         super(id, version);
         this.code = code;
         this.name = name;
         this.price = price;
-        this.lastModifiedDate = lastModifiedDate;
         this.supplierId = supplierId;
     }
 }

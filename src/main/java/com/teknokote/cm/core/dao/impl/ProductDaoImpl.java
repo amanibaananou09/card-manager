@@ -32,13 +32,8 @@ public class ProductDaoImpl extends JpaGenericDao<Long, ProductDto, Product> imp
 
     @Override
     public List<ProductDto> findBySupplier(Long supplierId) {
-        return getRepository().findAllBySupplierId(supplierId).stream()
-                .map(product -> {
-                    ProductDto productDto = getMapper().toDto(product);
-                    productDto.setLastModifiedDate(product.getAudit().getLastModifiedDate());
-                    return productDto;
-                })
-                .collect(Collectors.toList());
+
+        return getRepository().findAllBySupplierId(supplierId).stream().map(getMapper()::toDto).collect(Collectors.toList());
     }
 
     @Override

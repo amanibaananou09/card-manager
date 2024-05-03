@@ -17,20 +17,18 @@ import java.util.List;
 @CrossOrigin("*")
 @AllArgsConstructor
 @RequestMapping(EndPoints.PRODUCT_ROOT)
-public class ProductController
-{
-   @Autowired
-   private ProductService productService;
-   @Autowired
-   private SupplierService supplierService;
+public class ProductController {
+    @Autowired
+    private ProductService productService;
+    @Autowired
+    private SupplierService supplierService;
 
 
-   @PostMapping(EndPoints.ADD)
-   public ResponseEntity<ProductDto> addProduct(@RequestBody ProductDto dto)
-   {
-      ProductDto savedProduct = supplierService.addProduct(dto);
-      return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
-   }
+    @PostMapping(EndPoints.ADD)
+    public ResponseEntity<ProductDto> addProduct(@RequestBody ProductDto dto) {
+        ProductDto savedProduct = supplierService.addProduct(dto);
+        return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
+    }
 
 
     @PutMapping(EndPoints.UPDATE)
