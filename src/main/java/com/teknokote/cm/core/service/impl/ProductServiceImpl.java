@@ -9,12 +9,19 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Getter
-public class ProductServiceImpl extends GenericCheckedService<Long, ProductDto> implements ProductService
-{
-   @Autowired
-   private ESSValidator<ProductDto> validator;
-   @Autowired
-   private ProductDao dao;
+public class ProductServiceImpl extends GenericCheckedService<Long, ProductDto> implements ProductService {
+    @Autowired
+    private ESSValidator<ProductDto> validator;
+    @Autowired
+    private ProductDao dao;
+
+    @Override
+    public List<ProductDto> findBySupplier(Long supplierId) {
+
+        return getDao().findBySupplier(supplierId);
+    }
 }

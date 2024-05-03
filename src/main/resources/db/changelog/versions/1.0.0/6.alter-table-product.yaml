@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 5
+      author: Amani
+      changes:
+        - addColumn:
+            tableName: cm_product
+            columns:
+              - column:
+                  name: price
+                  type: double
