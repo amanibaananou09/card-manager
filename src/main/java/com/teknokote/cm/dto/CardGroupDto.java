@@ -28,4 +28,11 @@ public class CardGroupDto extends ESSActivatableDto<Long>{
         this.groupCondition=groupCondition;
         this.counters=counters;
     }
+    public void createConditionFromGroupCondition() {
+        if (groupCondition != null) {
+            condition = groupCondition.generateLogicalExpression();
+        } else {
+            condition = "";
+        }
+    }
 }

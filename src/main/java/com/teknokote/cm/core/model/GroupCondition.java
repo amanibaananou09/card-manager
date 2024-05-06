@@ -1,10 +1,12 @@
 package com.teknokote.cm.core.model;
-
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Embeddable
 @Getter
@@ -22,4 +24,7 @@ public class GroupCondition {
     private LocalTime startActivityTime;
     @Column(name = "end_activity_time")
     private LocalTime endActivityTime;
+    // List to store logical operators
+    @Transient
+    private List<String> logicalOperators;
 }
