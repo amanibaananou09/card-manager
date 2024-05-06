@@ -34,7 +34,7 @@ public ResponseEntity<CardGroupDto> addCardGroup(@PathVariable Long customerId,@
         CardGroupDto savedCardGroup = cardGroupService.update(dto);
         return new ResponseEntity<>(savedCardGroup, HttpStatus.CREATED);
     }
-    @GetMapping(EndPoints.INFO)
+    @GetMapping(EndPoints.INFO_OLD)
     public ResponseEntity<CardGroupDto> getCardGroup(@PathVariable Long customerId,@PathVariable Long id)
     {
         CardGroupDto foundCardGroup = cardGroupService.checkedFindById(id);
