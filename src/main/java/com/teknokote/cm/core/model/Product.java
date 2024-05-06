@@ -11,14 +11,14 @@ import java.io.Serial;
 @Setter
 @Entity
 @Table(name = "cm_product")
-public class Product extends ESSEntity<Long, User>
-{
-   @Serial
-   private static final long serialVersionUID = -5846775621723991874L;
-   private String code;
-   private String name;
-   @ManyToOne(fetch = FetchType.LAZY)
-   private Supplier supplier;
-   @Column(name = "supplier_id", insertable = false, updatable = false)
-   private Long supplierId;
+public class Product extends ESSEntity<Long, User> {
+    @Serial
+    private static final long serialVersionUID = -5846775621723991874L;
+    private String code;
+    private String name;
+    private Double price;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Supplier supplier;
+    @Column(name = "supplier_id", insertable = false, updatable = false)
+    private Long supplierId;
 }
