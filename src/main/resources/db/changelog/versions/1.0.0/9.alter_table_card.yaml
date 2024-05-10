@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Amani
+      changes:
+        - addColumn:
+            tableName: cm_card
+            columns:
+              - column:
+                  name: company_name
+                  type: varchar(255)
+              - column:
+                  name: holder
+                  type: varchar(255)
+              - column:
+                  name: card_id
+                  type: varchar(255)
+              - column:
+                  name: code_pin
+                  type: varchar(255)
+              - column:
+                  name: expiration_date
+                  type: date
+              - column:
+                  name: holder_password
+                  type: varchar(255)
