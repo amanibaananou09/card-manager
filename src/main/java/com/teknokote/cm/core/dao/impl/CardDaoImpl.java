@@ -34,6 +34,31 @@ public class CardDaoImpl extends JpaActivatableGenericDao<Long, User, CardDto, C
     }
 
     @Override
+    public List<CardDto> findAllByActifAndCustomer(Boolean actif, Long customerId) {
+        return getRepository().findAllByActifAndCustomer(actif, customerId).stream().map(getMapper()::toDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CardDto> findCardByHolderName(String holder, Long customerId) {
+        return getRepository().findCardByHolderName(holder, customerId).stream().map(getMapper()::toDto).collect(Collectors.toList());
+
+    }
+
+    @Override
+    public List<CardDto> findCardByCardId(String cardId, Long customerId) {
+        return getRepository().findCardByCardId(cardId, customerId).stream().map(getMapper()::toDto).collect(Collectors.toList());
+
+    }
+
+    @Override
+    public List<CardDto> findCardByExpirationDate(int month, int year, Long customerId) {
+        return getRepository().findCardByMonthAndYear(month, year, customerId)
+                .stream()
+                .map(getMapper()::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     protected Card beforeCreate(Card card, CardDto dto) {
         card.setActif(true);
         card.setDateStatusChange(LocalDateTime.now());

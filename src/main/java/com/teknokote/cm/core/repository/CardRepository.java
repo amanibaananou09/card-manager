@@ -11,4 +11,19 @@ import java.util.List;
 public interface CardRepository extends JpaActivatableRepository<Card, Long> {
     @Query("select c from Card c where c.account.customerId = :customerId order by c.audit.createdDate desc")
     List<Card> findAllByCustomerId(Long customerId);
+
+    @Query("select c from Card c where c.account.customerId = :customerId and c.actif = :actif order by c.audit.createdDate desc")
+    List<Card> findAllByActifAndCustomer(Boolean actif, Long customerId);
+
+    @Query("SELECT ca FROM Card ca WHERE ca.account.customerId = :customerId " +
+            "AND EXTRACT(MONTH FROM ca.expirationDate) = :month " +
+            "AND EXTRACT(YEAR FROM ca.expirationDate) = :year " +
+            "ORDER BY ca.audit.createdDate DESC")
+    List<Card> findCardByMonthAndYear(int month, int year, Long customerId);
+
+    @Query("SELECT ca FROM Card ca WHERE ca.account.customerId= :customerId and LOWER(ca.cardId) LIKE LOWER(CONCAT('%', :cardId, '%')) order by ca.audit.createdDate desc ")
+    List<Card> findCardByCardId(String cardId, Long customerId);
+
+    @Query("SELECT ca FROM Card ca WHERE ca.account.customerId= :customerId and LOWER(ca.holder) LIKE LOWER(CONCAT('%', :holder, '%')) order by ca.audit.createdDate desc ")
+    List<Card> findCardByHolderName(String holder, Long customerId);
 }
