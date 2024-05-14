@@ -36,7 +36,7 @@ public class CardController {
         return new ResponseEntity<>(savedCard, HttpStatus.CREATED);
     }
 
-    @GetMapping(EndPoints.INFO)
+    @GetMapping(EndPoints.INFO_OLD)
     public ResponseEntity<CardDto> getCard(@PathVariable Long customerId, @PathVariable Long id) {
         CardDto foundCard = cardService.checkedFindById(id);
         return new ResponseEntity<>(foundCard, HttpStatus.CREATED);

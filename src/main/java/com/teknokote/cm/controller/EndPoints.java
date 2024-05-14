@@ -17,8 +17,8 @@ public class EndPoints {
     public static final String CARD_ROOT = "/card";
     public static final String MOVEMENT_ROOT = "/movement";
     public static final String PRODUCT_ROOT = "/product";
-    public static final String TRANSACTION_ROOT = "/transaction";
     public static final String INFO = "/{id}";
+    public static final String INFO_OLD = "/{id}/info";
     public static final String SUPPLIER_INFO = "/{id}/info";
     public static final String REFERENCE = "/reference/{reference}";
     public static final String LOGIN = "/login";
