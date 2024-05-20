@@ -16,9 +16,10 @@ public class GroupConditionDto {
     private String allowedProduct;
     private LocalTime startActivityTime;
     private LocalTime endActivityTime;
-    private List<String> logicalOperators;
+    private String logicalOperators;
+
     @Builder
-    public GroupConditionDto(String allowedDays, String allowedSalePoints,String allowedCity,String allowedProduct, LocalTime startActivityTime,LocalTime endActivityTime,List<String> logicalOperators) {
+    public GroupConditionDto(String allowedDays, String allowedSalePoints, String allowedCity, String allowedProduct, LocalTime startActivityTime, LocalTime endActivityTime, String logicalOperators) {
         this.allowedDays = allowedDays;
         this.allowedSalePoints = allowedSalePoints;
         this.allowedCity=allowedCity;
@@ -33,13 +34,17 @@ public class GroupConditionDto {
         if (logicalOperators == null || logicalOperators.isEmpty()) {
             return logicalExpression.toString();
         }
+
+        String[] operators = logicalOperators.split(",");
+
         // Append each parameter with its condition and logical operator
         if (allowedDays != null && !allowedDays.isEmpty()) {
             logicalExpression.append("allowedDays : '").append(allowedDays).append("'");
         }
-        for (int i = 0; i < logicalOperators.size(); i++) {
-            String operator = logicalOperators.get(i);
-            if (operator != null && !operator.isEmpty()) {
+
+        for (int i = 0; i < operators.length; i++) {
+            String operator = operators[i].trim();
+            if (!operator.isEmpty()) {
                 logicalExpression.append(" ").append(operator).append(" ");
             }
             switch (i) {

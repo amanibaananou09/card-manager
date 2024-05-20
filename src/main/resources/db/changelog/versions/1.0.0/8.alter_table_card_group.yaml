@@ -24,3 +24,13 @@ databaseChangeLog:
               - column:
                   name: end_activity_time
                   type: time
+  - changeSet:
+      id: 2
+      author: amjed
+      changes:
+        - addColumn:
+            tableName: cm_card_group
+            columns:
+              - column:
+                  name: logical_operators
+                  type: varchar(255)
