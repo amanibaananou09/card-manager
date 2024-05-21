@@ -29,7 +29,6 @@ public class CardGroupDaoImpl extends JpaActivatableGenericDao<Long,User ,CardGr
 
     @Override
     protected CardGroup beforeCreate(CardGroup customer, CardGroupDto dto) {
-        customer.setActif(true);
         customer.setDateStatusChange(LocalDateTime.now());
         customer.setCustomer(getEntityManager().getReference(Customer.class, dto.getCustomerId()));
         return super.beforeCreate(customer, dto);
