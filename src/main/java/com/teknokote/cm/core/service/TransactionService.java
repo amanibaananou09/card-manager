@@ -6,4 +6,5 @@ import com.teknokote.core.service.BaseService;
 public interface TransactionService extends BaseService<Long, TransactionDto>
 {
 
+    TransactionDto createTransaction(TransactionDto dto);
 }

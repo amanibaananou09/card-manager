@@ -24,4 +24,9 @@ public class ProductServiceImpl extends GenericCheckedService<Long, ProductDto> 
 
         return getDao().findBySupplier(supplierId);
     }
+
+    @Override
+    public ProductDto findBySupplierAndName(String productName,Long supplierId) {
+        return getDao().findProductWithName(productName,supplierId);
+    }
 }

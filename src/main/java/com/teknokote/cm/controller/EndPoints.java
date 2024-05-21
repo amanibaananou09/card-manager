@@ -36,6 +36,8 @@ public class EndPoints {
     public static final String CUSTOMER_CARD_GROUP_ROOT = CUSTOMER_BASE_ROOT + CARD_GROUP_ROOT;
     public static final String CUSTOMER_CARD_ROOT = CUSTOMER_BASE_ROOT + CARD_ROOT;
     public static final String CUSTOMER_ACCOUNT_ROOT = CUSTOMER_BASE_ROOT + ACCOUNT_ROOT;
+    public static final String FREE_CARD="/card/free";
+    public static final String AUTHORIZE="/authorize";
 
 }
 

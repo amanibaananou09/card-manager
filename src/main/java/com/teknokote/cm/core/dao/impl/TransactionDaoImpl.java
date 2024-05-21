@@ -2,7 +2,7 @@ package com.teknokote.cm.core.dao.impl;
 
 import com.teknokote.cm.core.dao.TransactionDao;
 import com.teknokote.cm.core.dao.mappers.TransactionMapper;
-import com.teknokote.cm.core.model.Transaction;
+import com.teknokote.cm.core.model.*;
 import com.teknokote.cm.core.repository.TransactionRepository;
 import com.teknokote.cm.dto.TransactionDto;
 import com.teknokote.core.dao.JpaGenericDao;
@@ -20,4 +20,18 @@ public class TransactionDaoImpl extends JpaGenericDao<Long, TransactionDto, Tran
    private TransactionMapper mapper;
    @Autowired
    private TransactionRepository repository;
+   @Override
+   protected Transaction beforeCreate(Transaction transaction, TransactionDto dto) {
+      transaction.setCard(getEntityManager().getReference(Card.class,dto.getCardId()));
+      transaction.setAuthorization(getEntityManager().getReference(Authorization.class, dto.getAuthorizationId()));
+      transaction.setProduct(getEntityManager().getReference(Product.class,dto.getProductId()));
+      return super.beforeCreate(transaction, dto);
+   }
+   @Override
+   protected Transaction beforeUpdate(Transaction transaction, TransactionDto dto) {
+      transaction.setCard(getEntityManager().getReference(Card.class,dto.getCardId()));
+      transaction.setAuthorization(getEntityManager().getReference(Authorization.class, dto.getAuthorizationId()));
+      transaction.setProduct(getEntityManager().getReference(Product.class,dto.getProductId()));
+      return super.beforeUpdate(transaction, dto);
+   }
 }

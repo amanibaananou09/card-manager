@@ -83,4 +83,9 @@ public class CardDaoImpl extends JpaActivatableGenericDao<Long, User, CardDto, C
         }
         return super.beforeUpdate(card, dto);
     }
+
+    @Override
+    public CardDto findByTag(String tag) {
+        return getMapper().toDto(getRepository().findByTag(tag));
+    }
 }

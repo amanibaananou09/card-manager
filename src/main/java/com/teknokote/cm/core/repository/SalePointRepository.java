@@ -10,4 +10,5 @@ import java.util.List;
 public interface SalePointRepository extends JpaRepository<SalePoint, Long>
 {
     List<SalePoint> findAllBySupplierId(Long supplierId);
+    SalePoint findByName(String name);
 }

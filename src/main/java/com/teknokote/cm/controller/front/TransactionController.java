@@ -25,7 +25,7 @@ public class TransactionController
    @PostMapping(EndPoints.ADD)
    public ResponseEntity<TransactionDto> addTransaction(@RequestBody TransactionDto dto)
    {
-      TransactionDto savedTransaction = transactionService.create(dto);
+      TransactionDto savedTransaction = transactionService.createTransaction(dto);
       return new ResponseEntity<>(savedTransaction, HttpStatus.CREATED);
    }
 

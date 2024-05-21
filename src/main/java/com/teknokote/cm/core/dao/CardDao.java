@@ -15,5 +15,7 @@ public interface CardDao extends ActivatableDao<Long, CardDto> {
     List<CardDto> findCardByCardId(String cardId, Long customerId);
 
     List<CardDto> findCardByExpirationDate(int month, int year, Long customerId);
+
+    CardDto findByTag(String tag);
 }
 

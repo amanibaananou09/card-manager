@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface ProductService extends BaseService<Long, ProductDto> {
     List<ProductDto> findBySupplier(Long supplierId);
+
+    ProductDto findBySupplierAndName(String productName,Long SupplierId);
 }

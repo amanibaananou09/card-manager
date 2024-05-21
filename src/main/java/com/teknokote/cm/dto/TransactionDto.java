@@ -17,10 +17,12 @@ public class TransactionDto extends ESSIdentifiedDto<Long>
    private BigDecimal quantity;
    private Long cardId;
    private Long authorizationId;
+   private String productName;
    private Long productId;
+   private String reference;
 
    @Builder
-   public TransactionDto(Long id, Long version, LocalDateTime dateTime, BigDecimal amount, BigDecimal quantity, Long cardId, Long authorizationId, Long productId)
+   public TransactionDto(Long id, Long version, LocalDateTime dateTime, BigDecimal amount, BigDecimal quantity, Long cardId, Long authorizationId, Long productId,String productName,String reference)
    {
       super(id, version);
       this.dateTime = dateTime;
@@ -28,6 +30,8 @@ public class TransactionDto extends ESSIdentifiedDto<Long>
       this.quantity = quantity;
       this.cardId = cardId;
       this.authorizationId = authorizationId;
+      this.productName=productName;
+      this.reference=reference;
       this.productId = productId;
    }
 }

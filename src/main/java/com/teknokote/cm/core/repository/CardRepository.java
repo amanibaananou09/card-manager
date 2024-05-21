@@ -26,4 +26,6 @@ public interface CardRepository extends JpaActivatableRepository<Card, Long> {
 
     @Query("SELECT ca FROM Card ca WHERE ca.account.customerId= :customerId and LOWER(ca.holder) LIKE LOWER(CONCAT('%', :holder, '%')) order by ca.audit.createdDate desc ")
     List<Card> findCardByHolderName(String holder, Long customerId);
+
+    Card findByTag(String tag);
 }

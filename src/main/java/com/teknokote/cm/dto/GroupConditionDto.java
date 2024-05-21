@@ -39,7 +39,7 @@ public class GroupConditionDto {
 
         // Append each parameter with its condition and logical operator
         if (allowedDays != null && !allowedDays.isEmpty()) {
-            logicalExpression.append("allowedDays : '").append(allowedDays).append("'");
+            logicalExpression.append("allowedDays == '").append(allowedDays).append("'");
         }
 
         for (int i = 0; i < operators.length; i++) {
@@ -47,30 +47,26 @@ public class GroupConditionDto {
             if (!operator.isEmpty()) {
                 logicalExpression.append(" ").append(operator).append(" ");
             }
+
             switch (i) {
                 case 0:
                     if (allowedSalePoints != null && !allowedSalePoints.isEmpty()) {
-                        logicalExpression.append("allowedSalePoints : '").append(allowedSalePoints).append("'");
+                        logicalExpression.append("allowedSalePoints == '").append(allowedSalePoints).append("'");
                     }
                     break;
                 case 1:
                     if (allowedCity != null && !allowedCity.isEmpty()) {
-                        logicalExpression.append("allowedCity : '").append(allowedCity).append("'");
+                        logicalExpression.append("allowedCity == '").append(allowedCity).append("'");
                     }
                     break;
                 case 2:
                     if (allowedProduct != null && !allowedProduct.isEmpty()) {
-                        logicalExpression.append("allowedProduct : '").append(allowedProduct).append("'");
+                        logicalExpression.append("allowedProduct == '").append(allowedProduct).append("'");
                     }
                     break;
                 case 3:
-                    if (startActivityTime != null) {
-                        logicalExpression.append("startActivityTime : '").append(startActivityTime).append("'");
-                    }
-                    break;
-                case 4:
-                    if (endActivityTime != null) {
-                        logicalExpression.append("endActivityTime : '").append(endActivityTime).append("'");
+                    if (startActivityTime != null && endActivityTime != null) {
+                        logicalExpression.append("timeSlot == '").append(startActivityTime).append(" to ").append(endActivityTime).append("'");
                     }
                     break;
             }
