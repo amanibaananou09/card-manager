@@ -34,7 +34,7 @@ public class CustomerController {
         return new ResponseEntity<>(savedCustomer, HttpStatus.CREATED);
     }
 
-    @GetMapping(EndPoints.INFO)
+    @GetMapping(EndPoints.INFO_OLD)
     public ResponseEntity<CustomerDto> getCustomer(@PathVariable Long id) {
         CustomerDto foundCustomer = customerService.checkedFindById(id);
         return new ResponseEntity<>(foundCustomer, HttpStatus.CREATED);

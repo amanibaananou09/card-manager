@@ -12,6 +12,7 @@ import java.util.List;
 public interface CustomerRepository extends JpaActivatableRepository<Customer, Long> {
     @Query("SELECT ca FROM Customer ca WHERE LOWER(ca.identifier) LIKE LOWER(CONCAT('%', :identifier, '%')) order by ca.audit.createdDate desc")
     List<Customer> findCustomerByIdentifier(String identifier);
+    @Query("select c from Customer c where c.supplaierId = :supplierId order by c.audit.createdDate desc")
 
     List<Customer> findAllBySupplierId(Long supplierId);
 }
