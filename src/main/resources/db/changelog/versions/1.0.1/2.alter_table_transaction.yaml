@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: amjed
+      changes:
+        - addColumn:
+            tableName: cm_transaction
+            columns:
+              - column:
+                  name: available_balance
+                  type: numeric(38, 2)

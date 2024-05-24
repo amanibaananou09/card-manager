@@ -23,4 +23,5 @@ public class Counter extends ESSEntity<Long, User>
    private EnumCounterType counterType;
    private String name;
    private BigDecimal value;
+   private BigDecimal dailyLimitValue;
 }

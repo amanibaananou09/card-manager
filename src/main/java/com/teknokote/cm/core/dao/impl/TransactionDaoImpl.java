@@ -11,6 +11,11 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 @Repository
 @Getter
 @Setter
@@ -33,5 +38,16 @@ public class TransactionDaoImpl extends JpaGenericDao<Long, TransactionDto, Tran
       transaction.setAuthorization(getEntityManager().getReference(Authorization.class, dto.getAuthorizationId()));
       transaction.setProduct(getEntityManager().getReference(Product.class,dto.getProductId()));
       return super.beforeUpdate(transaction, dto);
+   }
+
+   @Override
+   public Optional<TransactionDto> findLastTransactionByCardIdAndMonth(Long cardId, int month) {
+      return Optional.ofNullable(getMapper().toDto(getRepository().findLastTransactionByCardIdAndMonth(cardId,month).orElse(null)));
+
+   }
+
+   @Override
+   public List<TransactionDto> findTodayTransaction(Long cardId, LocalDateTime dateTime) {
+      return getRepository().findAllByCardIdAndDateTimeBefore(cardId,dateTime).stream().map(getMapper()::toDto).collect(Collectors.toList());
    }
 }

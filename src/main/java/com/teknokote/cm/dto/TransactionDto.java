@@ -20,9 +20,10 @@ public class TransactionDto extends ESSIdentifiedDto<Long>
    private String productName;
    private Long productId;
    private String reference;
+   private BigDecimal availableBalance;
 
    @Builder
-   public TransactionDto(Long id, Long version, LocalDateTime dateTime, BigDecimal amount, BigDecimal quantity, Long cardId, Long authorizationId, Long productId,String productName,String reference)
+   public TransactionDto(Long id, Long version, LocalDateTime dateTime, BigDecimal amount, BigDecimal quantity, Long cardId, Long authorizationId, Long productId,String productName,String reference,BigDecimal availableBalance)
    {
       super(id, version);
       this.dateTime = dateTime;
@@ -33,5 +34,6 @@ public class TransactionDto extends ESSIdentifiedDto<Long>
       this.productName=productName;
       this.reference=reference;
       this.productId = productId;
+      this.availableBalance=availableBalance;
    }
 }

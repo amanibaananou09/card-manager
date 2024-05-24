@@ -1,9 +1,7 @@
 package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.AuthorizationDao;
-import com.teknokote.cm.core.model.EnumAuthorizationStatus;
-import com.teknokote.cm.core.model.EnumCardStatus;
-import com.teknokote.cm.core.model.EnumCounterType;
+import com.teknokote.cm.core.model.*;
 import com.teknokote.cm.core.service.*;
 import com.teknokote.cm.dto.*;
 import com.teknokote.core.service.ESSValidator;
@@ -16,6 +14,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Getter
@@ -32,44 +32,36 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
    private SalePointService salePointService;
    @Autowired
    private SupplierService supplierService;
+   @Autowired
+   private TransactionService transactionService;
    private int lastReferenceNumber = 0;
    @Override
    public AuthorizationDto createAuthorization(AuthorizationRequest authorizationRequest) {
       SupplierDto supplierDto = supplierService.findByReference(authorizationRequest.getReference());
-      if (supplierDto != null) {
-         SalePointDto salePoint = supplierDto.getSalePoints().stream()
-                 .filter(salePointDto -> salePointDto.getName().equals(authorizationRequest.getSalePointName()))
-                 .findFirst().orElse(null);
-         if (salePoint != null) {
-            CardDto cardDto = cardService.findByTag(authorizationRequest.getTag());
-            if (cardDto != null) {
-               CardGroupDto cardGroupDto = cardGroupService.findById(cardDto.getCardGroupId()).orElse(null);
-               BigDecimal cardValue= cardGroupDto.getCounters().stream().filter(counterDto -> counterDto.getCounterType().equals(EnumCounterType.CEILING)).findFirst().get().getValue();
-               if (cardGroupDto != null) {
-                  String condition = cardGroupDto.getCondition();
-                  boolean isAuthorized = evaluateCondition(condition, authorizationRequest.getProductName(), authorizationRequest.getSalePointName(), LocalDate.now().getDayOfWeek().toString(), salePoint.getCity());
-                  String generatedReference = generateReference();
-                  if (isAuthorized) {
-                     AuthorizationDto authorizationDto=createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(),cardValue);
-                     cardDto.setStatus(EnumCardStatus.IN_USE);
-                     cardService.update(cardDto);
-                     return authorizationDto;
-                  } else {
-                     return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(),cardValue);
-                  }
-               }
+      SalePointDto salePoint = findSalePoint(supplierDto, authorizationRequest.getSalePointName());
+      CardDto cardDto = cardService.findByTag(authorizationRequest.getTag());
+      CardGroupDto cardGroupDto = cardGroupService.checkedFindById(cardDto.getCardGroupId());
+      BigDecimal dailyCardLimit = calculateDailyCardLimit(cardDto);
+      if (cardGroupDto != null) {
+            String condition = cardGroupDto.getCondition();
+            boolean isAuthorized = evaluateCondition(condition, authorizationRequest.getProductName(),
+                    authorizationRequest.getSalePointName(), LocalDate.now().getDayOfWeek().toString(), salePoint.getCity());
+            String generatedReference = generateReference();
+            if (isAuthorized) {
+               return authorizeIfAuthorized(cardDto, generatedReference, dailyCardLimit);
+            } else {
+               return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), dailyCardLimit);
             }
-         }
       }
       return null;
    }
-   private AuthorizationDto createAuthorizationDto(String reference, EnumAuthorizationStatus status, Long cardId,BigDecimal cardValue) {
+   private AuthorizationDto createAuthorizationDto(String reference, EnumAuthorizationStatus status, Long cardId,BigDecimal ceilingValue) {
       return create(AuthorizationDto.builder()
               .status(status)
               .reference(reference)
               .cardId(cardId)
               .dateTime(LocalDateTime.now())
-              .quantity(cardValue)
+              .quantity(ceilingValue)
               .build());
    }
    private String generateReference() {
@@ -143,5 +135,77 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
             throw new IllegalArgumentException("Unrecognized property: " + property);
       }
    }
+
+   private BigDecimal calculateDailyCardLimit(CardDto cardDto) {
+      if (cardDto != null) {
+         EnumCardType cardType = cardDto.getType();
+         CardGroupDto cardGroupDto = cardGroupService.findById(cardDto.getCardGroupId()).orElse(null);
+         if (cardGroupDto != null) {
+            return cardGroupDto.getCounters().stream()
+                    .filter(counterDto -> counterDto.getCounterType().equals(EnumCounterType.CEILING))
+                    .findFirst()
+                    .map(counterDto -> {
+                       if (cardType == EnumCardType.AMOUNT) {
+                          return counterDto.getDailyLimitValue().multiply(BigDecimal.valueOf(1000));
+                       } else {
+                          return counterDto.getDailyLimitValue();
+                       }
+                    })
+                    .orElse(BigDecimal.ZERO);
+         }
+      }
+      return null;
+   }
+   private AuthorizationDto authorizeIfAuthorized(CardDto cardDto, String generatedReference, BigDecimal dailyCardLimit) {
+      Optional<TransactionDto> lastTransaction = transactionService.findLastTransactionByCardIdAndMonth(cardDto.getId(), LocalDateTime.now().getMonthValue());
+      if (lastTransaction.isPresent()) {
+         BigDecimal availableBalance = lastTransaction.get().getAvailableBalance();
+         if (availableBalance.compareTo(BigDecimal.ZERO) > 0) {
+            return authorizeBasedOnAvailableBalance(cardDto, generatedReference, dailyCardLimit);
+         } else {
+            return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), BigDecimal.ZERO);
+         }
+      } else {
+         return authorizeBasedOnLastTransaction(cardDto, generatedReference, dailyCardLimit);
+      }
+   }
+
+   private AuthorizationDto authorizeBasedOnAvailableBalance(CardDto cardDto, String generatedReference, BigDecimal dailyCardLimit) {
+      List<TransactionDto> dailyTransaction = transactionService.findTodayTransaction(cardDto.getId(), LocalDateTime.now());
+      if (!dailyTransaction.isEmpty()) {
+         BigDecimal totalDailyAmount = calculateTotalDailyAmount(cardDto.getType(),dailyTransaction);
+         if (totalDailyAmount.compareTo(dailyCardLimit) < 0) {
+            cardDto.setStatus(EnumCardStatus.IN_USE);
+            cardService.update(cardDto);
+            return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), dailyCardLimit.subtract(totalDailyAmount));
+         } else {
+            return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), BigDecimal.ZERO);
+         }
+      } else {
+         cardDto.setStatus(EnumCardStatus.IN_USE);
+         cardService.update(cardDto);
+         return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), dailyCardLimit);
+      }
+   }
+
+   private AuthorizationDto authorizeBasedOnLastTransaction(CardDto cardDto, String generatedReference, BigDecimal dailyCardLimit) {
+      cardDto.setStatus(EnumCardStatus.IN_USE);
+      cardService.update(cardDto);
+      return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), dailyCardLimit);
+   }
+
+   private BigDecimal calculateTotalDailyAmount(EnumCardType cardType,List<TransactionDto> dailyTransaction) {
+      if (cardType.equals(EnumCardType.AMOUNT)){
+         return dailyTransaction.stream().map(TransactionDto::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+      }else{
+         return dailyTransaction.stream().map(TransactionDto::getQuantity).reduce(BigDecimal.ZERO, BigDecimal::add);
+      }
+   }
+   private SalePointDto findSalePoint(SupplierDto supplierDto, String salePointName) {
+      return supplierDto != null ? supplierDto.getSalePoints().stream()
+              .filter(salePointDto -> salePointDto.getName().equals(salePointName))
+              .findFirst().orElse(null) : null;
+   }
+
 }
 
