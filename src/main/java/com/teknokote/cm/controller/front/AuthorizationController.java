@@ -2,7 +2,9 @@ package com.teknokote.cm.controller.front;
 
 import com.teknokote.cm.controller.EndPoints;
 import com.teknokote.cm.core.service.AuthorizationService;
+import com.teknokote.cm.core.service.CardService;
 import com.teknokote.cm.dto.AuthorizationDto;
+import com.teknokote.cm.dto.AuthorizationRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +22,8 @@ public class AuthorizationController
 {
    @Autowired
    private AuthorizationService authorizationService;
+   @Autowired
+   private CardService cardService;
 
 
    @PostMapping(EndPoints.ADD)
@@ -28,7 +32,17 @@ public class AuthorizationController
       AuthorizationDto savedAuthorization = authorizationService.create(dto);
       return new ResponseEntity<>(savedAuthorization, HttpStatus.CREATED);
    }
-
+   @PostMapping(EndPoints.FREE_CARD)
+   public void freeCard(@RequestParam String authorizationReference,@RequestParam String transactionReference)
+   {
+      cardService.freeCard(authorizationReference,transactionReference);
+   }
+   @PostMapping(EndPoints.AUTHORIZE)
+   public AuthorizationDto createAuthorization(@RequestBody AuthorizationRequest authorizationRequest)
+   {
+      AuthorizationDto savedAuthorization = authorizationService.createAuthorization(authorizationRequest);
+      return savedAuthorization;
+   }
 
    @PutMapping(EndPoints.UPDATE)
    public ResponseEntity<AuthorizationDto> updateAuthorization(@RequestBody AuthorizationDto dto)

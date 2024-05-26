@@ -28,10 +28,16 @@ public class CardGroupDaoImpl extends JpaActivatableGenericDao<Long,User ,CardGr
     private CardGroupRepository repository;
 
     @Override
-    protected CardGroup beforeCreate(CardGroup customer, CardGroupDto dto) {
-        customer.setDateStatusChange(LocalDateTime.now());
-        customer.setCustomer(getEntityManager().getReference(Customer.class, dto.getCustomerId()));
-        return super.beforeCreate(customer, dto);
+    protected CardGroup beforeCreate(CardGroup cardGroup, CardGroupDto dto) {
+        cardGroup.setDateStatusChange(LocalDateTime.now());
+        cardGroup.setCustomer(getEntityManager().getReference(Customer.class, dto.getCustomerId()));
+        return super.beforeCreate(cardGroup, dto);
+    }
+    @Override
+    protected CardGroup beforeUpdate(CardGroup cardGroup, CardGroupDto dto) {
+        cardGroup.setDateStatusChange(LocalDateTime.now());
+        cardGroup.setCustomer(getEntityManager().getReference(Customer.class, dto.getCustomerId()));
+        return super.beforeUpdate(cardGroup, dto);
     }
    @Override
    public List<CardGroupDto> findAllByActif(boolean actif){

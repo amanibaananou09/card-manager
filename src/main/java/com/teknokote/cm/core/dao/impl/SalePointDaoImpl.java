@@ -39,4 +39,9 @@ public class SalePointDaoImpl extends JpaGenericDao<Long,SalePointDto, SalePoint
     public List<SalePointDto> findBySupplier(Long supplierId) {
         return getRepository().findAllBySupplierId(supplierId).stream().map(getMapper()::toDto).collect(Collectors.toList());
     }
+
+    @Override
+    public SalePointDto findByName(String name) {
+        return getMapper().toDto(getRepository().findByName(name));
+    }
 }

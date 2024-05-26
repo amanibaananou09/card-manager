@@ -21,6 +21,8 @@ public class Authorization extends ESSEntity<Long, User>
    private LocalDateTime dateTime;
    private BigDecimal amount;
    private BigDecimal quantity;
+   @Enumerated(EnumType.STRING)
+   EnumAuthorizationStatus status;
    @ManyToOne(fetch = FetchType.LAZY)
    private Card card;
    @Column(name = "card_id", insertable = false, updatable = false)

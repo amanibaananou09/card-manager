@@ -1,0 +1,36 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: you
+      changes:
+        - addColumn:
+            tableName: cm_card_group
+            columns:
+              - column:
+                  name: allowed_days
+                  type: varchar(255)
+              - column:
+                  name: allowed_sale_points
+                  type: varchar(255)
+              - column:
+                  name: allowed_city
+                  type: varchar(255)
+              - column:
+                  name: allowed_product
+                  type: varchar(255)
+              - column:
+                  name: start_activity_time
+                  type: time
+              - column:
+                  name: end_activity_time
+                  type: time
+  - changeSet:
+      id: 2
+      author: amjed
+      changes:
+        - addColumn:
+            tableName: cm_card_group
+            columns:
+              - column:
+                  name: logical_operators
+                  type: varchar(255)

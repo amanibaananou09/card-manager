@@ -19,7 +19,9 @@ public class CardGroup extends ActivatableEntity<Long, User>
    private static final long serialVersionUID = 4192549111488448731L;
    private String name;
    private String condition;
-   @OneToMany
+   @Embedded
+   private GroupCondition groupCondition;
+   @OneToMany(cascade = CascadeType.ALL)
    private Set<Counter> counters=new HashSet<>();
    @ManyToOne(fetch = FetchType.LAZY)
    private Customer customer;

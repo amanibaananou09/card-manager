@@ -9,5 +9,7 @@ import java.util.List;
 public interface SalePointDao extends BasicDao<Long, SalePointDto>
 {
     List<SalePointDto> findBySupplier(Long supplierId);
+
+    SalePointDto findByName(String name);
 }
 

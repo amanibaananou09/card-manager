@@ -32,4 +32,5 @@ public class Transaction extends ESSEntity<Long, User>
    private Product product;
    @Column(name = "product_id", insertable = false, updatable = false)
    private Long productId;
+   private BigDecimal availableBalance;
 }

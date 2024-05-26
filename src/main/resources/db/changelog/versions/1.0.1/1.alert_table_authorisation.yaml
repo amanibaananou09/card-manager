@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2
+      author: amjed
+      changes:
+        - addColumn:
+            tableName: cm_authorization
+            columns:
+              - column:
+                  name: status
+                  type: varchar(255)

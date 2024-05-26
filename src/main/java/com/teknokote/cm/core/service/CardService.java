@@ -11,4 +11,7 @@ public interface CardService extends ActivatableEntityService<Long, CardDto>, Ba
     List<CardDto> findAllByCustomer(Long customerId);
 
     List<CardDto> findCardByFilter(Long customerId, String holder, String cardId, LocalDate expirationDate, Boolean actif);
+
+    CardDto findByTag(String tag);
+    void freeCard(String authorizationReference, String transactionReference);
 }
