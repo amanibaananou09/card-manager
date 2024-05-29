@@ -43,4 +43,10 @@ public class CardGroupDto extends ESSActivatableDto<Long> {
         }
         return null;
     }
+    public List<String> createListOperatorFromString() {
+        if (groupCondition != null) {
+            return groupCondition.createListOperatorFromString(groupCondition.getLogicalOperators());
+        }
+        return null;
+    }
 }

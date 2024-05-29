@@ -18,15 +18,21 @@ public class GroupConditionDto {
     private String timeSlot;
     private List<TimeSlotDto> timeSlots;
     private String logicalOperators;
+    private List<String> operators;
 
     @Builder
-    public GroupConditionDto(String allowedDays, String allowedSalePoints, String allowedCity, String allowedProduct, String logicalOperators,String timeSlot,List<TimeSlotDto> timeSlots) {
+    public GroupConditionDto(String allowedDays, String allowedSalePoints, String allowedCity, String allowedProduct, String logicalOperators, String timeSlot, List<TimeSlotDto> timeSlots,List<String> operators) {
         this.allowedDays = allowedDays;
         this.allowedSalePoints = allowedSalePoints;
-        this.allowedCity=allowedCity;
-        this.allowedProduct=allowedProduct;
-        this.timeSlots=timeSlots;
-        this.logicalOperators=logicalOperators;
+        this.allowedCity = allowedCity;
+        this.allowedProduct = allowedProduct;
+        this.timeSlots = timeSlots;
+        this.operators=operators;
+        if (operators!=null && !operators.isEmpty()){
+            this.logicalOperators=createLogicalOperatorsString(operators);
+        }else {
+            this.logicalOperators=logicalOperators;
+        }
         // Construct timeSlot string from timeSlots list
         if (timeSlots != null && !timeSlots.isEmpty()) {
             StringBuilder timeSlotBuilder = new StringBuilder();
@@ -38,11 +44,12 @@ public class GroupConditionDto {
                     timeSlotBuilder.append(" or ");
                 }
             }
-            this.timeSlot=timeSlotBuilder.toString();
-        }else {
-            this.timeSlot=timeSlot;
+            this.timeSlot = timeSlotBuilder.toString();
+        } else {
+            this.timeSlot = timeSlot;
         }
     }
+
     public String generateLogicalExpression() {
         StringBuilder logicalExpression = new StringBuilder();
 
@@ -88,6 +95,7 @@ public class GroupConditionDto {
         }
         return logicalExpression.toString();
     }
+
     public List<TimeSlotDto> createListTimeSlotsFromString(String timeSlotString) {
         List<TimeSlotDto> timeSlotList = new ArrayList<>();
         String[] timeSlotRanges = timeSlotString.split(" or ");
@@ -104,4 +112,25 @@ public class GroupConditionDto {
         }
         return timeSlotList;
     }
+
+    public List<String> createListOperatorFromString(String logicalOperators) {
+        List<String> operatorList = new ArrayList<>();
+        if (logicalOperators != null && !logicalOperators.isEmpty()) {
+            String[] operators = logicalOperators.split(",");
+            for (String operator : operators) {
+                String trimmedOperator = operator.trim();
+                if (!trimmedOperator.isEmpty()) {
+                    operatorList.add(trimmedOperator);
+                }
+            }
+        }
+        return operatorList;
+    }
+    private String createLogicalOperatorsString(List<String> operatorList) {
+        if (operatorList == null || operatorList.isEmpty()) {
+            return null;
+        }
+        return String.join(", ", operatorList);
+    }
+
 }

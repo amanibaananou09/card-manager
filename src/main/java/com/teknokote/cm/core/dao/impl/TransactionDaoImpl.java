@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -29,7 +30,9 @@ public class TransactionDaoImpl extends JpaGenericDao<Long, TransactionDto, Tran
    protected Transaction beforeCreate(Transaction transaction, TransactionDto dto) {
       transaction.setCard(getEntityManager().getReference(Card.class,dto.getCardId()));
       transaction.setAuthorization(getEntityManager().getReference(Authorization.class, dto.getAuthorizationId()));
-      transaction.setProduct(getEntityManager().getReference(Product.class,dto.getProductId()));
+      if (Objects.nonNull(dto.getProductId())){
+         transaction.setProduct(getEntityManager().getReference(Product.class,dto.getProductId()));
+      }
       return super.beforeCreate(transaction, dto);
    }
    @Override

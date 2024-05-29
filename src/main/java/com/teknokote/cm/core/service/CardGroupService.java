@@ -12,4 +12,5 @@ public interface CardGroupService extends ActivatableEntityService<Long, CardGro
 
     List<CardGroupDto> findAllByCustomer(Long customerId);
     CardGroupDto cardGroupInformation(Long id);
+    CardGroupDto updateCardGroup(CardGroupDto dto);
 }
