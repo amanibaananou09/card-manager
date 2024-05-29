@@ -3,9 +3,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalTime;
-import java.util.List;
-
 @Embeddable
 @Getter
 @Setter
@@ -18,9 +15,7 @@ public class GroupCondition {
     private String allowedCity;
     @Column(name = "allowed_product")
     private String allowedProduct;
-    @Column(name = "start_activity_time")
-    private LocalTime startActivityTime;
-    @Column(name = "end_activity_time")
-    private LocalTime endActivityTime;
+    @Column(name = "time_slot")
+    private String timeSlot;
     private String logicalOperators;
 }

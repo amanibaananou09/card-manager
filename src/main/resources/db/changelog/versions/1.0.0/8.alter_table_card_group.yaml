@@ -19,11 +19,8 @@ databaseChangeLog:
                   name: allowed_product
                   type: varchar(255)
               - column:
-                  name: start_activity_time
-                  type: time
-              - column:
-                  name: end_activity_time
-                  type: time
+                  name: time_slot
+                  type: varchar(255)
   - changeSet:
       id: 2
       author: amjed

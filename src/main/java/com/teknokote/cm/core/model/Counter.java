@@ -6,20 +6,17 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serial;
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Getter
 @Setter
-@Entity
-@Table(name = "cm_counter")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "counter_type", discriminatorType = DiscriminatorType.STRING)
-public class Counter extends ESSEntity<Long, User>
+@MappedSuperclass
+public abstract class Counter  extends ESSEntity<Long, User> implements Serializable
 {
    @Serial
    private static final long serialVersionUID = -8693534709306863581L;
    @Enumerated(EnumType.STRING)
-   @Column(insertable=false, updatable=false,name = "counter_type")
    private EnumCounterType counterType;
    private String name;
    private BigDecimal value;

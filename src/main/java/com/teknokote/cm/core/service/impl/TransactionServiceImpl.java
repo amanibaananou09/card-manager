@@ -1,7 +1,6 @@
 package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.TransactionDao;
-import com.teknokote.cm.core.model.EnumCounterType;
 import com.teknokote.cm.core.service.*;
 import com.teknokote.cm.dto.*;
 import com.teknokote.core.service.ESSValidator;
@@ -43,7 +42,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
       }
       CardDto card = cardService.checkedFindById(dto.getCardId());
       CardGroupDto cardGroupDto= cardGroupService.checkedFindById(card.getCardGroupId());
-      BigDecimal ceilingValue = cardGroupDto.getCounters().stream().filter(counterDto -> counterDto.getCounterType().equals(EnumCounterType.CEILING)).findFirst().get().getValue();
+      BigDecimal ceilingValue = cardGroupDto.getCeilings().stream().findFirst().get().getValue();
       BigDecimal availableBalance = calculateAvailableBalance(dto,dto.getCardId(),ceilingValue);
       dto.setAvailableBalance(availableBalance);
       return create(dto);

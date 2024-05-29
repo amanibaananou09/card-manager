@@ -22,7 +22,11 @@ public class CardGroup extends ActivatableEntity<Long, User>
    @Embedded
    private GroupCondition groupCondition;
    @OneToMany(cascade = CascadeType.ALL)
-   private Set<Counter> counters=new HashSet<>();
+   @JoinTable(name = "cm_card_group_ceilings", joinColumns = @JoinColumn(name = "card_group_id"), inverseJoinColumns = @JoinColumn(name = "ceiling_id"))
+   private Set<Ceiling> ceilings=new HashSet<>();
+   @OneToMany(cascade = CascadeType.ALL)
+   @JoinTable(name = "cm_card_group_bonuses", joinColumns = @JoinColumn(name = "card_group_id"), inverseJoinColumns = @JoinColumn(name = "bonus_id"))
+   private Set<Bonus> bonuses=new HashSet<>();
    @ManyToOne(fetch = FetchType.LAZY)
    private Customer customer;
    @Column(name = "customer_id", insertable = false, updatable = false)

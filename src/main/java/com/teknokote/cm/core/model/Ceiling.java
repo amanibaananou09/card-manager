@@ -9,6 +9,7 @@ import java.io.Serial;
 @Getter
 @Setter
 @Entity
+@Table(name = "cm_ceiling")
 @DiscriminatorValue(value = EnumCounterType.CounterType.CEILING)
 public class Ceiling extends Counter
 {
@@ -19,5 +20,4 @@ public class Ceiling extends Counter
    private EnumCeilingType ceilingType;
    @Enumerated(EnumType.STRING)
    private EnumCeilingLimitType limitType;
-
 }

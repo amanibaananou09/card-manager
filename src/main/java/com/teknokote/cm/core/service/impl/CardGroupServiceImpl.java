@@ -30,4 +30,11 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
     public List<CardGroupDto> findAllByCustomer(Long customerId) {
         return getDao().findAllByCustomer(customerId);
     }
+
+    @Override
+    public CardGroupDto cardGroupInformation(Long cardGroupId) {
+        CardGroupDto dto = checkedFindById(cardGroupId);
+        dto.getGroupCondition().setTimeSlots(dto.createListTimeSlotsFromString());
+        return dto;
+    }
 }

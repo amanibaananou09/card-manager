@@ -41,27 +41,52 @@ CREATE TABLE public.cm_user (
 );
 
 
--- public.cm_counter definition
+
+
+-- public.cm_ceiling definition
 
 -- Drop table
 
--- DROP TABLE public.cm_counter;
+-- DROP TABLE public.cm_ceiling;
 
-CREATE TABLE public.cm_counter (
-                                   value numeric(38, 2) NULL,
+CREATE TABLE public.cm_ceiling (
+                                   id int8 NOT NULL,
                                    created_by_id int8 NULL,
                                    created_date timestamp(6) NULL,
-                                   id int8 NOT NULL,
                                    last_modified_by_id int8 NULL,
                                    last_modified_date timestamp(6) NULL,
                                    "version" int8 NULL,
                                    counter_type varchar(31) NOT NULL,
-                                   "condition" varchar(255) NULL,
                                    "name" varchar(255) NULL,
-                                   CONSTRAINT cm_counter_pkey PRIMARY KEY (id),
-                                   CONSTRAINT fkd8fgsriuvus4giuokc0mlkccv FOREIGN KEY (last_modified_by_id) REFERENCES public.cm_user(id),
-                                   CONSTRAINT fkd8hgq8r1nqnngxqox4h9vyn38 FOREIGN KEY (created_by_id) REFERENCES public.cm_user(id)
+                                   value numeric(38, 2) NULL,
+                                   daily_limit_value numeric(38, 2) NULL,
+                                   condition varchar(255) NULL,
+                                   ceiling_type varchar(255) NULL,
+                                   limit_type varchar(255) NULL,
+                                   CONSTRAINT cm_ceiling_pkey PRIMARY KEY (id),
+                                   CONSTRAINT fk_ceiling_last_modified_by_id FOREIGN KEY (last_modified_by_id) REFERENCES public.cm_user(id),
+                                   CONSTRAINT fk_ceiling_created_by_id FOREIGN KEY (created_by_id) REFERENCES public.cm_user(id)
 );
+
+
+
+
+CREATE TABLE public.cm_bonus (
+                                   id int8 NOT NULL,
+                                   created_by_id int8 NULL,
+                                   created_date timestamp(6) NULL,
+                                   last_modified_by_id int8 NULL,
+                                   last_modified_date timestamp(6) NULL,
+                                   "version" int8 NULL,
+                                   counter_type varchar(31) NOT NULL,
+                                   "name" varchar(255) NULL,
+                                   value numeric(38, 2) NULL,
+                                   daily_limit_value numeric(38, 2) NULL,
+                                   CONSTRAINT cm_bonus_pkey PRIMARY KEY (id),
+                                   CONSTRAINT fk_bonus_created_by FOREIGN KEY (created_by_id) REFERENCES public.cm_user(id),
+                                   CONSTRAINT fk_bonus_last_modified_by FOREIGN KEY (last_modified_by_id) REFERENCES public.cm_user(id)
+);
+
 
 
 -- public.cm_country definition
@@ -268,19 +293,23 @@ CREATE TABLE public.cm_card_group (
 );
 
 
--- public.cm_card_group_counters definition
-
--- Drop table
-
--- DROP TABLE public.cm_card_group_counters;
-
-CREATE TABLE public.cm_card_group_counters (
+CREATE TABLE public.cm_card_group_ceilings (
                                                card_group_id int8 NOT NULL,
-                                               counters_id int8 NOT NULL,
-                                               CONSTRAINT cm_card_group_counters_counters_id_key UNIQUE (counters_id),
-                                               CONSTRAINT cm_card_group_counters_pkey PRIMARY KEY (card_group_id, counters_id),
-                                               CONSTRAINT fk2kl4atkrcvmjft447s5v5bdw2 FOREIGN KEY (counters_id) REFERENCES public.cm_counter(id),
-                                               CONSTRAINT fk2lgbyn3oamgbmh58iu7qrishn FOREIGN KEY (card_group_id) REFERENCES public.cm_card_group(id)
+                                               ceiling_id int8 NOT NULL,
+                                               CONSTRAINT cm_card_group_ceilings_id_key UNIQUE (ceiling_id),
+                                               CONSTRAINT cm_card_group_ceilings_pkey PRIMARY KEY (card_group_id, ceiling_id),
+                                               CONSTRAINT fk_card_group_ceilings_ceiling_id FOREIGN KEY (ceiling_id) REFERENCES public.cm_ceiling(id),
+                                               CONSTRAINT fk_card_group_ceilings_card_group_id FOREIGN KEY (card_group_id) REFERENCES public.cm_card_group(id)
+);
+
+
+CREATE TABLE public.cm_card_group_bonuses (
+                                              card_group_id int8 NOT NULL,
+                                              bonus_id int8 NOT NULL,
+                                              CONSTRAINT cm_card_group_bonuses_id_key UNIQUE (bonus_id),
+                                              CONSTRAINT cm_card_group_bonuses_pkey PRIMARY KEY (card_group_id, bonus_id),
+                                              CONSTRAINT fk_card_group_bonuses_bonus_id FOREIGN KEY (bonus_id) REFERENCES public.cm_bonus(id),
+                                              CONSTRAINT fk_card_group_bonuses_card_group_id FOREIGN KEY (card_group_id) REFERENCES public.cm_card_group(id)
 );
 
 
@@ -392,6 +421,32 @@ CREATE TABLE public.cm_transaction (
                                        CONSTRAINT fksbtb2s0bls33759wyqw5d5oc5 FOREIGN KEY (created_by_id) REFERENCES public.cm_user(id)
 );
 
+
+-- public.cm_ceiling_seq definition
+
+-- DROP SEQUENCE public.cm_ceiling_seq;
+
+CREATE SEQUENCE public.cm_ceiling_seq
+    INCREMENT BY 50
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    START 1
+	CACHE 1
+	NO CYCLE;
+
+
+-- public.cm_bonus_seq definition
+
+-- DROP SEQUENCE public.cm_bonus_seq;
+
+CREATE SEQUENCE public.cm_bonus_seq
+    INCREMENT BY 50
+    MINVALUE 1
+    MAXVALUE 9223372036854775807
+    START 1
+	CACHE 1
+	NO CYCLE;
+
 -- public.cm_account_seq definition
 
 -- DROP SEQUENCE public.cm_account_seq;
@@ -444,17 +499,6 @@ CREATE SEQUENCE public.cm_card_seq
 	NO CYCLE;
 
 
--- public.cm_counter_seq definition
-
--- DROP SEQUENCE public.cm_counter_seq;
-
-CREATE SEQUENCE public.cm_counter_seq
-    INCREMENT BY 50
-    MINVALUE 1
-    MAXVALUE 9223372036854775807
-    START 1
-	CACHE 1
-	NO CYCLE;
 
 
 -- public.cm_country_seq definition
