@@ -11,7 +11,6 @@ import java.io.Serial;
 @Getter
 @Setter
 @Entity
-@Table(name = "cm_bonus")
 @DiscriminatorValue(value = EnumCounterType.CounterType.BONUS)
 public class Bonus extends Counter
 {

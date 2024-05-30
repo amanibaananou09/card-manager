@@ -46,8 +46,9 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
     @Override
     public CardGroupDto updateCardGroup(CardGroupDto dto) {
         CardGroupDto cardGroupDto = checkedFindById(dto.getId());
+        dto.createConditionFromGroupCondition();
         List<TimeSlotDto> timeSlots = dto.getGroupCondition().getTimeSlots();
-        if (!timeSlots.isEmpty()){
+        if (timeSlots!=null && !timeSlots.isEmpty()){
             timeSlotsOverlap(timeSlots);
         }
         return update(dto);

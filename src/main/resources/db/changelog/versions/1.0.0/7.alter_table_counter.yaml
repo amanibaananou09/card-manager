@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: you
+      changes:
+        - addColumn:
+            tableName: cm_counter
+            columns:
+              - column:
+                  name: ceiling_type
+                  type: varchar(255)
+              - column:
+                  name: limit_type
+                  type: varchar(255)
+  - changeSet:
+      id: 2
+      author: amjed
+      changes:
+        - addColumn:
+            tableName: cm_counter
+            columns:
+              - column:
+                  name: daily_limit_value
+                  type: numeric(38, 2)

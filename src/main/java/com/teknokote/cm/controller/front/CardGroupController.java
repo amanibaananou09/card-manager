@@ -30,7 +30,6 @@ public ResponseEntity<CardGroupDto> addCardGroup(@PathVariable Long customerId,@
 
     @PutMapping(EndPoints.UPDATE)
     public ResponseEntity<CardGroupDto> updateCardGroup(@PathVariable Long customerId,@RequestBody CardGroupDto dto) {
-        dto.createConditionFromGroupCondition();
         CardGroupDto savedCardGroup = cardGroupService.updateCardGroup(dto);
         return new ResponseEntity<>(savedCardGroup, HttpStatus.CREATED);
     }

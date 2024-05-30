@@ -9,7 +9,6 @@ import java.io.Serial;
 @Getter
 @Setter
 @Entity
-@Table(name = "cm_ceiling")
 @DiscriminatorValue(value = EnumCounterType.CounterType.CEILING)
 public class Ceiling extends Counter
 {
