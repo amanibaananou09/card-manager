@@ -276,10 +276,10 @@ CREATE TABLE public.cm_card_group (
 
 CREATE TABLE public.cm_card_group_counters (
                                                card_group_id int8 NOT NULL,
-                                               counters_id int8 NOT NULL,
-                                               CONSTRAINT cm_card_group_counters_counters_id_key UNIQUE (counters_id),
-                                               CONSTRAINT cm_card_group_counters_pkey PRIMARY KEY (card_group_id, counters_id),
-                                               CONSTRAINT fk2kl4atkrcvmjft447s5v5bdw2 FOREIGN KEY (counters_id) REFERENCES public.cm_counter(id),
+                                               counter_id int8 NOT NULL,
+                                               CONSTRAINT cm_card_group_counters_counters_id_key UNIQUE (counter_id),
+                                               CONSTRAINT cm_card_group_counters_pkey PRIMARY KEY (card_group_id, counter_id),
+                                               CONSTRAINT fk2kl4atkrcvmjft447s5v5bdw2 FOREIGN KEY (counter_id) REFERENCES public.cm_counter(id),
                                                CONSTRAINT fk2lgbyn3oamgbmh58iu7qrishn FOREIGN KEY (card_group_id) REFERENCES public.cm_card_group(id)
 );
 

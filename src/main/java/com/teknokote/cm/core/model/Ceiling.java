@@ -19,5 +19,4 @@ public class Ceiling extends Counter
    private EnumCeilingType ceilingType;
    @Enumerated(EnumType.STRING)
    private EnumCeilingLimitType limitType;
-
 }

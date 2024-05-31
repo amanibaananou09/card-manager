@@ -40,9 +40,10 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
       SupplierDto supplierDto = supplierService.findByReference(authorizationRequest.getReference());
       SalePointDto salePoint = findSalePoint(supplierDto, authorizationRequest.getSalePointName());
       CardDto cardDto = cardService.findByTag(authorizationRequest.getTag());
-      CardGroupDto cardGroupDto = cardGroupService.checkedFindById(cardDto.getCardGroupId());
-      BigDecimal dailyCardLimit = calculateDailyCardLimit(cardDto);
-      if (cardGroupDto != null) {
+      if (cardDto!=null) {
+         CardGroupDto cardGroupDto = cardGroupService.checkedFindById(cardDto.getCardGroupId());
+         BigDecimal dailyCardLimit = calculateDailyCardLimit(cardDto);
+         if (cardGroupDto != null) {
             String condition = cardGroupDto.getCondition();
             boolean isAuthorized = evaluateCondition(condition, authorizationRequest.getProductName(),
                     authorizationRequest.getSalePointName(), LocalDate.now().getDayOfWeek().toString(), salePoint.getCity());
@@ -52,6 +53,7 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
             } else {
                return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), dailyCardLimit);
             }
+         }
       }
       return null;
    }
@@ -111,44 +113,63 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
       }
       String property = parts[0].trim();
       String value = parts[1].trim().replaceAll("'", "");
-
+      boolean negate = value.contains("not");
+      boolean result ;
       switch (property) {
          case "allowedDays":
-            return value.contains(day);
+            result = value.contains(day);
+            break;
          case "allowedSalePoints":
-            return value.contains(salePointName);
+            result = value.contains(salePointName);
+            break;
          case "allowedCity":
-            return value.contains(city);
+            result = value.contains(city);
+            break;
          case "allowedProduct":
-            return value.contains(productName);
+            result = value.contains(productName);
+            break;
          case "timeSlot":
-            String[] times = value.split("to");
-            if (times.length != 2) {
-               throw new IllegalArgumentException("Malformed time slot: " + value);
-            }
-            LocalTime startTime = LocalTime.parse(times[0].trim());
-            LocalTime endTime = LocalTime.parse(times[1].trim());
-            // Check if the current time is within the time slot
-            LocalTime currentTime = LocalTime.now();
-            return !currentTime.isBefore(startTime) && !currentTime.isAfter(endTime);
+            result = evaluateTimeSlot(value);
+            break;
          default:
             throw new IllegalArgumentException("Unrecognized property: " + property);
       }
+      if (negate) {
+         // If 'not' is present, negate the result
+         result = !result;
+      }
+      return result;
    }
 
+   private boolean evaluateTimeSlot(String value) {
+      String[] timeSlots = value.split("or");
+      for (String slot : timeSlots) {
+         String[] times = slot.split("to");
+         if (times.length != 2) {
+            throw new IllegalArgumentException("Malformed time slot: " + slot);
+         }
+         LocalTime startTime = LocalTime.parse(times[0].trim());
+         LocalTime endTime = LocalTime.parse(times[1].trim());
+         // Check if the current time is within the time slot
+         LocalTime currentTime = LocalTime.now();
+         if (currentTime.isAfter(startTime) && currentTime.isBefore(endTime)) {
+            return true; // Return true if current time is within any time slot
+         }
+      }
+      return false; // Return false if current time is not within any time slot
+   }
    private BigDecimal calculateDailyCardLimit(CardDto cardDto) {
       if (cardDto != null) {
          EnumCardType cardType = cardDto.getType();
          CardGroupDto cardGroupDto = cardGroupService.findById(cardDto.getCardGroupId()).orElse(null);
          if (cardGroupDto != null) {
-            return cardGroupDto.getCounters().stream()
-                    .filter(counterDto -> counterDto.getCounterType().equals(EnumCounterType.CEILING))
+            return cardGroupDto.getCeilings().stream()
                     .findFirst()
-                    .map(counterDto -> {
+                    .map(ceilingDto -> {
                        if (cardType == EnumCardType.AMOUNT) {
-                          return counterDto.getDailyLimitValue().multiply(BigDecimal.valueOf(1000));
+                          return ceilingDto.getDailyLimitValue().multiply(BigDecimal.valueOf(1000));
                        } else {
-                          return counterDto.getDailyLimitValue();
+                          return ceilingDto.getDailyLimitValue();
                        }
                     })
                     .orElse(BigDecimal.ZERO);
@@ -206,6 +227,5 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
               .filter(salePointDto -> salePointDto.getName().equals(salePointName))
               .findFirst().orElse(null) : null;
    }
-
 }
 
