@@ -21,6 +21,8 @@ public class LoginResponse {
     private Long customerAccountId;
     @JsonProperty(value = "supplier_id")
     private Long supplierId;
+    @JsonProperty(value = "customer_id")
+    private Long customerId;
 }
 
 

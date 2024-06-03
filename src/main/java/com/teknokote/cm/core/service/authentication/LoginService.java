@@ -2,8 +2,10 @@ package com.teknokote.cm.core.service.authentication;
 
 import com.teknokote.cm.authentification.model.LoginRequest;
 import com.teknokote.cm.authentification.model.LoginResponse;
+import com.teknokote.cm.core.dao.CustomerDao;
 import com.teknokote.cm.core.dao.SupplierDao;
 import com.teknokote.cm.core.dao.UserDao;
+import com.teknokote.cm.core.model.Customer;
 import com.teknokote.cm.core.model.Supplier;
 import com.teknokote.cm.core.model.User;
 import com.teknokote.cm.core.service.UserService;
@@ -48,6 +50,8 @@ public class LoginService
    @Autowired
    private SupplierDao supplierDao;
    @Autowired
+   private CustomerDao customerDao;
+   @Autowired
    private UserService userService;
    private final RestTemplate restTemplate;
 
@@ -89,6 +93,10 @@ public class LoginService
             Optional<Supplier> optionalSupplier = getSupplierDao().getRepository().findSupplierByUser(user.getUsername());
             if (optionalSupplier.isPresent()){
                response.getBody().setSupplierId(optionalSupplier.get().getId());
+            }
+            Optional<Customer> optionalCustomer = getCustomerDao().getRepository().findCustomerByUser(user.getUsername());
+            if (optionalCustomer.isPresent()){
+               response.getBody().setCustomerId(optionalCustomer.get().getId());
             }
          }
       }else{

@@ -1,12 +1,14 @@
 package com.teknokote.cm.core.repository;
 
 import com.teknokote.cm.core.model.Customer;
+import com.teknokote.cm.core.model.Supplier;
 import com.teknokote.core.dao.JpaActivatableRepository;
 import org.springframework.beans.PropertyValues;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CustomerRepository extends JpaActivatableRepository<Customer, Long> {
@@ -15,4 +17,6 @@ public interface CustomerRepository extends JpaActivatableRepository<Customer, L
     @Query("select c from Customer c where c.supplaierId = :supplierId order by c.audit.createdDate desc")
 
     List<Customer> findAllBySupplierId(Long supplierId);
+    @Query("select sp from Customer sp join sp.users user where user.username = :username")
+    Optional<Customer> findCustomerByUser(String username);
 }
