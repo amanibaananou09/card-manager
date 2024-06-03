@@ -5,10 +5,12 @@ import com.teknokote.cm.core.dao.mappers.TransactionMapper;
 import com.teknokote.cm.core.model.*;
 import com.teknokote.cm.core.repository.TransactionRepository;
 import com.teknokote.cm.dto.TransactionDto;
+import com.teknokote.cm.dto.TransactionFilterDto;
 import com.teknokote.core.dao.JpaGenericDao;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -28,18 +30,34 @@ public class TransactionDaoImpl extends JpaGenericDao<Long, TransactionDto, Tran
    private TransactionRepository repository;
    @Override
    protected Transaction beforeCreate(Transaction transaction, TransactionDto dto) {
-      transaction.setCard(getEntityManager().getReference(Card.class,dto.getCardId()));
-      transaction.setAuthorization(getEntityManager().getReference(Authorization.class, dto.getAuthorizationId()));
-      if (Objects.nonNull(dto.getProductId())){
-         transaction.setProduct(getEntityManager().getReference(Product.class,dto.getProductId()));
+      if (Objects.nonNull(dto.getCardId())) {
+         transaction.setCard(getEntityManager().getReference(Card.class, dto.getCardId()));
+      }
+      if (Objects.nonNull(dto.getAuthorizationId())) {
+         transaction.setAuthorization(getEntityManager().getReference(Authorization.class, dto.getAuthorizationId()));
+      }
+      if (Objects.nonNull(dto.getProductId())) {
+         transaction.setProduct(getEntityManager().getReference(Product.class, dto.getProductId()));
+      }
+      if (Objects.nonNull(dto.getSalePointId())) {
+         transaction.setSalePoint(getEntityManager().getReference(SalePoint.class, dto.getSalePointId()));
       }
       return super.beforeCreate(transaction, dto);
    }
    @Override
    protected Transaction beforeUpdate(Transaction transaction, TransactionDto dto) {
-      transaction.setCard(getEntityManager().getReference(Card.class,dto.getCardId()));
-      transaction.setAuthorization(getEntityManager().getReference(Authorization.class, dto.getAuthorizationId()));
-      transaction.setProduct(getEntityManager().getReference(Product.class,dto.getProductId()));
+      if (Objects.nonNull(dto.getCardId())) {
+         transaction.setCard(getEntityManager().getReference(Card.class,dto.getCardId()));
+      }
+      if (Objects.nonNull(dto.getAuthorizationId())) {
+         transaction.setAuthorization(getEntityManager().getReference(Authorization.class,dto.getAuthorizationId()));
+      }
+      if (Objects.nonNull(dto.getProductId())) {
+         transaction.setProduct(getEntityManager().getReference(Product.class,dto.getProductId()));
+      }
+      if (Objects.nonNull(dto.getSalePointId())) {
+         transaction.setSalePoint(getEntityManager().getReference(SalePoint.class,dto.getSalePointId()));
+      }
       return super.beforeUpdate(transaction, dto);
    }
 
@@ -52,5 +70,10 @@ public class TransactionDaoImpl extends JpaGenericDao<Long, TransactionDto, Tran
    @Override
    public List<TransactionDto> findTodayTransaction(Long cardId, LocalDateTime dateTime) {
       return getRepository().findAllByCardIdAndDateTimeBefore(cardId,dateTime).stream().map(getMapper()::toDto).collect(Collectors.toList());
+   }
+
+   @Override
+   public Page<Transaction> findByCriteria(Long customerId,TransactionFilterDto filterDto, int page, int size) {
+      return repository.findByCriteria(customerId,filterDto,page,size);
    }
 }

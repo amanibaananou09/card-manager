@@ -3,8 +3,10 @@ package com.teknokote.cm.controller.front;
 import com.teknokote.cm.controller.EndPoints;
 import com.teknokote.cm.core.service.TransactionService;
 import com.teknokote.cm.dto.TransactionDto;
+import com.teknokote.cm.dto.TransactionFilterDto;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -45,8 +47,13 @@ public class TransactionController
    }
 
    @GetMapping
-   public List<TransactionDto> listTransaction()
+   public Page<TransactionDto> listTransaction(@RequestBody TransactionFilterDto filterDto,
+                                               @RequestParam Long customerId,
+                                               @RequestParam(defaultValue = "0") int page,
+                                               @RequestParam(defaultValue = "50") int size)
    {
-      return transactionService.findAll();
+      Page<TransactionDto> transactionDtoPage=transactionService.findTransactionsByFilter(customerId,filterDto,page,size)
+              .map(transactionService::mapToTransactionDto);
+      return  transactionDtoPage;
    }
 }

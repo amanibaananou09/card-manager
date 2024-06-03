@@ -1,17 +1,20 @@
 package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.TransactionDao;
+import com.teknokote.cm.core.model.Transaction;
 import com.teknokote.cm.core.service.*;
 import com.teknokote.cm.dto.*;
 import com.teknokote.core.service.ESSValidator;
 import com.teknokote.core.service.GenericCheckedService;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -30,6 +33,8 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
    private CardService cardService;
    @Autowired
    private CardGroupService cardGroupService;
+   @Autowired
+   private SalePointService salePointService;
 
    @Override
    public TransactionDto createTransaction(TransactionDto dto) {
@@ -38,6 +43,10 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
          ProductDto productDto = productService.findBySupplierAndName(dto.getProductName(),supplierDto.getId());
          if (productDto!=null){
             dto.setProductId(productDto.getId());
+         }
+         SalePointDto salePoint = supplierDto.getSalePoints().stream().filter(salePointDto -> salePointDto.getName().equals(dto.getSalePointName())).toList().get(0);
+         if (salePoint!=null){
+            dto.setSalePointId(salePoint.getId());
          }
       }
       CardDto card = cardService.checkedFindById(dto.getCardId());
@@ -70,5 +79,37 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
          TransactionDto transaction = lastTransaction.get();
          return transaction.getAvailableBalance().subtract(transactionDto.getAmount());
       }
+   }
+   @Override
+   public Page<Transaction> findTransactionsByFilter(
+           Long customerId,
+           TransactionFilterDto filterDto,
+           int page, int size
+   ) {
+      return getDao().findByCriteria(customerId,filterDto, page, size);
+   }
+
+   @Override
+   public TransactionDto mapToTransactionDto(Transaction transaction) {
+      TransactionDto transactionDto = new TransactionDto(transaction.getId(),transaction.getVersion());
+      transactionDto.setAmount(transaction.getAmount());
+      transactionDto.setCardId(transaction.getCardId());
+      transactionDto.setQuantity(transaction.getQuantity());
+      transactionDto.setProductId(transaction.getProductId());
+      if (Objects.nonNull(transaction.getAuthorization())){
+         transactionDto.setAuthorizationId(transaction.getAuthorizationId());
+      }
+      transactionDto.setDateTime(transaction.getDateTime());
+      transactionDto.setAvailableBalance(transaction.getAvailableBalance());
+      if (Objects.nonNull(transaction.getProduct())){
+         transactionDto.setProductName(transaction.getProduct().getName());
+      }
+      if (Objects.nonNull(transaction.getSalePoint())){
+         transactionDto.setSalePointName(transaction.getSalePoint().getName());
+         transactionDto.setSalePointId(transaction.getSalePointId());
+         transactionDto.setCity(transaction.getSalePoint().getCity());
+      }
+
+      return transactionDto;
    }
 }

@@ -9,3 +9,21 @@ databaseChangeLog:
               - column:
                   name: available_balance
                   type: numeric(38, 2)
+  - changeSet:
+      id: 2
+      author: amjed
+      changes:
+        - addColumn:
+            tableName: cm_transaction
+            columns:
+              - column:
+                  name: sale_point_id
+                  type: int8
+        - addForeignKeyConstraint:
+            baseColumnNames: sale_point_id
+            baseTableName: cm_transaction
+            baseTableSchemaName: public
+            constraintName: fk_sale_point_id
+            referencedColumnNames: id
+            referencedTableName: cm_sale_point
+            referencedTableSchemaName: public
