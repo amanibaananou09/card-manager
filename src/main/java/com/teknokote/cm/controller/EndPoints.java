@@ -29,6 +29,8 @@ public class EndPoints {
     public static final String SALE_POINT_ROOT = SUPPLIER_ROOT + "/{supplierId}/salePoint";
     public static final String USER_ROOT = SUPPLIER_ROOT + "/{supplierId}/user";
     public static final String CUSTOMER_ROOT = SUPPLIER_ROOT + "/{supplierId}/customer";
+    public static final String GET_BY_IDENTIFIER = "/identifier/{identifier}";
+
     public static final String LIST_PRODUCT_BY_SUPPLIER = SUPPLIER_ROOT + "/{supplierId}";
     public static final String BONUS_ROOT = "/bonus";
     public static final String CEILING_ROOT = "/ceiling";
@@ -36,8 +38,8 @@ public class EndPoints {
     public static final String CUSTOMER_CARD_GROUP_ROOT = CUSTOMER_BASE_ROOT + CARD_GROUP_ROOT;
     public static final String CUSTOMER_CARD_ROOT = CUSTOMER_BASE_ROOT + CARD_ROOT;
     public static final String CUSTOMER_ACCOUNT_ROOT = CUSTOMER_BASE_ROOT + ACCOUNT_ROOT;
-    public static final String FREE_CARD="/card/free";
-    public static final String AUTHORIZE="/authorize";
+    public static final String FREE_CARD = "/card/free";
+    public static final String AUTHORIZE = "/authorize";
 
 }
 

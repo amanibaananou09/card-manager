@@ -11,8 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Mapper(config = MapperConfiguration.class)
-public interface UserMapper extends BidirectionalEntityDtoMapper<Long, User, UserDto>
-{
+public interface UserMapper extends BidirectionalEntityDtoMapper<Long, User, UserDto> {
     @Mapping(source = "username", target = "username")
     @Mapping(source = "firstName", target = "firstName") // Add more attributes as needed
     @Mapping(source = "lastName", target = "lastName")
@@ -21,6 +20,10 @@ public interface UserMapper extends BidirectionalEntityDtoMapper<Long, User, Use
     @Mapping(target = "id", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     UserDto enrichDtoFromUserRepresentation(UserRepresentation userRepresentation, @MappingTarget UserDto target);
+
+    @Mapping(target = "enabled", constant = "true")
+    UserRepresentation toUserRepresentation(UserDto userDto);
+
     default String mapPhoneAttribute(UserRepresentation userRepresentation) {
         // Retrieve the phone attribute from UserRepresentation
         Map<String, List<String>> attributes = userRepresentation.getAttributes();
