@@ -14,7 +14,7 @@ import java.math.BigDecimal;
 @Table(name = "cm_counter")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "counter_type", discriminatorType = DiscriminatorType.STRING)
-public class Counter extends ESSEntity<Long, User>
+public abstract class Counter extends ESSEntity<Long, User>
 {
    @Serial
    private static final long serialVersionUID = -8693534709306863581L;
