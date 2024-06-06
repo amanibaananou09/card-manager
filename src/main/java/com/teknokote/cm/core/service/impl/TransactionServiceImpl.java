@@ -1,6 +1,7 @@
 package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.TransactionDao;
+import com.teknokote.cm.core.model.EnumCeilingType;
 import com.teknokote.cm.core.model.Transaction;
 import com.teknokote.cm.core.service.*;
 import com.teknokote.cm.dto.*;
@@ -51,8 +52,8 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
       }
       CardDto card = cardService.checkedFindById(dto.getCardId());
       CardGroupDto cardGroupDto= cardGroupService.checkedFindById(card.getCardGroupId());
-      BigDecimal ceilingValue = cardGroupDto.getCeilings().stream().findFirst().get().getValue();
-      BigDecimal availableBalance = calculateAvailableBalance(dto,dto.getCardId(),ceilingValue);
+      CeilingDto ceilingDto = cardGroupDto.getCeilings().stream().findFirst().get();
+      BigDecimal availableBalance = calculateAvailableBalance(dto,dto.getCardId(),ceilingDto,cardGroupDto);
       dto.setAvailableBalance(availableBalance);
       return create(dto);
    }
@@ -67,18 +68,22 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
       return getDao().findTodayTransaction(cardId,dateTime);
    }
 
-   private BigDecimal calculateAvailableBalance(TransactionDto transactionDto, Long cardId, BigDecimal ceilingValue) {
-      Optional<TransactionDto> lastTransaction = this.findLastTransactionByCardIdAndMonth(
-              cardId, transactionDto.getDateTime().getMonthValue()
-      );
+   private BigDecimal calculateAvailableBalance(TransactionDto transactionDto, Long cardId, CeilingDto ceilingDto, CardGroupDto groupDto) {
+      Optional<TransactionDto> lastTransaction = this.findLastTransactionByCardIdAndMonth(cardId, transactionDto.getDateTime().getMonthValue());
+      BigDecimal valueToSubtract;
       if (lastTransaction.isEmpty()) {
          // First transaction of the month
-         return ceilingValue.multiply(BigDecimal.valueOf(1000)).subtract(transactionDto.getAmount());
+         valueToSubtract = calculateAmountToSubtract(transactionDto, ceilingDto.getCeilingType());
+         return ceilingDto.getValue().subtract(valueToSubtract);
       } else {
          // Subsequent transaction within the same month
          TransactionDto transaction = lastTransaction.get();
-         return transaction.getAvailableBalance().subtract(transactionDto.getAmount());
+         valueToSubtract = calculateAmountToSubtract(transactionDto, ceilingDto.getCeilingType());
+         return transaction.getAvailableBalance().subtract(valueToSubtract);
       }
+   }
+   private BigDecimal calculateAmountToSubtract(TransactionDto transactionDto, EnumCeilingType ceilingType) {
+      return ceilingType == EnumCeilingType.AMOUNT ? transactionDto.getAmount() : transactionDto.getQuantity();
    }
    @Override
    public Page<Transaction> findTransactionsByFilter(

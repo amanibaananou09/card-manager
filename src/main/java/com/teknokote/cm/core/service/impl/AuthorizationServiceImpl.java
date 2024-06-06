@@ -49,7 +49,8 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
                     authorizationRequest.getSalePointName(), LocalDate.now().getDayOfWeek().toString(), salePoint.getCity());
             String generatedReference = generateReference();
             if (isAuthorized) {
-               return authorizeIfAuthorized(cardDto, generatedReference, dailyCardLimit);
+               CeilingDto ceilingDto=cardGroupDto.getCeilings().stream().findFirst().get();
+               return authorizeIfAuthorized(cardDto,ceilingDto, generatedReference, dailyCardLimit);
             } else {
                return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), dailyCardLimit);
             }
@@ -160,29 +161,23 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
    }
    private BigDecimal calculateDailyCardLimit(CardDto cardDto) {
       if (cardDto != null) {
-         EnumCardType cardType = cardDto.getType();
          CardGroupDto cardGroupDto = cardGroupService.findById(cardDto.getCardGroupId()).orElse(null);
          if (cardGroupDto != null) {
             return cardGroupDto.getCeilings().stream()
                     .findFirst()
-                    .map(ceilingDto -> {
-                       if (cardType == EnumCardType.AMOUNT) {
-                          return ceilingDto.getDailyLimitValue().multiply(BigDecimal.valueOf(1000));
-                       } else {
-                          return ceilingDto.getDailyLimitValue();
-                       }
-                    })
+                    .map(ceilingDto -> ceilingDto.getDailyLimitValue()
+                    )
                     .orElse(BigDecimal.ZERO);
          }
       }
       return null;
    }
-   private AuthorizationDto authorizeIfAuthorized(CardDto cardDto, String generatedReference, BigDecimal dailyCardLimit) {
+   private AuthorizationDto authorizeIfAuthorized(CardDto cardDto,CeilingDto ceilingDto, String generatedReference, BigDecimal dailyCardLimit) {
       Optional<TransactionDto> lastTransaction = transactionService.findLastTransactionByCardIdAndMonth(cardDto.getId(), LocalDateTime.now().getMonthValue());
       if (lastTransaction.isPresent()) {
          BigDecimal availableBalance = lastTransaction.get().getAvailableBalance();
          if (availableBalance.compareTo(BigDecimal.ZERO) > 0) {
-            return authorizeBasedOnAvailableBalance(cardDto, generatedReference, dailyCardLimit);
+            return authorizeBasedOnAvailableBalance(cardDto,ceilingDto, generatedReference, dailyCardLimit);
          } else {
             return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), BigDecimal.ZERO);
          }
@@ -191,10 +186,10 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
       }
    }
 
-   private AuthorizationDto authorizeBasedOnAvailableBalance(CardDto cardDto, String generatedReference, BigDecimal dailyCardLimit) {
+   private AuthorizationDto authorizeBasedOnAvailableBalance(CardDto cardDto,CeilingDto ceilingDto, String generatedReference, BigDecimal dailyCardLimit) {
       List<TransactionDto> dailyTransaction = transactionService.findTodayTransaction(cardDto.getId(), LocalDateTime.now());
       if (!dailyTransaction.isEmpty()) {
-         BigDecimal totalDailyAmount = calculateTotalDailyAmount(cardDto.getType(),dailyTransaction);
+         BigDecimal totalDailyAmount = calculateTotalDailyAmount(ceilingDto.getCeilingType(),dailyTransaction);
          if (totalDailyAmount.compareTo(dailyCardLimit) < 0) {
             cardDto.setStatus(EnumCardStatus.IN_USE);
             cardService.update(cardDto);
@@ -215,8 +210,8 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
       return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), dailyCardLimit);
    }
 
-   private BigDecimal calculateTotalDailyAmount(EnumCardType cardType,List<TransactionDto> dailyTransaction) {
-      if (cardType.equals(EnumCardType.AMOUNT)){
+   private BigDecimal calculateTotalDailyAmount(EnumCeilingType ceilingType,List<TransactionDto> dailyTransaction) {
+      if (ceilingType.equals(EnumCeilingType.AMOUNT)){
          return dailyTransaction.stream().map(TransactionDto::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
       }else{
          return dailyTransaction.stream().map(TransactionDto::getQuantity).reduce(BigDecimal.ZERO, BigDecimal::add);
