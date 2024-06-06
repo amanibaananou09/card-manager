@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Getter
@@ -29,7 +31,15 @@ public class CustomerDaoImpl extends JpaActivatableGenericDao<Long, User, Custom
     protected Customer beforeCreate(Customer customer, CustomerDto dto) {
         customer.setActif(true);
         customer.setDateStatusChange(LocalDateTime.now());
+        customer.setCity(dto.getCity());
         customer.setSupplier(getEntityManager().getReference(Supplier.class, dto.getSupplierId()));
+
+        if (!dto.getUsers().isEmpty()) {
+            customer.getUsers().forEach(user -> {
+                        user.setDateStatusChange(LocalDateTime.now());
+                    }
+            );
+        }
 
         Customer savedCustomer = super.beforeCreate(customer, dto);
 
@@ -50,6 +60,13 @@ public class CustomerDaoImpl extends JpaActivatableGenericDao<Long, User, Custom
     @Override
     protected Customer beforeUpdate(Customer customer, CustomerDto dto) {
 
+        if (!dto.getUsers().isEmpty()) {
+            customer.getUsers().forEach(user -> {
+                        user.setDateStatusChange(LocalDateTime.now());
+                    }
+            );
+        }
+
         Customer savedCustomer = super.beforeUpdate(customer, dto);
 
         if (!dto.getAccounts().isEmpty()) {
@@ -57,9 +74,9 @@ public class CustomerDaoImpl extends JpaActivatableGenericDao<Long, User, Custom
                         account.setCustomer(savedCustomer);
                         account.setDateStatusChange(LocalDateTime.now());
                         account.setActif(true);
-                if (!account.getMovements().isEmpty()) {
-                    account.getMovements().forEach(movement -> movement.setAccount(account));
-                }
+                        if (!account.getMovements().isEmpty()) {
+                            account.getMovements().forEach(movement -> movement.setAccount(account));
+                        }
                     }
             );
         }
@@ -75,4 +92,21 @@ public class CustomerDaoImpl extends JpaActivatableGenericDao<Long, User, Custom
     public List<CustomerDto> findCustomerBySupplier(Long supplierId) {
         return getRepository().findAllBySupplierId(supplierId).stream().map(getMapper()::toDto).toList();
     }
+
+    public List<String> generateIdentiferSuggestions(String baseUsername) {
+        List<String> suggestions = new ArrayList<>();
+        for (int i = 1; i <= 2; i++) {
+            String suggestedUsername = baseUsername + String.format("%02d", i);
+            if (!getRepository().existsByIdentifier(suggestedUsername)) {
+                suggestions.add(suggestedUsername);
+            }
+        }
+        return suggestions;
+    }
+
+    @Override
+    public Optional<CustomerDto> findByIdentifier(String identifier) {
+        return getRepository().findAllByIdentifierIgnoreCase(identifier).map(getMapper()::toDto);
+    }
+
 }

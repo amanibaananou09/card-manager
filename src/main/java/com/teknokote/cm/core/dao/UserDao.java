@@ -5,11 +5,14 @@ import com.teknokote.cm.dto.UserDto;
 import com.teknokote.core.dao.BasicDao;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 
-public interface UserDao extends BasicDao<Long, UserDto>
-{
-   UserRepository getRepository();
-   void updateLastConnection(String userName, LocalDateTime connectionDate);
+public interface UserDao extends BasicDao<Long, UserDto> {
+    UserRepository getRepository();
+
+    void updateLastConnection(String userName, LocalDateTime connectionDate);
+
+    Optional<UserDto> findAllByUsername(String name);
 }
 
