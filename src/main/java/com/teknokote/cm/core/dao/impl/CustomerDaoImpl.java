@@ -14,7 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Getter
@@ -90,4 +92,21 @@ public class CustomerDaoImpl extends JpaActivatableGenericDao<Long, User, Custom
     public List<CustomerDto> findCustomerBySupplier(Long supplierId) {
         return getRepository().findAllBySupplierId(supplierId).stream().map(getMapper()::toDto).toList();
     }
+
+    public List<String> generateIdentiferSuggestions(String baseUsername) {
+        List<String> suggestions = new ArrayList<>();
+        for (int i = 1; i <= 2; i++) {
+            String suggestedUsername = baseUsername + String.format("%02d", i);
+            if (!getRepository().existsByIdentifier(suggestedUsername)) {
+                suggestions.add(suggestedUsername);
+            }
+        }
+        return suggestions;
+    }
+
+    @Override
+    public Optional<CustomerDto> findByIdentifier(String identifier) {
+        return getRepository().findAllByIdentifierIgnoreCase(identifier).map(getMapper()::toDto);
+    }
+
 }

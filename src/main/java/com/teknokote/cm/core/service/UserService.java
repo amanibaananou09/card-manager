@@ -15,6 +15,4 @@ public interface UserService extends BaseService<Long, UserDto> {
     List<UserDto> findBySupplier(Long supplierId);
 
     Optional<UserDto> findByUsername(String identifier);
-
-    List<String> generateUsernameSuggestions(String identifier);
 }

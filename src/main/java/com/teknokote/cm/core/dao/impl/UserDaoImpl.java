@@ -12,8 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -40,17 +38,4 @@ public class UserDaoImpl extends JpaGenericDao<Long, UserDto, User> implements U
     public Optional<UserDto> findAllByUsername(String name) {
         return getRepository().findAllByUsernameIgnoreCase(name).map(getMapper()::toDto);
     }
-
-    public List<String> generateUsernameSuggestions(String baseUsername) {
-        List<String> suggestions = new ArrayList<>();
-        for (int i = 1; i <= 2; i++) {
-            String suggestedUsername = baseUsername + String.format("%02d", i);
-            if (!getRepository().existsByUsername(suggestedUsername)) {
-                suggestions.add(suggestedUsername);
-            }
-        }
-        return suggestions;
-    }
-
-
 }

@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -53,5 +54,15 @@ public class CustomerServiceImpl extends ActivatableGenericCheckedService<Long, 
             }
         }
         return create(dto, false);
+    }
+
+    @Override
+    public List<String> generateIdentiferSuggestions(String identifier) {
+        return getDao().generateIdentiferSuggestions(identifier);
+    }
+
+    @Override
+    public Optional<CustomerDto> findByIdentifier(String identifier) {
+        return getDao().findByIdentifier(identifier);
     }
 }

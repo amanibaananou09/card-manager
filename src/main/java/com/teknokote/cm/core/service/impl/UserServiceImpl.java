@@ -68,10 +68,4 @@ public class UserServiceImpl extends GenericCheckedService<Long, UserDto> implem
         return getDao().findAllByUsername(name);
     }
 
-    @Override
-    public List<String> generateUsernameSuggestions(String identifier) {
-        return getDao().generateUsernameSuggestions(identifier);
-    }
-
-
 }

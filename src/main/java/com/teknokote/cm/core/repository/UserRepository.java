@@ -13,9 +13,6 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findAllByUsernameIgnoreCase(String name);
 
-    boolean existsByUsername(String username);
-
-
     @Modifying
     @Query("update User set lastConnectionDate= :connectionDate where username= :userName")
     void updateLastConnection(String userName, LocalDateTime connectionDate);

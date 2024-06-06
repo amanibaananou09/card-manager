@@ -4,7 +4,6 @@ import com.teknokote.cm.controller.EndPoints;
 import com.teknokote.cm.core.service.CustomerService;
 import com.teknokote.cm.core.service.UserService;
 import com.teknokote.cm.dto.CustomerDto;
-import com.teknokote.cm.dto.UserDto;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -71,13 +70,12 @@ public class CustomerController {
 
     @GetMapping(EndPoints.GET_BY_IDENTIFIER)
     public ResponseEntity<?> getByIdentifier(@PathVariable String identifier) {
-        Optional<UserDto> user = userService.findByUsername(identifier);
+        Optional<CustomerDto> customer = customerService.findByIdentifier(identifier);
 
-        if (user.isPresent()) {
-            List<String> suggestions = userService.generateUsernameSuggestions(identifier);
-            UserDto userDto = user.get();
-            userDto.setSuggestions(suggestions);
-            return ResponseEntity.ok(userDto);
+        if (customer.isPresent()) {
+            List<String> suggestions = customerService.generateIdentiferSuggestions(identifier);
+
+            return ResponseEntity.ok(suggestions);
         } else {
             return ResponseEntity.notFound().build();
         }
