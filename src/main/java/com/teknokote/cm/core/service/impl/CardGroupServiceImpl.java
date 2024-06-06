@@ -3,6 +3,7 @@ package com.teknokote.cm.core.service.impl;
 import com.teknokote.cm.core.dao.CardGroupDao;
 import com.teknokote.cm.core.service.CardGroupService;
 import com.teknokote.cm.dto.CardGroupDto;
+import com.teknokote.cm.dto.CeilingDto;
 import com.teknokote.cm.dto.TimeSlotDto;
 import com.teknokote.core.exceptions.ServiceValidationException;
 import com.teknokote.core.service.ActivatableGenericCheckedService;
@@ -11,6 +12,7 @@ import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -50,6 +52,19 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
         List<TimeSlotDto> timeSlots = dto.getGroupCondition().getTimeSlots();
         if (timeSlots!=null && !timeSlots.isEmpty()){
             timeSlotsOverlap(timeSlots);
+        }
+        if (dto.getCeilings()!=null && !dto.getCeilings().isEmpty()){
+            for (CeilingDto ceilingDto:dto.getCeilings()){
+                if (ceilingDto.getDailyLimitValue().equals(BigDecimal.ZERO)){
+                    throw new ServiceValidationException("daily limit value must be greater than 0 !");
+                }
+                if (ceilingDto.getValue().equals(BigDecimal.ZERO)){
+                    throw new ServiceValidationException("Monthly limit  value must be greater than 0 !");
+                }
+                if (ceilingDto.getValue().compareTo(ceilingDto.getDailyLimitValue())<=0){
+                    throw new ServiceValidationException("Monthly limit  value must be greater than the daily limit value  !");
+                }
+            }
         }
         return update(dto);
     }
