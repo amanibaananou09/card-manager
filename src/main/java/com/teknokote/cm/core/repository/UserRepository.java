@@ -10,11 +10,13 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long>
-{
-   Optional<User> findAllByUsernameIgnoreCase(String name);
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findAllByUsernameIgnoreCase(String name);
 
-   @Modifying
-   @Query("update User set lastConnectionDate= :connectionDate where username= :userName")
-   void updateLastConnection(String userName, LocalDateTime connectionDate);
+    boolean existsByUsername(String username);
+
+
+    @Modifying
+    @Query("update User set lastConnectionDate= :connectionDate where username= :userName")
+    void updateLastConnection(String userName, LocalDateTime connectionDate);
 }

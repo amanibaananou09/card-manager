@@ -2,7 +2,9 @@ package com.teknokote.cm.controller.front;
 
 import com.teknokote.cm.controller.EndPoints;
 import com.teknokote.cm.core.service.CustomerService;
+import com.teknokote.cm.core.service.UserService;
 import com.teknokote.cm.dto.CustomerDto;
+import com.teknokote.cm.dto.UserDto;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -19,11 +22,12 @@ import java.util.List;
 public class CustomerController {
     @Autowired
     private CustomerService customerService;
-
+    @Autowired
+    private UserService userService;
 
     @PostMapping(EndPoints.ADD)
     public ResponseEntity<CustomerDto> addCustomer(@RequestBody CustomerDto dto) {
-        CustomerDto savedCustomer = customerService.create(dto);
+        CustomerDto savedCustomer = customerService.addCustomer(dto);
         return new ResponseEntity<>(savedCustomer, HttpStatus.CREATED);
     }
 
@@ -44,6 +48,7 @@ public class CustomerController {
     public List<CustomerDto> listCustomerByActif(@RequestParam boolean actif) {
         return customerService.findAllByActif(actif);
     }
+
     @GetMapping
     public List<CustomerDto> listCustomerBySupplier(@PathVariable Long supplierId) {
         return customerService.findCustomerBySupplier(supplierId);
@@ -62,5 +67,19 @@ public class CustomerController {
     @GetMapping(EndPoints.LIST_BY_FILTER)
     public List<CustomerDto> listCustomerByFilter(@RequestParam(required = false) String identifier) {
         return customerService.findCustomerByFilter(identifier);
+    }
+
+    @GetMapping(EndPoints.GET_BY_IDENTIFIER)
+    public ResponseEntity<?> getByIdentifier(@PathVariable String identifier) {
+        Optional<UserDto> user = userService.findByUsername(identifier);
+
+        if (user.isPresent()) {
+            List<String> suggestions = userService.generateUsernameSuggestions(identifier);
+            UserDto userDto = user.get();
+            userDto.setSuggestions(suggestions);
+            return ResponseEntity.ok(userDto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

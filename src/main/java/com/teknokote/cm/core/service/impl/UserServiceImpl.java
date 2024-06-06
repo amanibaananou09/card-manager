@@ -1,4 +1,5 @@
 package com.teknokote.cm.core.service.impl;
+
 import com.teknokote.cm.core.dao.SupplierDao;
 import com.teknokote.cm.core.dao.UserDao;
 import com.teknokote.cm.core.dao.mappers.UserMapper;
@@ -22,44 +23,55 @@ import java.util.stream.Collectors;
 
 @Service
 @Getter
-public class UserServiceImpl extends GenericCheckedService<Long, UserDto> implements UserService
-{
-   @Autowired
-   private ESSValidator<UserDto> validator;
-   @Autowired
-   private UserDao dao;
-   @Autowired
-   private SupplierDao supplierDao;
-   @Autowired
-   private KeycloakService keycloakService;
-   @Autowired
-   private UserMapper userMapper;
+public class UserServiceImpl extends GenericCheckedService<Long, UserDto> implements UserService {
+    @Autowired
+    private ESSValidator<UserDto> validator;
+    @Autowired
+    private UserDao dao;
+    @Autowired
+    private SupplierDao supplierDao;
+    @Autowired
+    private KeycloakService keycloakService;
+    @Autowired
+    private UserMapper userMapper;
 
-   @Transactional
-   public void updateLastConnection(String userName) {
-      getDao().updateLastConnection(userName, LocalDateTime.now());
-   }
+    @Transactional
+    public void updateLastConnection(String userName) {
+        getDao().updateLastConnection(userName, LocalDateTime.now());
+    }
 
-   @Override
-   public List<UserDto> findBySupplier(Long supplierId) {
-      Optional<SupplierDto> supplier = supplierDao.findById(supplierId);
-      List<UserDto> users = new ArrayList<>();
-      if (supplier.isPresent()) {
-         Set<UserDto> usersSet = supplier.get().getUsers();
-         users.addAll(usersSet);
-      }
+    @Override
+    public List<UserDto> findBySupplier(Long supplierId) {
+        Optional<SupplierDto> supplier = supplierDao.findById(supplierId);
+        List<UserDto> users = new ArrayList<>();
+        if (supplier.isPresent()) {
+            Set<UserDto> usersSet = supplier.get().getUsers();
+            users.addAll(usersSet);
+        }
 
-      List<String> usernames = users.stream()
-              .map(userDto -> userDto.getUsername().toLowerCase())
-              .collect(Collectors.toList());
-      List<UserRepresentation> userRepresentations = keycloakService.getUserIdentities(usernames);
-      userRepresentations.forEach(userRepresentation -> {
-         UserDto dtoToEnrich = users.stream()
-                 .filter(dto -> dto.getUsername().equalsIgnoreCase(userRepresentation.getUsername()))
-                 .findFirst()
-                 .orElseThrow(() -> new RuntimeException("User not found: " + userRepresentation.getUsername()));
-         userMapper.enrichDtoFromUserRepresentation(userRepresentation, dtoToEnrich);
-      });
-      return users;
-   }
+        List<String> usernames = users.stream()
+                .map(userDto -> userDto.getUsername().toLowerCase())
+                .collect(Collectors.toList());
+        List<UserRepresentation> userRepresentations = keycloakService.getUserIdentities(usernames);
+        userRepresentations.forEach(userRepresentation -> {
+            UserDto dtoToEnrich = users.stream()
+                    .filter(dto -> dto.getUsername().equalsIgnoreCase(userRepresentation.getUsername()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("User not found: " + userRepresentation.getUsername()));
+            userMapper.enrichDtoFromUserRepresentation(userRepresentation, dtoToEnrich);
+        });
+        return users;
+    }
+
+    @Override
+    public Optional<UserDto> findByUsername(String name) {
+        return getDao().findAllByUsername(name);
+    }
+
+    @Override
+    public List<String> generateUsernameSuggestions(String identifier) {
+        return getDao().generateUsernameSuggestions(identifier);
+    }
+
+
 }

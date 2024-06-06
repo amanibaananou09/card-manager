@@ -21,12 +21,14 @@ public class Customer extends ActivatableEntity<Long, User> {
     private String address;
     private String phone;
     private String email;
+    @Column
+    private String city;
     private String companyName;
     @ManyToOne(fetch = FetchType.LAZY)
     private Supplier supplier;
     @Column(name = "supplier_id", insertable = false, updatable = false)
     private Long supplaierId;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "cm_customer_users", joinColumns = @JoinColumn(name = "customer_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<User> users = new HashSet<>();
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
