@@ -10,6 +10,8 @@ public interface CardDao extends ActivatableDao<Long, CardDto> {
 
     List<CardDto> findAllByActifAndCustomer(Boolean actif, Long customerId);
 
+    List<CardDto> findAllByCardGroupId(Long cardGroupId);
+
     List<CardDto> findCardByHolderName(String holder, Long customerId);
 
     List<CardDto> findCardByCardId(String cardId, Long customerId);

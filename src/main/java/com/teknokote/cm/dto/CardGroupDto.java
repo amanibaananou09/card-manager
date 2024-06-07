@@ -18,8 +18,9 @@ public class CardGroupDto extends ESSActivatableDto<Long> {
     private Set<CeilingDto> ceilings;
     private Set<BonusDto> bonuses;
     private GroupConditionDto groupCondition;
+    private int cardCount;
     @Builder
-    public CardGroupDto(Long id, Long version, boolean actif, LocalDateTime dateStatusChange, String name, String condition,Long customerId,GroupConditionDto groupCondition,Set<CeilingDto> ceilings,Set<BonusDto> bonuses)
+    public CardGroupDto(Long id, Long version, boolean actif, LocalDateTime dateStatusChange, String name, String condition,Long customerId,GroupConditionDto groupCondition,Set<CeilingDto> ceilings,Set<BonusDto> bonuses,int cardCount)
     {
         super(id,version,actif,dateStatusChange);
         this.name = name;
@@ -28,6 +29,7 @@ public class CardGroupDto extends ESSActivatableDto<Long> {
         this.groupCondition=groupCondition;
         this.ceilings=ceilings;
         this.bonuses=bonuses;
+        this.cardCount=cardCount;
     }
     public void createConditionFromGroupCondition() {
         if (groupCondition != null) {

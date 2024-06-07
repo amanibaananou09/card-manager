@@ -11,6 +11,7 @@ import java.util.List;
 public interface CardRepository extends JpaActivatableRepository<Card, Long> {
     @Query("select c from Card c where c.account.customerId = :customerId order by c.audit.createdDate desc")
     List<Card> findAllByCustomerId(Long customerId);
+    List<Card> findAllByCardGroupId(Long cardGroupId);
 
     @Query("select c from Card c where c.account.customerId = :customerId and c.actif = :actif order by c.audit.createdDate desc")
     List<Card> findAllByActifAndCustomer(Boolean actif, Long customerId);

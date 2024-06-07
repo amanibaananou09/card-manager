@@ -37,6 +37,10 @@ public class CardDaoImpl extends JpaActivatableGenericDao<Long, User, CardDto, C
     public List<CardDto> findAllByActifAndCustomer(Boolean actif, Long customerId) {
         return getRepository().findAllByActifAndCustomer(actif, customerId).stream().map(getMapper()::toDto).collect(Collectors.toList());
     }
+    @Override
+    public List<CardDto> findAllByCardGroupId(Long cardGroupId) {
+        return getRepository().findAllByCardGroupId(cardGroupId).stream().map(getMapper()::toDto).collect(Collectors.toList());
+    }
 
     @Override
     public List<CardDto> findCardByHolderName(String holder, Long customerId) {
