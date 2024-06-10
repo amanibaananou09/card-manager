@@ -10,8 +10,8 @@ import java.util.Optional;
 
 @Repository
 public interface SupplierRepository extends JpaActivatableRepository<Supplier, Long> {
-    @Query("select sp from Supplier sp WHERE sp.reference = :reference")
-    Supplier findAllByReference(@Param("reference") String reference);
+
+    Supplier findByReference(String reference);
 
     @Query("select sp from Supplier sp WHERE sp.reference = :reference and sp.name = :name")
     Supplier findByReferenceAndName(@Param("reference") String reference, @Param("name") String name);

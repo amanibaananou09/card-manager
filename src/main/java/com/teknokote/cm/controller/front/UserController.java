@@ -26,17 +26,17 @@ public class UserController
 
 
    @PostMapping(EndPoints.ADD)
-   public ResponseEntity<UserDto> addUser(@RequestBody UserDto dto)
+   public ResponseEntity<UserDto> addUser(@PathVariable Long supplierId,@RequestBody UserDto dto)
    {
-      UserDto savedUser = supplierService.createUser(dto);
+      UserDto savedUser = supplierService.createUser(supplierId,dto);
       return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
    }
 
 
    @PutMapping(EndPoints.UPDATE)
-   public ResponseEntity<UserDto> updateUser(@RequestBody UserDto dto)
+   public ResponseEntity<UserDto> updateUser(@PathVariable Long supplierId,@RequestBody UserDto dto)
    {
-      UserDto savedUser = supplierService.updateUser(dto);
+      UserDto savedUser = supplierService.updateUser(supplierId,dto);
       return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
    }
 
