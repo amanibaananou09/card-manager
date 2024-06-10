@@ -25,13 +25,13 @@ private SupplierService supplierService;
 
 
 @PostMapping(EndPoints.ADD)
-public ResponseEntity<SalePointDto> addSalePoint(@RequestBody SalePointDto dto) {
-    SalePointDto savedSalePoint = supplierService.createSalePoint(dto);
+public ResponseEntity<SalePointDto> addSalePoint(@PathVariable Long supplierId,@RequestBody SalePointDto dto) {
+    SalePointDto savedSalePoint = supplierService.createSalePoint(supplierId,dto);
     return new ResponseEntity<>(savedSalePoint, HttpStatus.CREATED);
     }
     @PutMapping(EndPoints.UPDATE)
-    public ResponseEntity<SalePointDto> updateSalePoint(@RequestBody SalePointDto dto) {
-        SalePointDto savedSalePoint = supplierService.updateSalePoint(dto);
+    public ResponseEntity<SalePointDto> updateSalePoint(@PathVariable Long supplierId,@RequestBody SalePointDto dto) {
+        SalePointDto savedSalePoint = supplierService.updateSalePoint(supplierId,dto);
         return new ResponseEntity<>(savedSalePoint, HttpStatus.CREATED);
     }
     @GetMapping(EndPoints.INFO)

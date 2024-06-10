@@ -18,10 +18,10 @@ public interface SupplierService extends ActivatableEntityService<Long, Supplier
 
     SupplierDto updateSupplier(SupplierDto supplierDto);
     SupplierDto createSupplier(SupplierDto supplierDto);
-    SalePointDto createSalePoint(SalePointDto salePointDto);
-    SalePointDto updateSalePoint(SalePointDto salePointDto);
-    UserDto createUser(UserDto salePointDto);
-    UserDto updateUser(UserDto salePointDto);
+    SalePointDto createSalePoint(Long supplierId,SalePointDto salePointDto);
+    SalePointDto updateSalePoint(Long supplierId,SalePointDto salePointDto);
+    UserDto createUser(Long supplierId,UserDto salePointDto);
+    UserDto updateUser(Long supplierId,UserDto salePointDto);
     ProductDto addProduct(ProductDto productDto);
 
 }
