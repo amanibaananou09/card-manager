@@ -27,4 +27,6 @@ public class Authorization extends ESSEntity<Long, User>
    private Card card;
    @Column(name = "card_id", insertable = false, updatable = false)
    private Long cardId;
+   private String ptsId;
+   private Long pump;
 }

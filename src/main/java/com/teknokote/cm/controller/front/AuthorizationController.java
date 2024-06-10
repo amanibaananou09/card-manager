@@ -63,4 +63,10 @@ public class AuthorizationController
    {
       return authorizationService.findAll();
    }
+   @GetMapping(EndPoints.FIND)
+   public AuthorizationDto getAuthorization(@RequestParam String ptsId,@RequestParam Long pump)
+   {
+      return authorizationService.findByPtsIdAndPump(ptsId,pump);
+   }
+
 }
