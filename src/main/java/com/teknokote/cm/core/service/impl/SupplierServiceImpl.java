@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Getter
 public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, SupplierDto> implements SupplierService {
@@ -79,8 +81,9 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
     public SalePointDto updateSalePoint(Long supplierId,SalePointDto salePointDto) {
         SupplierDto supplier = checkedFindById(supplierId);
         if (supplier != null) {
-            SalePointDto existingSalePoint = supplier.getSalePoints().stream().filter(salePointDto1 -> salePointDto1.getName().equals(salePointDto.getName())).toList().get(0);
-            if (existingSalePoint != null) {
+            List<SalePointDto> salePoints = supplier.getSalePoints().stream().filter(salePointDto1 -> salePointDto1.getName().equals(salePointDto.getName())).toList();
+            if (!salePoints.isEmpty()){
+                SalePointDto existingSalePoint = salePoints.get(0);
                 salePointDto.setId(existingSalePoint.getId());
                 return salePointDao.update(salePointDto);
             }
