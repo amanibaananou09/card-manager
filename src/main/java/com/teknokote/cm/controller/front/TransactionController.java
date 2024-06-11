@@ -11,49 +11,42 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 
 @RestController
 @CrossOrigin("*")
 @AllArgsConstructor
 @RequestMapping(EndPoints.TRANSACTION_ROOT)
-public class TransactionController
-{
-   @Autowired
-   private TransactionService transactionService;
+public class TransactionController {
+    @Autowired
+    private TransactionService transactionService;
 
 
-   @PostMapping(EndPoints.ADD)
-   public ResponseEntity<TransactionDto> addTransaction(@RequestBody TransactionDto dto)
-   {
-      TransactionDto savedTransaction = transactionService.createTransaction(dto);
-      return new ResponseEntity<>(savedTransaction, HttpStatus.CREATED);
-   }
+    @PostMapping(EndPoints.ADD)
+    public ResponseEntity<TransactionDto> addTransaction(@RequestBody TransactionDto dto) {
+        TransactionDto savedTransaction = transactionService.createTransaction(dto);
+        return new ResponseEntity<>(savedTransaction, HttpStatus.CREATED);
+    }
 
 
-   @PutMapping(EndPoints.UPDATE)
-   public ResponseEntity<TransactionDto> updateTransaction(@RequestBody TransactionDto dto)
-   {
-      TransactionDto savedTransaction = transactionService.update(dto);
-      return new ResponseEntity<>(savedTransaction, HttpStatus.CREATED);
-   }
+    @PutMapping(EndPoints.UPDATE)
+    public ResponseEntity<TransactionDto> updateTransaction(@RequestBody TransactionDto dto) {
+        TransactionDto savedTransaction = transactionService.update(dto);
+        return new ResponseEntity<>(savedTransaction, HttpStatus.CREATED);
+    }
 
-   @GetMapping(EndPoints.INFO)
-   public ResponseEntity<TransactionDto> getTransaction(@PathVariable Long id)
-   {
-      TransactionDto foundTransaction = transactionService.checkedFindById(id);
-      return new ResponseEntity<>(foundTransaction, HttpStatus.CREATED);
-   }
+    @GetMapping(EndPoints.INFO)
+    public ResponseEntity<TransactionDto> getTransaction(@PathVariable Long id) {
+        TransactionDto foundTransaction = transactionService.checkedFindById(id);
+        return new ResponseEntity<>(foundTransaction, HttpStatus.CREATED);
+    }
 
-   @GetMapping
-   public Page<TransactionDto> listTransaction(@RequestBody TransactionFilterDto filterDto,
-                                               @RequestParam Long customerId,
-                                               @RequestParam(defaultValue = "0") int page,
-                                               @RequestParam(defaultValue = "50") int size)
-   {
-      Page<TransactionDto> transactionDtoPage=transactionService.findTransactionsByFilter(customerId,filterDto,page,size)
-              .map(transactionService::mapToTransactionDto);
-      return  transactionDtoPage;
-   }
+    @PostMapping
+    public Page<TransactionDto> listTransaction(@RequestBody TransactionFilterDto filterDto,
+                                                @RequestParam Long customerId,
+                                                @RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "50") int size) {
+        Page<TransactionDto> transactionDtoPage = transactionService.findTransactionsByFilter(customerId, filterDto, page, size)
+                .map(transactionService::mapToTransactionDto);
+        return transactionDtoPage;
+    }
 }
