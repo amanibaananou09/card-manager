@@ -8,4 +8,5 @@ public interface AuthorizationService extends BaseService<Long, AuthorizationDto
 {
     AuthorizationDto createAuthorization (AuthorizationRequest authorizationRequest);
 
+    AuthorizationDto findByPtsIdAndPump(String ptsId, Long pump);
 }

@@ -21,9 +21,11 @@ public class AuthorizationDto extends ESSIdentifiedDto<Long>
    private BigDecimal quantity;
    private Long cardId;
    private EnumCardType cardType;
+   private String ptsId;
+   private Long pump;
 
    @Builder
-   public AuthorizationDto(Long id, Long version, String reference, LocalDateTime dateTime, BigDecimal amount, BigDecimal quantity, Long cardId,EnumAuthorizationStatus status,EnumCardType cardType)
+   public AuthorizationDto(Long id, Long version, String reference, LocalDateTime dateTime, BigDecimal amount, BigDecimal quantity, Long cardId,EnumAuthorizationStatus status,EnumCardType cardType,String ptsId,Long pump)
    {
       super(id, version);
       this.status=status;
@@ -33,5 +35,7 @@ public class AuthorizationDto extends ESSIdentifiedDto<Long>
       this.quantity = quantity;
       this.cardId = cardId;
       this.cardType=cardType;
+      this.ptsId=ptsId;
+      this.pump=pump;
    }
 }

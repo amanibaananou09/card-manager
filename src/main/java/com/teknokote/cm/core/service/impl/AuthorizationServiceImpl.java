@@ -222,5 +222,9 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
               .filter(salePointDto -> salePointDto.getName().equals(salePointName))
               .findFirst().orElse(null) : null;
    }
+   @Override
+   public AuthorizationDto findByPtsIdAndPump(String ptsId,Long pump) {
+      return getDao().findAuthorizationByPtsIdAndPump(ptsId,pump);
+   }
 }
 

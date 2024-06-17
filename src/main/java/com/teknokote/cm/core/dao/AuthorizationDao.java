@@ -9,5 +9,7 @@ public interface AuthorizationDao extends BasicDao<Long, AuthorizationDto>
     AuthorizationDto findLastAuthorization();
 
     AuthorizationDto findByReference(String authorizationReference);
+
+    AuthorizationDto findAuthorizationByPtsIdAndPump(String ptsId, Long pump);
 }
 

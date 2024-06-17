@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Amjed
+      changes:
+        - addColumn:
+            tableName: cm_authorization
+            columns:
+              - column:
+                  name: pts_id
+                  type: varchar(255)
+              - column:
+                  name: pump
+                  type: int8
