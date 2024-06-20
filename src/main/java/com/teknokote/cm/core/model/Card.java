@@ -34,4 +34,11 @@ public class Card extends ActivatableEntity<Long, User> {
     private Account account;
     @Column(name = "account_id", insertable = false, updatable = false)
     private Long accountId;
+
+    public EnumCeilingType getFirstCeilingType() {
+        if (cardGroup != null && cardGroup.getCeilings() != null && !cardGroup.getCeilings().isEmpty()) {
+            return cardGroup.getCeilings().iterator().next().getCeilingType();
+        }
+        return null;
+    }
 }
