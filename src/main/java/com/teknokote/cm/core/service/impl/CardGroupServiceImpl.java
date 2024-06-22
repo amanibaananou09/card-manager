@@ -50,9 +50,13 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
     @Override
     public CardGroupDto cardGroupInformation(Long cardGroupId) {
         CardGroupDto dto = checkedFindById(cardGroupId);
-        if (dto.getGroupCondition() != null){
-            dto.getGroupCondition().setTimeSlots(dto.createListTimeSlotsFromString());
-            dto.getGroupCondition().setOperators(dto.createListOperatorFromString());
+        if (dto.getGroupCondition() != null) {
+            if (dto.getGroupCondition().getTimeSlot() != null) {
+                dto.getGroupCondition().setTimeSlots(dto.createListTimeSlotsFromString());
+            }
+            if (dto.getGroupCondition().getLogicalOperators() != null){
+                dto.getGroupCondition().setOperators(dto.createListOperatorFromString());
+            }
         }
         return dto;
     }

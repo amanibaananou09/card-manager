@@ -11,11 +11,15 @@ public class AuthorizationRequest {
     private String tag;
     private String productName;
     private String salePointName;
+    private String ptsId;
+    private Long pump;
     @Builder
-    public AuthorizationRequest(String reference, String tag, String productName, String salePointName) {
+    public AuthorizationRequest(String reference, String tag, String productName, String salePointName,String ptsId,Long pump) {
         this.reference = reference;
         this.tag = tag;
         this.productName = productName;
         this.salePointName = salePointName;
+        this.ptsId=ptsId;
+        this.pump=pump;
     }
 }

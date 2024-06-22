@@ -38,33 +38,41 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
    @Override
    public AuthorizationDto createAuthorization(AuthorizationRequest authorizationRequest) {
       SupplierDto supplierDto = supplierService.findByReference(authorizationRequest.getReference());
-      SalePointDto salePoint = findSalePoint(supplierDto, authorizationRequest.getSalePointName());
-      CardDto cardDto = cardService.findByTag(authorizationRequest.getTag());
-      if (cardDto!=null) {
-         CardGroupDto cardGroupDto = cardGroupService.checkedFindById(cardDto.getCardGroupId());
-         BigDecimal dailyCardLimit = calculateDailyCardLimit(cardDto);
-         if (cardGroupDto != null) {
-            String condition = cardGroupDto.getCondition();
-            boolean isAuthorized = evaluateCondition(condition, authorizationRequest.getProductName(),
-                    authorizationRequest.getSalePointName(), LocalDate.now().getDayOfWeek().toString(), salePoint.getCity());
-            String generatedReference = generateReference();
-            if (isAuthorized) {
-               CeilingDto ceilingDto=cardGroupDto.getCeilings().stream().findFirst().get();
-               return authorizeIfAuthorized(cardDto,ceilingDto, generatedReference, dailyCardLimit);
-            } else {
-               return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), dailyCardLimit);
+      String generatedReference = generateReference();
+      if (supplierDto != null) {
+         SalePointDto salePoint = findSalePoint(supplierDto, authorizationRequest.getSalePointName());
+         if (salePoint != null) {
+            CardDto cardDto = cardService.findByTag(authorizationRequest.getTag());
+            if (cardDto != null && cardDto.getExpirationDate().isAfter(LocalDate.now())) {
+               CardGroupDto cardGroupDto = cardGroupService.checkedFindById(cardDto.getCardGroupId());
+               BigDecimal dailyCardLimit = calculateDailyCardLimit(cardDto);
+               if (cardGroupDto != null) {
+                  String condition = cardGroupDto.getCondition();
+                  boolean isAuthorized = evaluateCondition(condition, authorizationRequest.getProductName(),
+                          authorizationRequest.getSalePointName(), LocalDate.now().getDayOfWeek().toString(), salePoint.getCity());
+                  if (isAuthorized) {
+                     CeilingDto ceilingDto = cardGroupDto.getCeilings().stream().findFirst().get();
+                     return authorizeIfAuthorized(cardDto, ceilingDto, generatedReference, dailyCardLimit,authorizationRequest);
+                  } else {
+                     return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), dailyCardLimit,authorizationRequest);
+                  }
+               }
             }
+            return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, null, BigDecimal.ZERO,authorizationRequest);
          }
+         return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, null, BigDecimal.ZERO,authorizationRequest);
       }
-      return null;
+      return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, null, BigDecimal.ZERO,authorizationRequest);
    }
-   private AuthorizationDto createAuthorizationDto(String reference, EnumAuthorizationStatus status, Long cardId,BigDecimal ceilingValue) {
+   private AuthorizationDto createAuthorizationDto(String reference, EnumAuthorizationStatus status, Long cardId,BigDecimal ceilingValue,AuthorizationRequest authorizationRequest) {
       return create(AuthorizationDto.builder()
               .status(status)
               .reference(reference)
               .cardId(cardId)
               .dateTime(LocalDateTime.now())
               .quantity(ceilingValue)
+              .ptsId(authorizationRequest.getPtsId())
+              .pump(authorizationRequest.getPump())
               .build());
    }
    private String generateReference() {
@@ -172,42 +180,42 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
       }
       return null;
    }
-   private AuthorizationDto authorizeIfAuthorized(CardDto cardDto,CeilingDto ceilingDto, String generatedReference, BigDecimal dailyCardLimit) {
+   private AuthorizationDto authorizeIfAuthorized(CardDto cardDto,CeilingDto ceilingDto, String generatedReference, BigDecimal dailyCardLimit,AuthorizationRequest authorizationRequest) {
       Optional<TransactionDto> lastTransaction = transactionService.findLastTransactionByCardIdAndMonth(cardDto.getId(), LocalDateTime.now().getMonthValue());
       if (lastTransaction.isPresent()) {
          BigDecimal availableBalance = lastTransaction.get().getAvailableBalance();
          if (availableBalance.compareTo(BigDecimal.ZERO) > 0) {
-            return authorizeBasedOnAvailableBalance(cardDto,ceilingDto, generatedReference, dailyCardLimit);
+            return authorizeBasedOnAvailableBalance(cardDto,ceilingDto, generatedReference, dailyCardLimit,authorizationRequest);
          } else {
-            return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), BigDecimal.ZERO);
+            return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), BigDecimal.ZERO,authorizationRequest);
          }
       } else {
-         return authorizeBasedOnLastTransaction(cardDto, generatedReference, dailyCardLimit);
+         return authorizeBasedOnLastTransaction(cardDto, generatedReference, dailyCardLimit,authorizationRequest);
       }
    }
 
-   private AuthorizationDto authorizeBasedOnAvailableBalance(CardDto cardDto,CeilingDto ceilingDto, String generatedReference, BigDecimal dailyCardLimit) {
+   private AuthorizationDto authorizeBasedOnAvailableBalance(CardDto cardDto,CeilingDto ceilingDto, String generatedReference, BigDecimal dailyCardLimit,AuthorizationRequest authorizationRequest) {
       List<TransactionDto> dailyTransaction = transactionService.findTodayTransaction(cardDto.getId(), LocalDateTime.now());
       if (!dailyTransaction.isEmpty()) {
          BigDecimal totalDailyAmount = calculateTotalDailyAmount(ceilingDto.getCeilingType(),dailyTransaction);
          if (totalDailyAmount.compareTo(dailyCardLimit) < 0) {
             cardDto.setStatus(EnumCardStatus.IN_USE);
             cardService.update(cardDto);
-            return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), dailyCardLimit.subtract(totalDailyAmount));
+            return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), dailyCardLimit.subtract(totalDailyAmount),authorizationRequest);
          } else {
-            return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), BigDecimal.ZERO);
+            return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), BigDecimal.ZERO,authorizationRequest);
          }
       } else {
          cardDto.setStatus(EnumCardStatus.IN_USE);
          cardService.update(cardDto);
-         return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), dailyCardLimit);
+         return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), dailyCardLimit,authorizationRequest);
       }
    }
 
-   private AuthorizationDto authorizeBasedOnLastTransaction(CardDto cardDto, String generatedReference, BigDecimal dailyCardLimit) {
+   private AuthorizationDto authorizeBasedOnLastTransaction(CardDto cardDto, String generatedReference, BigDecimal dailyCardLimit,AuthorizationRequest authorizationRequest) {
       cardDto.setStatus(EnumCardStatus.IN_USE);
       cardService.update(cardDto);
-      return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), dailyCardLimit);
+      return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), dailyCardLimit,authorizationRequest);
    }
 
    private BigDecimal calculateTotalDailyAmount(EnumCeilingType ceilingType,List<TransactionDto> dailyTransaction) {

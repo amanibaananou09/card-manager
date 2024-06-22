@@ -44,8 +44,4 @@ public class TransactionDto extends ESSIdentifiedDto<Long> {
         this.price = price;
         this.cardIdentifier = cardIdentifier;
     }
-
-    public TransactionDto(Long id, Long version) {
-        super(id, version);
-    }
 }

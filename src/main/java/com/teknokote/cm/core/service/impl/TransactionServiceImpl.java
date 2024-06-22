@@ -44,9 +44,9 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
             if (productDto != null) {
                 dto.setProductId(productDto.getId());
             }
-            SalePointDto salePoint = supplierDto.getSalePoints().stream().filter(salePointDto -> salePointDto.getName().equals(dto.getSalePointName())).toList().get(0);
-            if (salePoint != null) {
-                dto.setSalePointId(salePoint.getId());
+            List<SalePointDto> salePoints = supplierDto.getSalePoints().stream().filter(salePointDto -> salePointDto.getName().equals(dto.getSalePointName())).toList();
+            if (salePoints != null && !salePoints.isEmpty()) {
+                dto.setSalePointId(salePoints.get(0).getId());
             }
         }
         CardDto card = cardService.checkedFindById(dto.getCardId());
@@ -97,31 +97,36 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
 
     @Override
     public TransactionDto mapToTransactionDto(Transaction transaction) {
-        TransactionDto transactionDto = new TransactionDto(transaction.getId(), transaction.getVersion());
-        transactionDto.setAmount(transaction.getAmount());
+        TransactionDto.TransactionDtoBuilder builder = TransactionDto.builder()
+                .id(transaction.getId())
+                .version(transaction.getVersion())
+                .amount(transaction.getAmount())
+                .quantity(transaction.getQuantity())
+                .dateTime(transaction.getDateTime())
+                .availableBalance(transaction.getAvailableBalance());
 
         if (Objects.nonNull(transaction.getCard())) {
-            transactionDto.setCardId(transaction.getCardId());
-            transactionDto.setCardIdentifier(transaction.getCard().getCardId());
+            builder.cardId(transaction.getCardId())
+                    .cardIdentifier(transaction.getCard().getCardId());
         }
-        transactionDto.setQuantity(transaction.getQuantity());
+
         if (Objects.nonNull(transaction.getAuthorization())) {
-            transactionDto.setAuthorizationId(transaction.getAuthorizationId());
+            builder.authorizationId(transaction.getAuthorizationId());
         }
-        transactionDto.setDateTime(transaction.getDateTime());
-        transactionDto.setAvailableBalance(transaction.getAvailableBalance());
 
         if (Objects.nonNull(transaction.getProduct())) {
-            transactionDto.setProductId(transaction.getProductId());
-            transactionDto.setProductName(transaction.getProduct().getName());
-            transactionDto.setPrice(transaction.getProduct().getPrice());
-        }
-        if (Objects.nonNull(transaction.getSalePoint())) {
-            transactionDto.setSalePointName(transaction.getSalePoint().getName());
-            transactionDto.setSalePointId(transaction.getSalePointId());
-            transactionDto.setCity(transaction.getSalePoint().getCity());
+            builder.productId(transaction.getProductId())
+                    .productName(transaction.getProduct().getName())
+                    .price(transaction.getProduct().getPrice());
         }
 
-        return transactionDto;
+        if (Objects.nonNull(transaction.getSalePoint())) {
+            builder.salePointName(transaction.getSalePoint().getName())
+                    .salePointId(transaction.getSalePointId())
+                    .city(transaction.getSalePoint().getCity());
+        }
+
+        return builder.build();
     }
+
 }
