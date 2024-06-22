@@ -19,8 +19,11 @@ public interface AuthorizationMapper extends BidirectionalEntityDtoMapper<Long, 
 
     @Named("mapCardToCardType")
     default EnumCardType mapCardToCardType(Card card) {
-        EnumCeilingType ceilingType = card.getFirstCeilingType();
-        return convertCeilingTypeToCardType(ceilingType);
+        if (card!=null) {
+            EnumCeilingType ceilingType = card.getFirstCeilingType();
+            return convertCeilingTypeToCardType(ceilingType);
+        }
+        return null;
     }
     default EnumCardType convertCeilingTypeToCardType(EnumCeilingType ceilingType) {
         if (ceilingType != null) {

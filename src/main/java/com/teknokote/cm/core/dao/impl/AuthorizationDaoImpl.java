@@ -12,6 +12,8 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Objects;
+
 @Repository
 @Getter
 @Setter
@@ -24,8 +26,17 @@ public class AuthorizationDaoImpl extends JpaGenericDao<Long, AuthorizationDto, 
 
    @Override
    protected Authorization beforeCreate(Authorization authorization, AuthorizationDto dto) {
-      authorization.setCard(getEntityManager().getReference(Card.class, dto.getCardId()));
+      if (Objects.nonNull(dto.getCardId())){
+         authorization.setCard(getEntityManager().getReference(Card.class, dto.getCardId()));
+      }
       return super.beforeCreate(authorization, dto);
+   }
+   @Override
+   protected Authorization beforeUpdate(Authorization authorization, AuthorizationDto dto) {
+      if (Objects.nonNull(dto.getCardId())){
+         authorization.setCard(getEntityManager().getReference(Card.class, dto.getCardId()));
+      }
+      return super.beforeUpdate(authorization, dto);
    }
 
    @Override
