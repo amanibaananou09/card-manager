@@ -22,19 +22,17 @@ public class CardDto extends ESSActivatableDto<Long> {
     private String holderPassword;
     private LocalDate expirationDate;
     private EnumCardStatus status;
-    private AccountDto account;
     private Long cardGroupId;
     private Long accountId;
     private String cardGroupName;
 
 
     @Builder
-    public CardDto(Long id, Long version, boolean actif, LocalDateTime dateStatusChange, String tag, EnumCardType type, EnumCardStatus status, AccountDto account, Long cardGroupId, Long accountId, String companyName, String holder, String cardId, String codePin, String holderPassword, LocalDate expirationDate, String cardGroupName) {
+    public CardDto(Long id, Long version, boolean actif, LocalDateTime dateStatusChange, String tag, EnumCardType type, EnumCardStatus status, Long cardGroupId, Long accountId, String companyName, String holder, String cardId, String codePin, String holderPassword, LocalDate expirationDate, String cardGroupName) {
         super(id, version, actif, dateStatusChange);
         this.tag = tag;
         this.type = type;
         this.status = status;
-        this.account = account;
         this.cardGroupId = cardGroupId;
         this.accountId = accountId;
         this.companyName = companyName;
