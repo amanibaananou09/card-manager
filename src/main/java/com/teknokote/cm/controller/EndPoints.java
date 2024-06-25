@@ -42,5 +42,6 @@ public class EndPoints {
     public static final String AUTHORIZE = "/authorize";
 
     public static final String FIND = "/find";
+    public static final String CHART = "/chart";
 }
 

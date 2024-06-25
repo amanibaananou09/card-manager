@@ -4,6 +4,7 @@ import com.teknokote.cm.core.dao.TransactionDao;
 import com.teknokote.cm.core.dao.mappers.TransactionMapper;
 import com.teknokote.cm.core.model.*;
 import com.teknokote.cm.core.repository.TransactionRepository;
+import com.teknokote.cm.dto.TransactionChart;
 import com.teknokote.cm.dto.TransactionDto;
 import com.teknokote.cm.dto.TransactionFilterDto;
 import com.teknokote.core.dao.JpaGenericDao;
@@ -71,9 +72,48 @@ public class TransactionDaoImpl extends JpaGenericDao<Long, TransactionDto, Tran
    public List<TransactionDto> findTodayTransaction(Long cardId, LocalDateTime dateTime) {
       return getRepository().findAllByCardIdAndDateTimeBefore(cardId,dateTime).stream().map(getMapper()::toDto).collect(Collectors.toList());
    }
+   @Override
+   public List<TransactionChart> todayChartTransaction(Long customerId) {
+      return getRepository().findTodayTransactions(customerId);
+   }
+
+   @Override
+   public List<TransactionChart> todayChartTransactionWithCardId(Long customerId, Long cardId) {
+      return getRepository().findTodayTransactionsWithCardId(customerId,cardId);
+   }
+   @Override
+   public List<TransactionChart> weeklyChartTransaction(Long customerId) {
+      return getRepository().findWeeklyTransactions(customerId);
+   }
+
+   @Override
+   public List<TransactionChart> weeklyChartTransactionWithCardId(Long customerId, Long cardId) {
+      return getRepository().findWeeklyTransactionsWithCardId(customerId,cardId);
+   }
+
+   @Override
+   public List<TransactionChart> monthlyChartTransaction(Long customerId) {
+      return getRepository().findMonthlyTransactions(customerId);
+   }
+
+   @Override
+   public List<TransactionChart> monthlyChartTransactionWithCardId(Long customerId, Long cardId) {
+      return getRepository().findMonthlyTransactions(customerId);
+   }
+
+   @Override
+   public List<TransactionChart> findTransactionBetween(Long customerId,LocalDateTime startDate, LocalDateTime endDate) {
+      return getRepository().findTransactionsBetweenDate(customerId,startDate,endDate);
+   }
+
+   @Override
+   public List<TransactionChart> findTransactionBetweenDateWithCardId(Long customerId,Long cardId,LocalDateTime startDate, LocalDateTime endDate) {
+      return getRepository().findTransactionsBetweenDateAndCardId(customerId,cardId,startDate,endDate);
+   }
 
    @Override
    public Page<Transaction> findByCriteria(Long customerId,TransactionFilterDto filterDto, int page, int size) {
       return repository.findByCriteria(customerId,filterDto,page,size);
    }
+
 }

@@ -2,9 +2,11 @@ package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.TransactionDao;
 import com.teknokote.cm.core.model.EnumCeilingType;
+import com.teknokote.cm.core.model.EnumFilterPeriod;
 import com.teknokote.cm.core.model.Transaction;
 import com.teknokote.cm.core.service.*;
 import com.teknokote.cm.dto.*;
+import com.teknokote.core.exceptions.ServiceValidationException;
 import com.teknokote.core.service.ESSValidator;
 import com.teknokote.core.service.GenericCheckedService;
 import lombok.Getter;
@@ -13,7 +15,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -127,6 +131,53 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         }
 
         return builder.build();
+    }
+
+    @Override
+    public List<TransactionChart> chartTransaction(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate) {
+        if (period!=null) {
+            if (EnumFilterPeriod.today.toString().equalsIgnoreCase(period)) {
+                if (Objects.isNull(cardId)) {
+                    return getDao().todayChartTransaction(customerId);
+                } else {
+                    return getDao().todayChartTransactionWithCardId(customerId, cardId);
+                }
+            }
+            if (EnumFilterPeriod.yesterday.toString().equalsIgnoreCase(period)) {
+                LocalDate yesterday = LocalDate.now().minusDays(1);
+                LocalDateTime startOfDay = yesterday.atStartOfDay();
+                LocalDateTime endOfDay = yesterday.atTime(LocalTime.MAX);
+                if (Objects.isNull(cardId)) {
+                    return getDao().findTransactionBetween(customerId, startOfDay, endOfDay);
+                } else {
+                    return getDao().findTransactionBetweenDateWithCardId(customerId, cardId, startOfDay, endOfDay);
+                }
+            }
+            if (EnumFilterPeriod.weekly.toString().equalsIgnoreCase(period)) {
+                if (Objects.isNull(cardId)) {
+                    return getDao().weeklyChartTransaction(customerId);
+                } else {
+                    return getDao().weeklyChartTransactionWithCardId(customerId, cardId);
+                }
+            }
+            if (EnumFilterPeriod.monthly.toString().equalsIgnoreCase(period)) {
+                if (Objects.isNull(cardId)) {
+                    return getDao().monthlyChartTransaction(customerId);
+                } else {
+                    return getDao().monthlyChartTransactionWithCardId(customerId, cardId);
+                }
+            }
+        }else{
+            if (startDate == null || endDate == null) {
+                throw new ServiceValidationException("startDate and endDate must not be null");
+            }
+            if (Objects.isNull(cardId)){
+                return getDao().findTransactionBetween(customerId,startDate,endDate);
+            }else {
+                return getDao().findTransactionBetweenDateWithCardId(customerId,cardId,startDate,endDate);
+            }
+        }
+        return null;
     }
 
 }
