@@ -98,9 +98,8 @@ public class TransactionDaoImpl extends JpaGenericDao<Long, TransactionDto, Tran
 
    @Override
    public List<TransactionChart> monthlyChartTransactionWithCardId(Long customerId, Long cardId) {
-      return getRepository().findMonthlyTransactions(customerId);
+      return getRepository().findMonthlyTransactionsWithCardId(customerId,cardId);
    }
-
    @Override
    public List<TransactionChart> findTransactionBetween(Long customerId,LocalDateTime startDate, LocalDateTime endDate) {
       return getRepository().findTransactionsBetweenDate(customerId,startDate,endDate);
