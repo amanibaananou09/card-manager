@@ -12,12 +12,12 @@ import java.math.BigDecimal;
 public class TransactionChart {
     private String date;
     private String fuelGrade;
-    private Long cardId;
+    private String cardIdentifier;
     private BigDecimal sum;
 
-    public TransactionChart(String date,String fuelGrade, Long cardId, BigDecimal sum) {
+    public TransactionChart(String date,String fuelGrade, String cardIdentifier, BigDecimal sum) {
         this.date = date;
-        this.cardId = cardId;
+        this.cardIdentifier = cardIdentifier;
         this.fuelGrade=fuelGrade;
         this.sum = sum;
     }
