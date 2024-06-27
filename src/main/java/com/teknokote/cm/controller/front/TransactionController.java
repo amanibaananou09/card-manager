@@ -2,6 +2,7 @@ package com.teknokote.cm.controller.front;
 
 import com.teknokote.cm.controller.EndPoints;
 import com.teknokote.cm.core.service.TransactionService;
+import com.teknokote.cm.dto.DailyTransactionChart;
 import com.teknokote.cm.dto.TransactionChart;
 import com.teknokote.cm.dto.TransactionDto;
 import com.teknokote.cm.dto.TransactionFilterDto;
@@ -54,8 +55,8 @@ public class TransactionController {
         return transactionDtoPage;
     }
 
-    @GetMapping(EndPoints.CHART)
-    public List<TransactionChart> chartTransaction(
+    @GetMapping(EndPoints.DAILY_CHART)
+    public List<DailyTransactionChart> allCardChartTransaction(
             @RequestParam Long customerId,
             @RequestParam(required = false) Long cardId,
             @RequestParam(required = false)  String period,
@@ -69,5 +70,22 @@ public class TransactionController {
             realEndDate = LocalDateTime.parse(endDate);
         }
         return transactionService.chartTransaction(customerId,cardId,period,realStartDate,realEndDate);
+    }
+
+    @GetMapping(EndPoints.CHART)
+    public List<TransactionChart> chartTransactionWithPeriod(
+            @RequestParam Long customerId,
+            @RequestParam(required = false) Long cardId,
+            @RequestParam(required = false)  String period,
+            @RequestParam(required = false)String startDate,
+            @RequestParam(required = false) String endDate)
+    {
+        LocalDateTime realStartDate = null;
+        LocalDateTime realEndDate = null;
+        if (startDate != null && !startDate.isEmpty() && endDate != null && !endDate.isEmpty()) {
+            realStartDate = LocalDateTime.parse(startDate);
+            realEndDate = LocalDateTime.parse(endDate);
+        }
+        return transactionService.getTransactionChart(customerId,cardId,period,realStartDate,realEndDate);
     }
 }

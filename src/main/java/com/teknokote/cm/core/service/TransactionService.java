@@ -1,6 +1,7 @@
 package com.teknokote.cm.core.service;
 
 import com.teknokote.cm.core.model.Transaction;
+import com.teknokote.cm.dto.DailyTransactionChart;
 import com.teknokote.cm.dto.TransactionChart;
 import com.teknokote.cm.dto.TransactionDto;
 import com.teknokote.cm.dto.TransactionFilterDto;
@@ -23,5 +24,7 @@ public interface TransactionService extends BaseService<Long, TransactionDto>
 
     TransactionDto mapToTransactionDto(Transaction transaction);
 
-    List<TransactionChart> chartTransaction(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate);
+    List<DailyTransactionChart> chartTransaction(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate);
+
+    List<TransactionChart> getTransactionChart(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate);
 }

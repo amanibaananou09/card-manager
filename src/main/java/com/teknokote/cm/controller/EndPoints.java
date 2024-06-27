@@ -43,5 +43,6 @@ public class EndPoints {
 
     public static final String FIND = "/find";
     public static final String CHART = "/chart";
+    public static final String DAILY_CHART = "/dailyChart";
 }
 

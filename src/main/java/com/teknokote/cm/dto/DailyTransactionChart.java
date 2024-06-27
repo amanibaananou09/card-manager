@@ -9,12 +9,14 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 @NoArgsConstructor
-public class TransactionChart {
+public class DailyTransactionChart {
+    private String date;
     private String fuelGrade;
     private String cardIdentifier;
     private BigDecimal sum;
 
-    public TransactionChart(String fuelGrade, String cardIdentifier, BigDecimal sum) {
+    public DailyTransactionChart(String date,String fuelGrade, String cardIdentifier, BigDecimal sum) {
+        this.date = date;
         this.cardIdentifier = cardIdentifier;
         this.fuelGrade=fuelGrade;
         this.sum = sum;

@@ -18,9 +18,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Getter
@@ -134,7 +132,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
     }
 
     @Override
-    public List<TransactionChart> chartTransaction(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<DailyTransactionChart> chartTransaction(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate) {
         if (period!=null) {
             if (EnumFilterPeriod.today.toString().equalsIgnoreCase(period)) {
                 if (Objects.isNull(cardId)) {
@@ -179,5 +177,21 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         }
         return null;
     }
+
+    @Override
+    public List<TransactionChart> getTransactionChart(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate) {
+        List<DailyTransactionChart> dailyTransactionCharts = chartTransaction(customerId, cardId, period, startDate, endDate);
+
+        Map<String, TransactionChart> transactionChartMap = new HashMap<>();
+        for (DailyTransactionChart daily : dailyTransactionCharts) {
+            String key = daily.getFuelGrade() + "-" + daily.getCardIdentifier();
+            TransactionChart transactionChart = transactionChartMap.getOrDefault(key, new TransactionChart(daily.getFuelGrade(), daily.getCardIdentifier(), BigDecimal.ZERO));
+            transactionChart.setSum(transactionChart.getSum().add(daily.getSum()));
+            transactionChartMap.put(key, transactionChart);
+        }
+
+        return new ArrayList<>(transactionChartMap.values());
+    }
+
 
 }
