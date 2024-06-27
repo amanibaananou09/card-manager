@@ -31,78 +31,77 @@ import java.util.Optional;
 @Getter
 @Setter
 @Slf4j
-public class LoginService
-{
-   @Value("${spring.security.oauth2.client.provider.keycloak.realm}")
-   public String realm;
-   @Value("${spring.security.oauth2.client.provider.keycloak.serverUrl}")
-   private String serverUrl;
-   @Value("${spring.security.oauth2.client.registration.oauth2-client-credentials.client-id}")
-   private String clientId;
-   @Value("${spring.security.oauth2.client.registration.oauth2-client-credentials.client-secret}")
-   private String clientSecret;
-   @Value("${spring.security.oauth2.client.registration.oauth2-client-credentials.authorization-grant-type}")
-   private String grantType;
-   @Value("${spring.security.oauth2.client.provider.keycloak.token_endpoint}")
-   private String tokenEndpoint;
-   @Autowired
-   private UserDao userDao;
-   @Autowired
-   private SupplierDao supplierDao;
-   @Autowired
-   private CustomerDao customerDao;
-   @Autowired
-   private UserService userService;
-   private final RestTemplate restTemplate;
+public class LoginService {
+    @Value("${spring.security.oauth2.client.provider.keycloak.realm}")
+    public String realm;
+    @Value("${spring.security.oauth2.client.provider.keycloak.serverUrl}")
+    private String serverUrl;
+    @Value("${spring.security.oauth2.client.registration.oauth2-client-credentials.client-id}")
+    private String clientId;
+    @Value("${spring.security.oauth2.client.registration.oauth2-client-credentials.client-secret}")
+    private String clientSecret;
+    @Value("${spring.security.oauth2.client.registration.oauth2-client-credentials.authorization-grant-type}")
+    private String grantType;
+    @Value("${spring.security.oauth2.client.provider.keycloak.token_endpoint}")
+    private String tokenEndpoint;
+    @Autowired
+    private UserDao userDao;
+    @Autowired
+    private SupplierDao supplierDao;
+    @Autowired
+    private CustomerDao customerDao;
+    @Autowired
+    private UserService userService;
+    private final RestTemplate restTemplate;
 
-   @Autowired
-   public LoginService(RestTemplate restTemplate) {
-      this.restTemplate = restTemplate;
-   }
+    @Autowired
+    public LoginService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
-   public LoginResponse login(LoginRequest loginrequest, boolean doCheckUser) {
-      if(doCheckUser)
-      {
-         if(Objects.isNull(loginrequest.getUsername()))
-            throw new BadCredentialsException("username or password mismatch");
-         final Optional<User> user = getUserDao().getRepository().findAllByUsernameIgnoreCase(loginrequest.getUsername());
-         if(user.isEmpty()) throw new BadCredentialsException("username or password mismatch");
-      }
+    public LoginResponse login(LoginRequest loginrequest, boolean doCheckUser) {
+        if (doCheckUser) {
+            if (Objects.isNull(loginrequest.getUsername()))
+                throw new BadCredentialsException("username or password mismatch");
+            final Optional<User> user = getUserDao().getRepository().findAllByUsernameIgnoreCase(loginrequest.getUsername());
+            if (user.isEmpty()) throw new BadCredentialsException("username or password mismatch");
+        }
 
-      HttpHeaders headers = new HttpHeaders();
-      headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-      MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
-      map.add("client_id", clientId);
-      map.add("client_secret", clientSecret);
-      map.add("grant_type", grantType);
-      map.add("username", loginrequest.getUsername());
-      map.add("password", loginrequest.getPassword());
+        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        map.add("client_id", clientId);
+        map.add("client_secret", clientSecret);
+        map.add("grant_type", grantType);
+        map.add("username", loginrequest.getUsername());
+        map.add("password", loginrequest.getPassword());
 
 
-      HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
 
-      log.info("Trying to log in: {}",loginrequest.getUsername());
-      ResponseEntity<LoginResponse> response = restTemplate.postForEntity(tokenEndpoint, httpEntity, LoginResponse.class);
-      if(response.hasBody()){
-         userService.updateLastConnection(loginrequest.getUsername());
-         log.info("{} -> logged in",loginrequest.getUsername());
-         final Optional<User> optionalUser = getUserDao().getRepository().findAllByUsernameIgnoreCase(loginrequest.getUsername());
-         if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
-            Optional<Supplier> optionalSupplier = getSupplierDao().getRepository().findSupplierByUser(user.getUsername());
-            if (optionalSupplier.isPresent()){
-               response.getBody().setSupplierId(optionalSupplier.get().getId());
+        log.info("Trying to log in: {}", loginrequest.getUsername());
+        ResponseEntity<LoginResponse> response = restTemplate.postForEntity(tokenEndpoint, httpEntity, LoginResponse.class);
+        if (response.hasBody()) {
+            userService.updateLastConnection(loginrequest.getUsername());
+            log.info("{} -> logged in", loginrequest.getUsername());
+            final Optional<User> optionalUser = getUserDao().getRepository().findAllByUsernameIgnoreCase(loginrequest.getUsername());
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                Optional<Supplier> optionalSupplier = getSupplierDao().getRepository().findSupplierByUser(user.getUsername());
+                if (optionalSupplier.isPresent()) {
+                    response.getBody().setSupplierId(optionalSupplier.get().getId());
+                }
+                Optional<Customer> optionalCustomer = getCustomerDao().getRepository().findCustomerByUser(user.getUsername());
+                if (optionalCustomer.isPresent()) {
+                    response.getBody().setCustomerId(optionalCustomer.get().getId());
+                    response.getBody().setSupplierId(optionalCustomer.get().getSupplaierId());
+                }
             }
-            Optional<Customer> optionalCustomer = getCustomerDao().getRepository().findCustomerByUser(user.getUsername());
-            if (optionalCustomer.isPresent()){
-               response.getBody().setCustomerId(optionalCustomer.get().getId());
-            }
-         }
-      }else{
-         log.info("{} -> Failed to log in, result:{}",loginrequest.getUsername(), response.getBody());
-      }
-      return response.getBody();
+        } else {
+            log.info("{} -> Failed to log in, result:{}", loginrequest.getUsername(), response.getBody());
+        }
+        return response.getBody();
 
-   }
+    }
 }
