@@ -2,9 +2,11 @@ package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.TransactionDao;
 import com.teknokote.cm.core.model.EnumCeilingType;
+import com.teknokote.cm.core.model.EnumFilterPeriod;
 import com.teknokote.cm.core.model.Transaction;
 import com.teknokote.cm.core.service.*;
 import com.teknokote.cm.dto.*;
+import com.teknokote.core.exceptions.ServiceValidationException;
 import com.teknokote.core.service.ESSValidator;
 import com.teknokote.core.service.GenericCheckedService;
 import lombok.Getter;
@@ -13,10 +15,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.LocalTime;
+import java.util.*;
 
 @Service
 @Getter
@@ -128,5 +130,70 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
 
         return builder.build();
     }
+
+    @Override
+    public List<DailyTransactionChart> chartTransaction(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate) {
+        if (period!=null) {
+            if (EnumFilterPeriod.today.toString().equalsIgnoreCase(period)) {
+                if (Objects.isNull(cardId)) {
+                    return getDao().todayChartTransaction(customerId);
+                } else {
+                    return getDao().todayChartTransactionWithCardId(customerId, cardId);
+                }
+            }
+            if (EnumFilterPeriod.yesterday.toString().equalsIgnoreCase(period)) {
+                LocalDate yesterday = LocalDate.now().minusDays(1);
+                LocalDateTime startOfDay = yesterday.atStartOfDay();
+                LocalDateTime endOfDay = yesterday.atTime(LocalTime.MAX);
+                if (Objects.isNull(cardId)) {
+                    return getDao().findTransactionBetween(customerId, startOfDay, endOfDay);
+                } else {
+                    return getDao().findTransactionBetweenDateWithCardId(customerId, cardId, startOfDay, endOfDay);
+                }
+            }
+            if (EnumFilterPeriod.weekly.toString().equalsIgnoreCase(period)) {
+                if (Objects.isNull(cardId)) {
+                    return getDao().weeklyChartTransaction(customerId);
+                } else {
+                    return getDao().weeklyChartTransactionWithCardId(customerId, cardId);
+                }
+            }
+            if (EnumFilterPeriod.monthly.toString().equalsIgnoreCase(period)) {
+                if (Objects.isNull(cardId)) {
+                    return getDao().monthlyChartTransaction(customerId);
+                } else {
+                    return getDao().monthlyChartTransactionWithCardId(customerId, cardId);
+                }
+            }
+        }else{
+            if (startDate == null || endDate == null) {
+                throw new ServiceValidationException("startDate and endDate must not be null");
+            }
+            if (Objects.isNull(cardId)){
+                return getDao().findTransactionBetween(customerId,startDate,endDate);
+            }else {
+                return getDao().findTransactionBetweenDateWithCardId(customerId,cardId,startDate,endDate);
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<TransactionChart> getTransactionChart(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate) {
+        List<DailyTransactionChart> dailyTransactionCharts = chartTransaction(customerId, cardId, period, startDate, endDate);
+
+        Map<String, TransactionChart> transactionChartMap = new HashMap<>();
+        if (dailyTransactionCharts!=null && !dailyTransactionCharts.isEmpty()) {
+            for (DailyTransactionChart daily : dailyTransactionCharts) {
+                String key = daily.getFuelGrade() + "-" + daily.getCardIdentifier();
+                TransactionChart transactionChart = transactionChartMap.getOrDefault(key, new TransactionChart(daily.getFuelGrade(), daily.getCardIdentifier(), BigDecimal.ZERO));
+                transactionChart.setSum(transactionChart.getSum().add(daily.getSum()));
+                transactionChartMap.put(key, transactionChart);
+            }
+            return new ArrayList<>(transactionChartMap.values());
+        }
+        return new ArrayList<>();
+    }
+
 
 }
