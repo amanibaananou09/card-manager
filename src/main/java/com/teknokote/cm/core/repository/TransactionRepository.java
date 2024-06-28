@@ -49,14 +49,16 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("SELECT new com.teknokote.cm.dto.DailyTransactionChart(TO_CHAR(t.dateTime, 'DY'),t.product.name, t.card.cardId, SUM(t.quantity)) " +
             "FROM Transaction t join t.card c where c.cardGroup.customer.id = :customerId " +
             "and EXTRACT(WEEK FROM t.dateTime) = EXTRACT(WEEK FROM CURRENT_DATE) " +
-            "GROUP BY TO_CHAR(t.dateTime, 'DY'),t.product.name, t.card.cardId")
+            "GROUP BY TO_CHAR(t.dateTime, 'DY'),t.product.name, t.card.cardId " +
+            "order by CASE WHEN to_char(t.dateTime, 'DY') = 'SUN' THEN 1 ELSE 0 END, MIN(t.dateTime) ASC")
     List<DailyTransactionChart> findWeeklyTransactions(Long customerId);
 
     @Query("SELECT new com.teknokote.cm.dto.DailyTransactionChart(TO_CHAR(t.dateTime, 'DY'),t.product.name, t.card.cardId, SUM(t.quantity)) " +
             "FROM Transaction t join t.card c where c.cardGroup.customer.id = :customerId " +
             "and EXTRACT(WEEK FROM t.dateTime) = EXTRACT(WEEK FROM CURRENT_DATE) " +
             "AND t.cardId = :cardId " +
-            "GROUP BY TO_CHAR(t.dateTime, 'DY'),t.product.name, t.card.cardId")
+            "GROUP BY TO_CHAR(t.dateTime, 'DY'), t.product.name, t.card.cardId " +
+            "order by CASE WHEN to_char(t.dateTime, 'DY') = 'SUN' THEN 1 ELSE 0 END, MIN(t.dateTime) ASC")
     List<DailyTransactionChart> findWeeklyTransactionsWithCardId(Long customerId,Long cardId);
 
     @Query("SELECT new com.teknokote.cm.dto.DailyTransactionChart(TO_CHAR(t.dateTime, 'dd'),t.product.name, t.card.cardId, SUM(t.quantity)) " +

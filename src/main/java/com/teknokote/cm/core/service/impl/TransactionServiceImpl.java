@@ -175,7 +175,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
                 return getDao().findTransactionBetweenDateWithCardId(customerId,cardId,startDate,endDate);
             }
         }
-        return null;
+        return new ArrayList<>();
     }
 
     @Override
@@ -183,14 +183,16 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         List<DailyTransactionChart> dailyTransactionCharts = chartTransaction(customerId, cardId, period, startDate, endDate);
 
         Map<String, TransactionChart> transactionChartMap = new HashMap<>();
-        for (DailyTransactionChart daily : dailyTransactionCharts) {
-            String key = daily.getFuelGrade() + "-" + daily.getCardIdentifier();
-            TransactionChart transactionChart = transactionChartMap.getOrDefault(key, new TransactionChart(daily.getFuelGrade(), daily.getCardIdentifier(), BigDecimal.ZERO));
-            transactionChart.setSum(transactionChart.getSum().add(daily.getSum()));
-            transactionChartMap.put(key, transactionChart);
+        if (dailyTransactionCharts!=null && !dailyTransactionCharts.isEmpty()) {
+            for (DailyTransactionChart daily : dailyTransactionCharts) {
+                String key = daily.getFuelGrade() + "-" + daily.getCardIdentifier();
+                TransactionChart transactionChart = transactionChartMap.getOrDefault(key, new TransactionChart(daily.getFuelGrade(), daily.getCardIdentifier(), BigDecimal.ZERO));
+                transactionChart.setSum(transactionChart.getSum().add(daily.getSum()));
+                transactionChartMap.put(key, transactionChart);
+            }
+            return new ArrayList<>(transactionChartMap.values());
         }
-
-        return new ArrayList<>(transactionChartMap.values());
+        return new ArrayList<>();
     }
 
 
