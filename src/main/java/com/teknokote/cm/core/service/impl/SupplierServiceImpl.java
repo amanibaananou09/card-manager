@@ -51,8 +51,9 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
         if (supplier != null) {
             supplierDto.setId(supplier.getId());
             return update(supplierDto);
+        } else {
+            throw new ServiceValidationException("supplier not existing on card manager !!!");
         }
-        return null;
     }
 
     @Override
@@ -72,8 +73,9 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
         if (supplier != null) {
             salePointDto.setSupplierId(supplier.getId());
             return salePointDao.create(salePointDto);
+        }else {
+            throw new ServiceValidationException("supplier not existing on card manager !!!");
         }
-        return null;
     }
 
     @Override
@@ -97,8 +99,9 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
         SupplierDto supplier = checkedFindById(supplierId);
         if (supplier != null) {
             return userDao.create(userDto);
+        }else {
+            throw new ServiceValidationException("supplier not existing on card manager !!!");
         }
-        return null;
     }
 
     @Override
