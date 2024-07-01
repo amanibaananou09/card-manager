@@ -130,7 +130,8 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
                 return productDao.update(productDto);
             }
             return productDao.create(productDto);
+        }else {
+            throw new ServiceValidationException("supplier not existing on card manager !!!");
         }
-        return null;
     }
 }
