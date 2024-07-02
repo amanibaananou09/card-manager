@@ -65,8 +65,8 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
     }
 
     @Override
-    public List<TransactionDto> findTodayTransaction(Long cardId, LocalDateTime dateTime) {
-        return getDao().findTodayTransaction(cardId, dateTime);
+    public List<TransactionDto> findTodayTransaction(Long cardId) {
+        return getDao().findTodayTransaction(cardId);
     }
 
     private BigDecimal calculateAvailableBalance(TransactionDto transactionDto, Long cardId, CeilingDto ceilingDto, CardGroupDto groupDto) {
@@ -133,7 +133,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
 
     @Override
     public List<DailyTransactionChart> chartTransaction(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate) {
-        if (period!=null) {
+        if (period != null) {
             if (EnumFilterPeriod.today.toString().equalsIgnoreCase(period)) {
                 if (Objects.isNull(cardId)) {
                     return getDao().todayChartTransaction(customerId);
@@ -165,14 +165,14 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
                     return getDao().monthlyChartTransactionWithCardId(customerId, cardId);
                 }
             }
-        }else{
+        } else {
             if (startDate == null || endDate == null) {
                 throw new ServiceValidationException("startDate and endDate must not be null");
             }
-            if (Objects.isNull(cardId)){
-                return getDao().findTransactionBetween(customerId,startDate,endDate);
-            }else {
-                return getDao().findTransactionBetweenDateWithCardId(customerId,cardId,startDate,endDate);
+            if (Objects.isNull(cardId)) {
+                return getDao().findTransactionBetween(customerId, startDate, endDate);
+            } else {
+                return getDao().findTransactionBetweenDateWithCardId(customerId, cardId, startDate, endDate);
             }
         }
         return new ArrayList<>();
@@ -183,7 +183,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         List<DailyTransactionChart> dailyTransactionCharts = chartTransaction(customerId, cardId, period, startDate, endDate);
 
         Map<String, TransactionChart> transactionChartMap = new HashMap<>();
-        if (dailyTransactionCharts!=null && !dailyTransactionCharts.isEmpty()) {
+        if (dailyTransactionCharts != null && !dailyTransactionCharts.isEmpty()) {
             for (DailyTransactionChart daily : dailyTransactionCharts) {
                 String key = daily.getFuelGrade() + "-" + daily.getCardIdentifier();
                 TransactionChart transactionChart = transactionChartMap.getOrDefault(key, new TransactionChart(daily.getFuelGrade(), daily.getCardIdentifier(), BigDecimal.ZERO));
