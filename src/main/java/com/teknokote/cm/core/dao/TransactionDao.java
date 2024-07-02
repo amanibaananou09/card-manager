@@ -12,11 +12,10 @@ import java.util.List;
 import java.util.Optional;
 
 
-public interface TransactionDao extends BasicDao<Long, TransactionDto>
-{
+public interface TransactionDao extends BasicDao<Long, TransactionDto> {
     Optional<TransactionDto> findLastTransactionByCardIdAndMonth(Long cardId, int month);
 
-    List<TransactionDto> findTodayTransaction(Long cardId, LocalDateTime dateTime);
+    List<TransactionDto> findTodayTransaction(Long cardId);
 
     List<DailyTransactionChart> todayChartTransaction(Long customerId);
 
