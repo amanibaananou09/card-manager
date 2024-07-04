@@ -4,8 +4,7 @@ import com.teknokote.cm.core.model.Customer;
 import com.teknokote.cm.dto.CustomerDto;
 import com.teknokote.core.config.MapperConfiguration;
 import com.teknokote.core.mappers.BidirectionalEntityDtoMapper;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 
 @Mapper(config = MapperConfiguration.class)
 public interface CustomerMapper extends BidirectionalEntityDtoMapper<Long, Customer, CustomerDto> {
@@ -13,4 +12,8 @@ public interface CustomerMapper extends BidirectionalEntityDtoMapper<Long, Custo
     @Mapping(source = "supplier.id", target = "supplierId")
     @Override
     CustomerDto toDto(Customer source);
+
+    @Mapping(target = "users", ignore = true)
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Customer update(CustomerDto source, @MappingTarget Customer target);
 }

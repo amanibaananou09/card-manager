@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Repository
 @Getter
@@ -59,30 +57,20 @@ public class CustomerDaoImpl extends JpaActivatableGenericDao<Long, User, Custom
 
     @Override
     protected Customer beforeUpdate(Customer customer, CustomerDto dto) {
-
-        if (!dto.getUsers().isEmpty()) {
-            customer.getUsers().forEach(user -> {
-                        user.setDateStatusChange(LocalDateTime.now());
-                    }
-            );
-        }
-
-        Customer savedCustomer = super.beforeUpdate(customer, dto);
-
+        dto.setDateStatusChange(LocalDateTime.now());
         if (!dto.getAccounts().isEmpty()) {
-            savedCustomer.getAccounts().forEach(account -> {
-                        account.setCustomer(savedCustomer);
-                        account.setDateStatusChange(LocalDateTime.now());
-                        account.setActif(true);
-                        if (!account.getMovements().isEmpty()) {
-                            account.getMovements().forEach(movement -> movement.setAccount(account));
-                        }
-                    }
-            );
+            customer.getAccounts().forEach(account -> {
+                account.setCustomer(customer);
+                account.setDateStatusChange(LocalDateTime.now());
+                account.setActif(true);
+                if (!account.getMovements().isEmpty()) {
+                    account.getMovements().forEach(movement -> movement.setAccount(account));
+                }
+            });
         }
-        return savedCustomer;
-    }
 
+        return super.beforeUpdate(customer, dto);
+    }
 
     public List<CustomerDto> findCustomerByIdentifier(String identifier) {
         return getRepository().findCustomerByIdentifier(identifier).stream().map(getMapper()::toDto).toList();
