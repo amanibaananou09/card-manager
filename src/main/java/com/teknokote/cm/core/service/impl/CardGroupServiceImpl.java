@@ -16,12 +16,12 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
 @Getter
-public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long, CardGroupDto> implements CardGroupService
-{
+public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long, CardGroupDto> implements CardGroupService {
     @Autowired
     private ESSValidator<CardGroupDto> validator;
     @Autowired
@@ -30,7 +30,7 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
     private CardDao cardDao;
 
     @Override
-    public List<CardGroupDto> findAllByActif(boolean actif){
+    public List<CardGroupDto> findAllByActif(boolean actif) {
         return getDao().findAllByActif(actif);
     }
 
@@ -54,7 +54,7 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
             if (dto.getGroupCondition().getTimeSlot() != null) {
                 dto.getGroupCondition().setTimeSlots(dto.createListTimeSlotsFromString());
             }
-            if (dto.getGroupCondition().getLogicalOperators() != null){
+            if (dto.getGroupCondition().getLogicalOperators() != null) {
                 dto.getGroupCondition().setOperators(dto.createListOperatorFromString());
             }
         }
@@ -65,19 +65,22 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
     public CardGroupDto updateCardGroup(CardGroupDto dto) {
         CardGroupDto cardGroupDto = checkedFindById(dto.getId());
         dto.createConditionFromGroupCondition();
-        List<TimeSlotDto> timeSlots = dto.getGroupCondition().getTimeSlots();
-        if (timeSlots!=null && !timeSlots.isEmpty()){
-            timeSlotsOverlap(timeSlots);
+        if (dto.getGroupCondition() != null) {
+            List<TimeSlotDto> timeSlots = dto.getGroupCondition().getTimeSlots();
+
+            if (timeSlots != null && !timeSlots.isEmpty()) {
+                timeSlotsOverlap(timeSlots);
+            }
         }
-        if (dto.getCeilings()!=null && !dto.getCeilings().isEmpty()){
-            for (CeilingDto ceilingDto:dto.getCeilings()){
-                if (ceilingDto.getDailyLimitValue().equals(BigDecimal.ZERO)){
+        if (dto.getCeilings() != null && !dto.getCeilings().isEmpty()) {
+            for (CeilingDto ceilingDto : dto.getCeilings()) {
+                if (ceilingDto.getDailyLimitValue().equals(BigDecimal.ZERO)) {
                     throw new ServiceValidationException("daily limit value must be greater than 0 !");
                 }
-                if (ceilingDto.getValue().equals(BigDecimal.ZERO)){
+                if (ceilingDto.getValue().equals(BigDecimal.ZERO)) {
                     throw new ServiceValidationException("Monthly limit  value must be greater than 0 !");
                 }
-                if (ceilingDto.getValue().compareTo(ceilingDto.getDailyLimitValue())<=0){
+                if (ceilingDto.getValue().compareTo(ceilingDto.getDailyLimitValue()) <= 0) {
                     throw new ServiceValidationException("Monthly limit  value must be greater than the daily limit value  !");
                 }
             }
@@ -86,14 +89,17 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
     }
 
     public void timeSlotsOverlap(List<TimeSlotDto> timeSlots) {
-        for (int i = 0; i < timeSlots.size(); i++) {
-            for (int j = i + 1; j < timeSlots.size(); j++) {
-                if (isOverlap(timeSlots.get(i), timeSlots.get(j))) {
+        List<TimeSlotDto> timeSlotsList = timeSlots.stream().sorted(Comparator
+                .comparing(TimeSlotDto::getStartActivityTime)).toList();
+        for (int i = 0; i < timeSlotsList.size(); i++) {
+            for (int j = i + 1; j < timeSlotsList.size(); j++) {
+                if (isOverlap(timeSlotsList.get(i), timeSlotsList.get(j))) {
                     throw new ServiceValidationException("Overlap between time Slots ");
                 }
             }
         }
     }
+
     public boolean isOverlap(TimeSlotDto firstTimeSlot, TimeSlotDto secondTimeSlot) {
         LocalTime end1 = firstTimeSlot.getEndActivityTime();
         LocalTime start2 = secondTimeSlot.getStartActivityTime();
