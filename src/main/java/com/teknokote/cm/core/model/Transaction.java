@@ -20,6 +20,7 @@ public class Transaction extends ESSEntity<Long, User>
    private LocalDateTime dateTime;
    private BigDecimal amount;
    private BigDecimal quantity;
+   private Double price;
    @ManyToOne(fetch = FetchType.LAZY)
    private Card card;
    @Column(name = "card_id", insertable = false, updatable = false)

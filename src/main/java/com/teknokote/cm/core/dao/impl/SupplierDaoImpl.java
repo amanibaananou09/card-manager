@@ -2,6 +2,7 @@ package com.teknokote.cm.core.dao.impl;
 
 import com.teknokote.cm.core.dao.SupplierDao;
 import com.teknokote.cm.core.dao.mappers.SupplierMapper;
+import com.teknokote.cm.core.dao.mappers.UserMapper;
 import com.teknokote.cm.core.model.Supplier;
 import com.teknokote.cm.core.model.User;
 import com.teknokote.cm.core.repository.SupplierRepository;
@@ -23,6 +24,8 @@ public class SupplierDaoImpl extends JpaActivatableGenericDao<Long,User ,Supplie
     @Autowired
     private SupplierMapper mapper;
     @Autowired
+    private UserMapper userMapper;
+    @Autowired
     private SupplierRepository repository;
     @Override
     protected Supplier beforeCreate(Supplier supplier, SupplierDto dto) {
@@ -41,7 +44,7 @@ public class SupplierDaoImpl extends JpaActivatableGenericDao<Long,User ,Supplie
     @Override
     protected Supplier beforeUpdate(Supplier supplier, SupplierDto dto) {
         supplier.setDateStatusChange(LocalDateTime.now());
-        Supplier savedSupplier = super.beforeCreate(supplier, dto);
+        Supplier savedSupplier = super.beforeUpdate(supplier, dto);
         if (Objects.nonNull(dto.getSalePoints())) {
             savedSupplier.getSalePoints().forEach(salePoint -> salePoint.setSupplier(savedSupplier));
         }
