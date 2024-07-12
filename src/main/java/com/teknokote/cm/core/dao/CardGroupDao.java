@@ -11,5 +11,7 @@ public interface CardGroupDao extends ActivatableDao<Long, CardGroupDto>
     List<CardGroupDto> findAllByActif(boolean actif);
 
     List<CardGroupDto> findAllByCustomer(Long customerId);
+
+    CardGroupDto findByNameAndCustomerId(String name, Long customerId);
 }
 

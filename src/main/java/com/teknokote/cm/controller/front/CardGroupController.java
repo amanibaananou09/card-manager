@@ -23,7 +23,7 @@ private CardGroupService cardGroupService;
 
 @PostMapping(EndPoints.ADD)
 public ResponseEntity<CardGroupDto> addCardGroup(@PathVariable Long customerId,@RequestBody CardGroupDto dto) {
-    CardGroupDto savedCardGroup = cardGroupService.create(dto);
+    CardGroupDto savedCardGroup = cardGroupService.createCardGroup(dto);
     return new ResponseEntity<>(savedCardGroup, HttpStatus.CREATED);
     }
 

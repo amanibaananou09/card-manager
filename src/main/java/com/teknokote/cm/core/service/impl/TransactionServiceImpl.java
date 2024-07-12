@@ -103,6 +103,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
                 .id(transaction.getId())
                 .version(transaction.getVersion())
                 .amount(transaction.getAmount())
+                .price(transaction.getPrice())
                 .quantity(transaction.getQuantity())
                 .dateTime(transaction.getDateTime())
                 .availableBalance(transaction.getAvailableBalance());
@@ -118,8 +119,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
 
         if (Objects.nonNull(transaction.getProduct())) {
             builder.productId(transaction.getProductId())
-                    .productName(transaction.getProduct().getName())
-                    .price(transaction.getProduct().getPrice());
+                    .productName(transaction.getProduct().getName());
         }
 
         if (Objects.nonNull(transaction.getSalePoint())) {

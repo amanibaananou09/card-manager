@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 @Getter
@@ -94,14 +95,22 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
     }
 
     @Override
-    @Transactional
     public UserDto createUser(Long supplierId,UserDto userDto) {
         SupplierDto supplier = checkedFindById(supplierId);
+        Set<UserDto> existingUsers = supplier.getUsers();
         if (supplier != null) {
-            return userDao.create(userDto);
-        }else {
-            throw new ServiceValidationException("supplier not existing on card manager !!!");
-        }
+            supplier.getUsers().add(userDto);
+            SupplierDto supplierDto=dao.update(supplier);
+            for (UserDto existingUser : existingUsers.stream().filter(userDto1 -> userDto1.getId()!=null).toList()) {
+                if (!supplierDto.getUsers().contains(existingUser)) {
+                    supplier.getUsers().remove(existingUser);
+                    userDao.deleteById(existingUser.getId());
+                }
+            }
+            }else{
+                throw new ServiceValidationException("supplier not existing on card manager !!!");
+            }
+        return userDto;
     }
 
     @Override
