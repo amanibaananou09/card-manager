@@ -83,6 +83,14 @@ public class CardServiceImpl extends ActivatableGenericCheckedService<Long, Card
         }
         return super.create(dto);
     }
+    @Override
+    public CardDto update(CardDto dto) {
+        final ESSValidationResult cardValidation = getValidator().validateOnUpdate(dto);
+        if (cardValidation.hasErrors()) {
+            throw new ServiceValidationException(cardValidation.getMessage());
+        }
+        return super.update(dto);
+    }
 }
 
 
