@@ -8,7 +8,9 @@ import com.teknokote.cm.core.service.AuthorizationService;
 import com.teknokote.cm.core.service.CardService;
 import com.teknokote.cm.dto.AuthorizationDto;
 import com.teknokote.cm.dto.CardDto;
+import com.teknokote.core.exceptions.ServiceValidationException;
 import com.teknokote.core.service.ActivatableGenericCheckedService;
+import com.teknokote.core.service.ESSValidationResult;
 import com.teknokote.core.service.ESSValidator;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -71,6 +73,23 @@ public class CardServiceImpl extends ActivatableGenericCheckedService<Long, Card
                     update(cardDto);
                 }
         }
+    }
+
+    @Override
+    public CardDto create(CardDto dto) {
+        final ESSValidationResult cardValidation = getValidator().validateOnCreate(dto);
+        if (cardValidation.hasErrors()) {
+            throw new ServiceValidationException(cardValidation.getMessage());
+        }
+        return super.create(dto);
+    }
+    @Override
+    public CardDto update(CardDto dto) {
+        final ESSValidationResult cardValidation = getValidator().validateOnUpdate(dto);
+        if (cardValidation.hasErrors()) {
+            throw new ServiceValidationException(cardValidation.getMessage());
+        }
+        return super.update(dto);
     }
 }
 

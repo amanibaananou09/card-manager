@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
@@ -88,5 +89,10 @@ public class CardDaoImpl extends JpaActivatableGenericDao<Long, User, CardDto, C
     @Override
     public CardDto findByTag(String tag) {
         return getMapper().toDto(getRepository().findByTag(tag));
+    }
+
+    @Override
+    public Optional<CardDto> findCardById(Long customerId,String cardId) {
+        return getRepository().findByCardId(customerId,cardId).map(getMapper()::toDto);
     }
 }

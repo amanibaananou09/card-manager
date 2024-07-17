@@ -4,6 +4,7 @@ import com.teknokote.cm.dto.CardDto;
 import com.teknokote.core.dao.ActivatableDao;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CardDao extends ActivatableDao<Long, CardDto> {
     List<CardDto> findAllByCustomer(Long customerId);
@@ -19,5 +20,7 @@ public interface CardDao extends ActivatableDao<Long, CardDto> {
     List<CardDto> findCardByExpirationDate(int month, int year, Long customerId);
 
     CardDto findByTag(String tag);
+
+    Optional<CardDto> findCardById(Long customerId,String cardId);
 }
 

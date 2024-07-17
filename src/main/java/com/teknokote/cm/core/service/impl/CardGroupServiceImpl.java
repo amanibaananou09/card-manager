@@ -49,7 +49,7 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
     public CardGroupDto createCardGroup(CardGroupDto cardGroupDto){
         CardGroupDto cardGroup = getDao().findByNameAndCustomerId(cardGroupDto.getName(),cardGroupDto.getCustomerId());
         if (cardGroup!=null){
-            throw new ServiceValidationException("card group "+ "'"+cardGroup.getName()+"' "+"existe déja , veillier choisir un autre nom" );
+            throw new ServiceValidationException("Un groupe de carte avec le nom "+ "'"+cardGroup.getName()+"' "+"existe déja , veillier choisir un autre nom" );
         }else{
             return getDao().create(cardGroupDto);
         }
@@ -72,7 +72,13 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
 
     @Override
     public CardGroupDto updateCardGroup(CardGroupDto dto) {
-        CardGroupDto cardGroupDto = checkedFindById(dto.getId());
+        CardGroupDto cardGroup = checkedFindById(dto.getId());
+        List<CardGroupDto> cardGroups = getDao().findAllByCustomer(dto.getCustomerId()).stream().filter(cardGroupDto->!cardGroupDto.getId().equals(dto.getId())).toList();
+        for (CardGroupDto cardGroupDto : cardGroups){
+            if (cardGroupDto.getName().equals(dto.getName())){
+                throw new ServiceValidationException("Un groupe de carte avec le nom "+ "'"+dto.getName()+"' "+"existe déja , veillier choisir un autre nom" );
+            }
+        }
         dto.createConditionFromGroupCondition();
         if (dto.getGroupCondition() != null) {
             List<TimeSlotDto> timeSlots = dto.getGroupCondition().getTimeSlots();
