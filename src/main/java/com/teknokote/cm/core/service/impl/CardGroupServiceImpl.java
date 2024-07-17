@@ -49,7 +49,7 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
     public CardGroupDto createCardGroup(CardGroupDto cardGroupDto){
         CardGroupDto cardGroup = getDao().findByNameAndCustomerId(cardGroupDto.getName(),cardGroupDto.getCustomerId());
         if (cardGroup!=null){
-            throw new ServiceValidationException("card group "+ "'"+cardGroup.getName()+"' "+"existe déja , veillier choisir un autre nom" );
+            throw new ServiceValidationException("Un groupe de carte avec le nom "+ "'"+cardGroup.getName()+"' "+"existe déja , veillier choisir un autre nom" );
         }else{
             return getDao().create(cardGroupDto);
         }

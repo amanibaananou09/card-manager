@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CardRepository extends JpaActivatableRepository<Card, Long> {
@@ -30,4 +31,6 @@ public interface CardRepository extends JpaActivatableRepository<Card, Long> {
     List<Card> findCardByHolderName(String holder, Long customerId);
 
     Card findByTag(String tag);
+    @Query("SELECT ca FROM Card ca WHERE ca.cardGroup.customerId= :customerId and ca.cardId= :cardId")
+    Optional<Card> findByCardId(Long customerId,String cardId);
 }
