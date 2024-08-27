@@ -9,7 +9,7 @@ spring:
         registration:
           oauth2-client-credentials:
             client-id: ess
-            client-secret: x8VFOcBjbqF65sXCrjXVVjQDPI7T7B41
+            client-secret: WvaglRGLxViy46Ar9EyQPouxEn9MgNHT
             scope: openid, profile, roles
             authorization-grant-type: password
         provider:
