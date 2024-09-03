@@ -48,6 +48,7 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
                     CardGroupDto cardGroupDto = cardGroupService.checkedFindById(cardDto.getCardGroupId());
                     BigDecimal dailyCardLimit = calculateDailyCardLimit(cardDto);
                     if (cardGroupDto != null && cardGroupDto.getActif().equals(true)) {
+
                         String condition = cardGroupDto.getCondition();
                         boolean isAuthorized = evaluateCondition(condition, authorizationRequest.getProductName(),
                                 authorizationRequest.getSalePointName(), LocalDate.now().getDayOfWeek().toString(), salePoint.getCity());
