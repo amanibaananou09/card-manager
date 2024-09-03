@@ -6,6 +6,9 @@ import com.teknokote.cm.core.service.UserService;
 import com.teknokote.cm.dto.CustomerDto;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,8 +52,12 @@ public class CustomerController {
     }
 
     @GetMapping
-    public List<CustomerDto> listCustomerBySupplier(@PathVariable Long supplierId) {
-        return customerService.findCustomerBySupplier(supplierId);
+    public Page<CustomerDto> listCustomerBySupplier(@PathVariable Long supplierId, @RequestParam(defaultValue = "0") int page,
+                                                    @RequestParam(defaultValue = "25") int size) {
+        List<CustomerDto> customerList= customerService.findCustomerBySupplier(supplierId);
+        int start = page * size;
+        int end = Math.min((start + size), customerList.size());
+        return new PageImpl<>(customerList.subList(start, end), PageRequest.of(page, size), customerList.size());
     }
 
     @PostMapping(EndPoints.DEACTIVATE)
