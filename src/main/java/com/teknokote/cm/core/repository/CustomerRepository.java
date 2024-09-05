@@ -10,10 +10,10 @@ import java.util.Optional;
 
 @Repository
 public interface CustomerRepository extends JpaActivatableRepository<Customer, Long> {
-    @Query("SELECT ca FROM Customer ca WHERE LOWER(ca.identifier) LIKE LOWER(CONCAT('%', :identifier, '%')) order by ca.audit.createdDate desc")
+    @Query("SELECT ca FROM Customer ca WHERE LOWER(ca.identifier) LIKE LOWER(CONCAT('%', :identifier, '%')) order by ca.audit.createdDate asc")
     List<Customer> findCustomerByIdentifier(String identifier);
 
-    @Query("select c from Customer c where c.supplaierId = :supplierId order by c.audit.createdDate desc")
+    @Query("select c from Customer c where c.supplaierId = :supplierId order by c.audit.createdDate asc ")
     List<Customer> findAllBySupplierId(Long supplierId);
 
     @Query("select sp from Customer sp join sp.users user where user.username = :username")
