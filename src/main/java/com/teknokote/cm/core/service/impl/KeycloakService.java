@@ -3,6 +3,7 @@ package com.teknokote.cm.core.service.impl;
 import com.teknokote.cm.exception.KeycloakUserCreationException;
 import com.teknokote.cm.core.dao.mappers.UserMapper;
 import com.teknokote.cm.dto.UserDto;
+import com.teknokote.core.exceptions.EntityNotFoundException;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
@@ -148,4 +149,34 @@ public class KeycloakService {
 
         return user;
     }
+
+    /**
+     * Updates the user with the given username in Keycloak.
+     *
+     * @param userUsernameToUpdate the username of the user to update
+     * @param userDto              the updated user information
+     * @throws EntityNotFoundException if the user with the given username is not found in Keycloak
+     */
+    public void updateUser(String userUsernameToUpdate, UserDto userDto) {
+        Keycloak keycloak = this.getInstance();
+        RealmResource realmResource = keycloak.realm(realm);
+        Optional<UserRepresentation> keycloakUser = getUserIdentity(userUsernameToUpdate).stream().findFirst();
+        UserRepresentation keycloakUserToUpdate = keycloakUser.orElseThrow(() -> new EntityNotFoundException("Keycloak keycloakUser with userUsernameToUpdate  " + userUsernameToUpdate + " not found"));
+        UserResource userResource = realmResource.users().get(keycloakUserToUpdate.getId());
+        UserRepresentation userRepresentation = userMapper.toUserRepresentation(userDto);
+        userRepresentation.setId(keycloakUserToUpdate.getId());
+        if (userDto.getPassword() != null) {
+            CredentialRepresentation passwordCred = new CredentialRepresentation();
+            passwordCred.setTemporary(false);
+            passwordCred.setType(CredentialRepresentation.PASSWORD);
+            passwordCred.setValue(userDto.getPassword());
+            userRepresentation.setCredentials(Collections.singletonList(passwordCred));
+        }
+        Map<String, List<String>> attributes = new HashMap<>();
+        attributes.put("phone", Collections.singletonList(userDto.getPhone()));
+        userRepresentation.setAttributes(attributes);
+
+        userResource.update(userRepresentation);
+    }
+
 }
