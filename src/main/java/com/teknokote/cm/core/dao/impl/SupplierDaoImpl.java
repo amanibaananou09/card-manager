@@ -60,7 +60,8 @@ public class SupplierDaoImpl extends JpaActivatableGenericDao<Long,User ,Supplie
     }
 
     @Override
-    public SupplierDto findAllByReferenceAndName(String reference,String name) {
-        return getMapper().toDto(getRepository().findByReferenceAndName(reference,name));
+    public SupplierDto findAllByReferenceAndIdentifier(String reference, String identifier) {
+        Supplier supplier=getRepository().findByReferenceAndIdentifier(reference,identifier);
+        return getMapper().toDto(supplier);
     }
 }

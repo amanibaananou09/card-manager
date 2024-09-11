@@ -41,7 +41,7 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
         SupplierDto supplierDto = supplierService.findByReference(authorizationRequest.getReference());
         String generatedReference = generateReference();
         if (supplierDto != null) {
-            SalePointDto salePoint = findSalePoint(supplierDto, authorizationRequest.getSalePointName());
+            SalePointDto salePoint = findSalePoint(supplierDto, authorizationRequest.getSalePointIdentifier());
             if (salePoint != null) {
                 CardDto cardDto = cardService.findByTag(authorizationRequest.getTag());
                 if (cardDto != null && cardDto.getExpirationDate().isAfter(LocalDate.now()) && cardDto.getActif().equals(true)) {
@@ -233,9 +233,9 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
         }
     }
 
-    private SalePointDto findSalePoint(SupplierDto supplierDto, String salePointName) {
+    private SalePointDto findSalePoint(SupplierDto supplierDto, String salePointIdentifier) {
         return supplierDto != null ? supplierDto.getSalePoints().stream()
-                .filter(salePointDto -> salePointDto.getName().equals(salePointName))
+                .filter(salePointDto -> salePointDto.getIdentifier().equals(salePointIdentifier))
                 .findFirst().orElse(null) : null;
     }
 
