@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 public class UserDto extends ESSActivatableDto<Long> {
     @NotEmpty
-    private String identifier;
+    private String userIdentifier;
     private String username;
     private String password;
     private String firstName;
@@ -26,9 +26,9 @@ public class UserDto extends ESSActivatableDto<Long> {
     private List<String> suggestions;
 
     @Builder
-    public UserDto(Long id, Long version, Boolean actif, LocalDateTime dateStatusChange, List<String> suggestions, String username, String firstName, String lastName, String email, String phone, LocalDateTime lastConnectionDate, String reference, String password, String role,String identifier) {
+    public UserDto(Long id, Long version, Boolean actif, LocalDateTime dateStatusChange, List<String> suggestions, String username, String firstName, String lastName, String email, String phone, LocalDateTime lastConnectionDate, String reference, String password, String role,String userIdentifier) {
         super(id, version, actif, dateStatusChange);
-        this.identifier=identifier;
+        this.userIdentifier=userIdentifier;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;

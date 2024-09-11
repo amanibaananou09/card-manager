@@ -19,5 +19,5 @@ databaseChangeLog:
             tableName: cm_user
             columns:
               - column:
-                  name: identifier
+                  name: user_identifier
                   type: varchar(50) null

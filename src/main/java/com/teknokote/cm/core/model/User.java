@@ -22,7 +22,7 @@ public class User extends EssUser<Long, User>
    @Serial
    private static final long serialVersionUID = 1334158047026037242L;
    @Column(nullable = false)
-   private String identifier;
+   private String userIdentifier;
    private String username;
    private LocalDateTime lastConnectionDate;
 }

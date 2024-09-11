@@ -115,11 +115,15 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
 
     @Override
     @Transactional
-    public UserDto updateUser(Long supplierId,UserDto userDto) {
+    public UserDto updateUser(Long supplierId, UserDto userDto) {
         SupplierDto supplier = checkedFindById(supplierId);
         if (supplier != null) {
-            UserDto existingUser = supplier.getUsers().stream().filter(userDto1 -> userDto1.getIdentifier().equals(userDto.getIdentifier())).toList().get(0);
-            if (existingUser != null) {
+            List<UserDto> matchingUsers = supplier.getUsers().stream()
+                    .filter(userDto1 -> userDto1.getUserIdentifier() != null && userDto1.getUserIdentifier().equals(userDto.getUserIdentifier()))
+                    .toList();
+
+            if (!matchingUsers.isEmpty()) {
+                UserDto existingUser = matchingUsers.get(0);
                 userDto.setId(existingUser.getId());
                 return userDao.update(userDto);
             }
