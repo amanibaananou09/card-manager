@@ -3,4 +3,6 @@ databaseChangeLog:
       path: classpath:db/changelog/versions/1.0.0/
   - includeAll:
       path: classpath:db/changelog/versions/1.0.1/
+  - includeAll:
+      path: classpath:db/changelog/versions/1.0.2/
 

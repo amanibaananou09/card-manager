@@ -2,6 +2,7 @@ package com.teknokote.cm.core.model;
 
 import com.teknokote.core.model.ESSEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +16,8 @@ public class SalePoint extends ESSEntity<Long, User>
 {
    @Serial
    private static final long serialVersionUID = 8023792932074153377L;
+   @Column(nullable = false)
+   private String identifier;
    private String name;
    private String city;
    private String area;

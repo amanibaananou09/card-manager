@@ -6,15 +6,12 @@ import com.teknokote.cm.dto.SupplierDto;
 import com.teknokote.cm.dto.UserDto;
 import com.teknokote.core.service.ActivatableEntityService;
 import com.teknokote.core.service.BaseService;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 public interface SupplierService extends ActivatableEntityService<Long, SupplierDto>, BaseService<Long, SupplierDto>
 {
     SupplierDto findByReference(String reference);
 
-    SupplierDto findByReferenceAndName(String reference, String name);
+    SupplierDto findByReferenceAndIdentifier(String reference, String name);
 
     SupplierDto updateSupplier(SupplierDto supplierDto);
     SupplierDto createSupplier(SupplierDto supplierDto);

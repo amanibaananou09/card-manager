@@ -17,6 +17,8 @@ public class Supplier extends ActivatableEntity<Long, User>
 {
    @Serial
    private static final long serialVersionUID = 4397829570013258848L;
+   @Column(nullable = false)
+   private String identifier;
    @Enumerated(EnumType.STRING)
    private EnumOriginModule origin;
    @Enumerated(EnumType.STRING)

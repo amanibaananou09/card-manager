@@ -12,9 +12,7 @@ import java.util.Optional;
 public interface SupplierRepository extends JpaActivatableRepository<Supplier, Long> {
 
     Supplier findByReference(String reference);
-
-    @Query("select sp from Supplier sp WHERE sp.reference = :reference and sp.name = :name")
-    Supplier findByReferenceAndName(@Param("reference") String reference, @Param("name") String name);
+    Supplier findByReferenceAndIdentifier(String reference, String identifier);
     @Query("select sp from Supplier sp join sp.users user where user.username = :username")
     Optional<Supplier> findSupplierByUser(String username);
 }

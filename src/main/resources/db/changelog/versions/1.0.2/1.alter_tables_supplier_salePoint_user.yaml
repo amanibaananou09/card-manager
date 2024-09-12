@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: Amjed
+      changes:
+        - addColumn:
+            tableName: cm_supplier
+            columns:
+              - column:
+                  name: identifier
+                  type: varchar(50) null
+        - addColumn:
+            tableName: cm_sale_point
+            columns:
+              - column:
+                  name: identifier
+                  type: varchar(50) null
+        - addColumn:
+            tableName: cm_user
+            columns:
+              - column:
+                  name: user_identifier
+                  type: varchar(50) null

@@ -1,6 +1,7 @@
 package com.teknokote.cm.dto;
 
 import com.teknokote.core.dto.ESSIdentifiedDto;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SalePointDto extends ESSIdentifiedDto<Long>{
+    @NotEmpty
+    private String identifier;
     private String name;
     private String city;
     private String area;
@@ -18,9 +21,10 @@ public class SalePointDto extends ESSIdentifiedDto<Long>{
     private String phone;
     private boolean status;
     @Builder
-    public SalePointDto(Long id, Long version,String name,String city,String area,Long supplierId,boolean status,Long countryId,String reference,String phone,String countryName)
+    public SalePointDto(Long id, Long version,String name,String city,String area,Long supplierId,boolean status,Long countryId,String reference,String phone,String countryName,String identifier)
     {
         super(id,version);
+        this.identifier=identifier;
         this.name = name;
         this.city = city;
         this.area = area;
