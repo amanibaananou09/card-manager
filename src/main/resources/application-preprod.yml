@@ -1,0 +1,34 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/cardmanager
+    username: cardmanager
+    password: cardmanager%1
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://keycloak:8443/realms/ess-realm
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+      client:
+        registration:
+          oauth2-client-credentials:
+            client-id: ess
+            client-secret: 1gJy8AohCbRWUMoua4ekXB6zjZHGddPJ
+            scope: openid, profile, roles
+            authorization-grant-type: password
+        provider:
+          keycloak:
+            realm: ess-realm
+            issuer-uri: https://keycloak:8443/realms/ess-realm
+            token_endpoint: https://keycloak:8443/realms/ess-realm/protocol/openid-connect/token
+            serverUrl: https://keycloak:8443/
+            username: ali
+            password: ali
+
+logging:
+  level:
+    com.teknokote: INFO
+    org.apache: INFO
+    org.apache.tomcat.util.net.NioEndpoint: INFO
+    org.springframework.security.web: INFO
+  file: cardmanager.log
