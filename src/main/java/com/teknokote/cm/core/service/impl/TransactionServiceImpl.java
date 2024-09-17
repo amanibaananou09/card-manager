@@ -1,9 +1,7 @@
 package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.TransactionDao;
-import com.teknokote.cm.core.model.EnumCeilingType;
-import com.teknokote.cm.core.model.EnumFilterPeriod;
-import com.teknokote.cm.core.model.Transaction;
+import com.teknokote.cm.core.model.*;
 import com.teknokote.cm.core.service.*;
 import com.teknokote.cm.dto.*;
 import com.teknokote.core.exceptions.ServiceValidationException;
@@ -123,12 +121,32 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         }
 
         if (Objects.nonNull(transaction.getSalePoint())) {
-            builder.salePointName(transaction.getSalePoint().getName())
+            SalePointDto salePointDto = mapToSalePointDto(transaction.getSalePoint());
+            builder.salePoint(salePointDto)
                     .salePointId(transaction.getSalePointId())
+                    .salePointName(transaction.getSalePoint().getName())
                     .city(transaction.getSalePoint().getCity());
         }
 
         return builder.build();
+    }
+
+    private SalePointDto mapToSalePointDto(SalePoint salePoint) {
+        CountryDto countryDto = mapToCountryDto(salePoint.getCountry());
+        return SalePointDto.builder()
+                .id(salePoint.getId())
+                .name(salePoint.getName())
+                .city(salePoint.getCity())
+                .country(countryDto)
+                .build();
+    }
+
+    private CountryDto mapToCountryDto(Country salePoint) {
+        return CountryDto.builder()
+                .id(salePoint.getId())
+                .name(salePoint.getName())
+                .code(salePoint.getCode())
+                .build();
     }
 
     @Override
