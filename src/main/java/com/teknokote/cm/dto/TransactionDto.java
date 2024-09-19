@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -21,14 +22,16 @@ public class TransactionDto extends ESSIdentifiedDto<Long> {
     private Long productId;
     private String reference;
     private BigDecimal availableBalance;
+    private BigDecimal availableVolume;
     private Long salePointId;
     private SalePointDto salePoint;
     private String salePointName;
     private String city;
     private Double price;
+    private Map<String, BigDecimal> remainingBalancePerProduct;
 
     @Builder
-    public TransactionDto(Long id, Long version, LocalDateTime dateTime, String cardIdentifier, Double price, BigDecimal amount, BigDecimal quantity, Long cardId, Long authorizationId, Long productId, SalePointDto salePoint, String productName, String reference, BigDecimal availableBalance, Long salePointId, String salePointName, String city) {
+    public TransactionDto(Long id, Long version, LocalDateTime dateTime, String cardIdentifier, Double price, BigDecimal amount, BigDecimal quantity, Long cardId, Long authorizationId, Long productId, SalePointDto salePoint, String productName, String reference, BigDecimal availableBalance, Long salePointId, String salePointName, String city,BigDecimal availableVolume,Map<String, BigDecimal> remainingBalancePerProduct) {
         super(id, version);
         this.dateTime = dateTime;
         this.amount = amount;
@@ -45,5 +48,7 @@ public class TransactionDto extends ESSIdentifiedDto<Long> {
         this.city = city;
         this.price = price;
         this.cardIdentifier = cardIdentifier;
+        this.availableVolume=availableVolume;
+        this.remainingBalancePerProduct=remainingBalancePerProduct;
     }
 }

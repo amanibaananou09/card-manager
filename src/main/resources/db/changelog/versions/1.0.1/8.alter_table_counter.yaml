@@ -1,0 +1,8 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: amjed
+      changes:
+        - dropColumn:
+            tableName: cm_counter
+            columnName: daily_limit_value
