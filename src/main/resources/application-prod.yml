@@ -1,9 +1,13 @@
 spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/cardmanager
+    username: cardmanager
+    password: cardmanager%1
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloack:8080/realms/ess-realm
+          issuer-uri: https://keycloak:8443/realms/ess-realm
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
       client:
         registration:
@@ -15,9 +19,9 @@ spring:
         provider:
           keycloak:
             realm: ess-realm
-            issuer-uri: http://keycloack:8080/realms/ess-realm
-            token_endpoint: http://keycloack:8080/realms/ess-realm/protocol/openid-connect/token
-            serverUrl: http://keycloack:8080/
+            issuer-uri: https://keycloak:8443/realms/ess-realm
+            token_endpoint: https://keycloak:8443/realms/ess-realm/protocol/openid-connect/token
+            serverUrl: https://keycloak:8443/
             username: ali
             password: ali
 
