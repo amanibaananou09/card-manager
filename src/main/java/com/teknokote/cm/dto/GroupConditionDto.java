@@ -1,5 +1,6 @@
 package com.teknokote.cm.dto;
 
+import com.teknokote.core.exceptions.ServiceValidationException;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -58,6 +59,11 @@ public class GroupConditionDto {
         }
 
         String[] operators = logicalOperators.split(",");
+        // Check for invalid `not()` and `not('null')` conditions
+        checkForInvalidNotCondition(allowedDays, "allowedDays");
+        checkForInvalidNotCondition(allowedSalePoints, "allowedSalePoints");
+        checkForInvalidNotCondition(allowedCity, "allowedCity");
+        checkForInvalidNotCondition(allowedProduct, "allowedProduct");
 
         // Append each parameter with its condition and logical operator
         if (allowedDays != null && !allowedDays.isEmpty()) {
@@ -96,6 +102,17 @@ public class GroupConditionDto {
         return logicalExpression.toString();
     }
 
+    private void checkForInvalidNotCondition(String value, String fieldName) {
+        if (value != null) {
+            String lowerValue = value.toLowerCase();
+            if (lowerValue.contains("not ()")) {
+                throw new ServiceValidationException("Invalid condition: 'not()' is not allowed for " + fieldName);
+            }
+            if (lowerValue.contains("not (null)")) {
+                throw new ServiceValidationException("Invalid condition: 'not(null)' is not allowed for " + fieldName);
+            }
+        }
+    }
     public List<TimeSlotDto> createListTimeSlotsFromString(String timeSlotString) {
         List<TimeSlotDto> timeSlotList = new ArrayList<>();
         String[] timeSlotRanges = timeSlotString.split(" or ");
