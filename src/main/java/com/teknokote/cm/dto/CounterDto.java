@@ -14,14 +14,12 @@ public class CounterDto extends ESSIdentifiedDto<Long> {
     private EnumCounterType counterType;
     private String name;
     private BigDecimal value;
-    private BigDecimal dailyLimitValue;
 
     @Builder
-    public CounterDto(Long id,Long version,EnumCounterType counterType, String name, BigDecimal value,BigDecimal dailyLimitValue) {
+    public CounterDto(Long id,Long version,EnumCounterType counterType, String name, BigDecimal value) {
         super(id,version);
         this.counterType = counterType;
         this.name = name;
         this.value = value;
-        this.dailyLimitValue=dailyLimitValue;
     }
 }

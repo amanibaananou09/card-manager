@@ -13,10 +13,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Getter
@@ -53,13 +55,25 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         CardGroupDto cardGroupDto = cardGroupService.checkedFindById(card.getCardGroupId());
         CeilingDto ceilingDto = cardGroupDto.getCeilings().stream().findFirst().get();
         BigDecimal availableBalance = calculateAvailableBalance(dto, dto.getCardId(), ceilingDto, cardGroupDto);
-        dto.setAvailableBalance(availableBalance);
+        if (ceilingDto.getCeilingType().equals(EnumCeilingType.AMOUNT)) {
+            dto.setAvailableBalance(availableBalance);
+        }else{
+            dto.setAvailableVolume(availableBalance);
+        }
         return create(dto);
     }
 
     @Override
-    public Optional<TransactionDto> findLastTransactionByCardIdAndMonth(Long cardId, int month) {
-        return getDao().findLastTransactionByCardIdAndMonth(cardId, month);
+    public Optional<TransactionDto>  findLastTransactionByCardId(Long cardId, EnumCeilingLimitType limitType, LocalDateTime dateTime) {
+        if (limitType.equals(EnumCeilingLimitType.MONTHLY)){
+            return getDao().findLastTransactionByCardIdAndMonth(cardId, dateTime.getMonthValue());
+        } else if (limitType.equals(EnumCeilingLimitType.WEEKLY)) {
+            LocalDateTime startOfWeek = LocalDate.now().with(DayOfWeek.MONDAY).atStartOfDay();
+            LocalDateTime endOfWeek = startOfWeek.plusDays(7);
+            return getDao().findLastTransactionByCardIdAndWeek(cardId,startOfWeek,endOfWeek);
+        }else {
+            return getDao().findTodayLastTransactionByCardId(cardId);
+        }
     }
 
     @Override
@@ -68,14 +82,14 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
     }
 
     private BigDecimal calculateAvailableBalance(TransactionDto transactionDto, Long cardId, CeilingDto ceilingDto, CardGroupDto groupDto) {
-        Optional<TransactionDto> lastTransaction = this.findLastTransactionByCardIdAndMonth(cardId, transactionDto.getDateTime().getMonthValue());
+        Optional<TransactionDto> lastTransaction = this.findLastTransactionByCardId(cardId,ceilingDto.getLimitType(),LocalDateTime.now());
         BigDecimal valueToSubtract;
         if (lastTransaction.isEmpty()) {
-            // First transaction of the month
+            // First transaction on ceiling limit type
             valueToSubtract = calculateAmountToSubtract(transactionDto, ceilingDto.getCeilingType());
             return ceilingDto.getValue().subtract(valueToSubtract);
         } else {
-            // Subsequent transaction within the same month
+            // Subsequent transaction within the same ceiling limit type
             TransactionDto transaction = lastTransaction.get();
             valueToSubtract = calculateAmountToSubtract(transactionDto, ceilingDto.getCeilingType());
             return transaction.getAvailableBalance().subtract(valueToSubtract);
@@ -92,8 +106,10 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
             TransactionFilterDto filterDto,
             int page, int size
     ) {
-        return getDao().findByCriteria(customerId, filterDto, page, size);
+        Page<Transaction> transactions = getDao().findByCriteria(customerId, filterDto, page, size);
+        return transactions;
     }
+
 
     @Override
     public TransactionDto mapToTransactionDto(Transaction transaction) {
@@ -103,8 +119,12 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
                 .amount(transaction.getAmount())
                 .price(transaction.getPrice())
                 .quantity(transaction.getQuantity())
-                .dateTime(transaction.getDateTime())
-                .availableBalance(transaction.getAvailableBalance());
+                .dateTime(transaction.getDateTime());
+        if (Objects.nonNull(transaction.getAvailableVolume())) {
+            builder.availableBalance(transaction.getAvailableBalance());
+        }        if (Objects.nonNull(transaction.getAvailableVolume())) {
+            builder.availableVolume(transaction.getAvailableVolume());
+        }
 
         if (Objects.nonNull(transaction.getCard())) {
             builder.cardId(transaction.getCardId())
@@ -121,32 +141,42 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         }
 
         if (Objects.nonNull(transaction.getSalePoint())) {
-            SalePointDto salePointDto = mapToSalePointDto(transaction.getSalePoint());
-            builder.salePoint(salePointDto)
+            builder.salePointName(transaction.getSalePoint().getName())
                     .salePointId(transaction.getSalePointId())
                     .salePointName(transaction.getSalePoint().getName())
                     .city(transaction.getSalePoint().getCity());
         }
-
+        // Calculate SRÉ for each product and add it to the DTO
+        Map<String, BigDecimal> remainingBalancePerProduct = calculateRemainingBalance(transaction);
+        builder.remainingBalancePerProduct(remainingBalancePerProduct);
         return builder.build();
     }
+    private Map<String, BigDecimal> calculateRemainingBalance(Transaction transaction) {
+        // Assuming getFuelPrices() gives you a map of product ID to price
+        List<ProductDto> productList = productService.findBySupplier(transaction.getSalePoint().getSupplierId());
+        Map<String, Double> fuelPrices = productList.stream()
+                .collect(Collectors.toMap(ProductDto::getName, ProductDto::getPrice));
 
-    private SalePointDto mapToSalePointDto(SalePoint salePoint) {
-        CountryDto countryDto = mapToCountryDto(salePoint.getCountry());
-        return SalePointDto.builder()
-                .id(salePoint.getId())
-                .name(salePoint.getName())
-                .city(salePoint.getCity())
-                .country(countryDto)
-                .build();
-    }
+        // Initialize the map to store SRÉ values
+        Map<String, BigDecimal> remainingBalancePerProduct = new HashMap<>();
 
-    private CountryDto mapToCountryDto(Country salePoint) {
-        return CountryDto.builder()
-                .id(salePoint.getId())
-                .name(salePoint.getName())
-                .code(salePoint.getCode())
-                .build();
+        // Get the remaining volume from the transaction (adjust as necessary)
+        BigDecimal remainingVolume = transaction.getAvailableVolume() != null ?
+                transaction.getAvailableVolume() : BigDecimal.ZERO;
+
+        // Loop through each product price and calculate the SRÉ
+        for (Map.Entry<String, Double> entry : fuelPrices.entrySet()) {
+            String productName = entry.getKey();
+            Double pricePerUnit = entry.getValue();
+
+            // Calculate SRÉ: remaining volume * price per unit
+            BigDecimal remainingBalance = remainingVolume.multiply(BigDecimal.valueOf(pricePerUnit));
+
+            // Store the result in the map
+            remainingBalancePerProduct.put(productName, remainingBalance);
+        }
+
+        return remainingBalancePerProduct;
     }
 
     @Override

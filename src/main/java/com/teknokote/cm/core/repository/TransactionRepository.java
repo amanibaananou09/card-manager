@@ -15,7 +15,10 @@ import java.util.Optional;
 public interface TransactionRepository extends JpaRepository<Transaction, Long>, CustomTransactionRepository {
     @Query("SELECT t FROM Transaction t WHERE t.cardId = :cardId AND EXTRACT(MONTH FROM t.dateTime) = :month ORDER BY t.dateTime DESC LIMIT 1")
     Optional<Transaction> findLastTransactionByCardIdAndMonth(Long cardId, int month);
-
+    @Query("SELECT t FROM Transaction t WHERE t.cardId = :cardId AND t.dateTime >= :startOfWeek AND t.dateTime < :endOfWeek ORDER BY t.dateTime DESC LIMIT 1")
+    Optional<Transaction> findLastTransactionByCardIdAndWeek(Long cardId, LocalDateTime startOfWeek, LocalDateTime endOfWeek);
+    @Query(" SELECT t FROM Transaction t WHERE t.cardId = :cardId and FUNCTION('DATE', t.dateTime) = CURRENT_DATE ORDER BY t.dateTime DESC LIMIT 1")
+    Optional<Transaction> findTodayLastTransactionByCardId(Long cardId);
     @Query(" SELECT t FROM Transaction t WHERE t.cardId = :cardId and FUNCTION('DATE', t.dateTime) = CURRENT_DATE")
     List<Transaction> findAllByCardIdToday(Long cardId);
 

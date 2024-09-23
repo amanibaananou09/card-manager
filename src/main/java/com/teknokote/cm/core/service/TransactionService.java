@@ -1,5 +1,6 @@
 package com.teknokote.cm.core.service;
 
+import com.teknokote.cm.core.model.EnumCeilingLimitType;
 import com.teknokote.cm.core.model.Transaction;
 import com.teknokote.cm.dto.DailyTransactionChart;
 import com.teknokote.cm.dto.TransactionChart;
@@ -16,7 +17,7 @@ public interface TransactionService extends BaseService<Long, TransactionDto> {
 
     TransactionDto createTransaction(TransactionDto dto);
 
-    Optional<TransactionDto> findLastTransactionByCardIdAndMonth(Long id, int monthValue);
+    Optional<TransactionDto> findLastTransactionByCardId(Long id, EnumCeilingLimitType limitType, LocalDateTime dateTime);
 
     List<TransactionDto> findTodayTransaction(Long cardId);
 

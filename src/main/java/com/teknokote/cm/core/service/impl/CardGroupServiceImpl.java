@@ -89,14 +89,8 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
         }
         if (dto.getCeilings() != null && !dto.getCeilings().isEmpty()) {
             for (CeilingDto ceilingDto : dto.getCeilings()) {
-                if (ceilingDto.getDailyLimitValue().equals(BigDecimal.ZERO)) {
-                    throw new ServiceValidationException("daily limit value must be greater than 0 !");
-                }
                 if (ceilingDto.getValue().equals(BigDecimal.ZERO)) {
-                    throw new ServiceValidationException("Monthly limit  value must be greater than 0 !");
-                }
-                if (ceilingDto.getValue().compareTo(ceilingDto.getDailyLimitValue()) <= 0) {
-                    throw new ServiceValidationException("Monthly limit  value must be greater than the daily limit value  !");
+                    throw new ServiceValidationException("limit  value must be greater than 0 !");
                 }
             }
         }

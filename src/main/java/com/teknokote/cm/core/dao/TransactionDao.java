@@ -15,6 +15,10 @@ import java.util.Optional;
 public interface TransactionDao extends BasicDao<Long, TransactionDto> {
     Optional<TransactionDto> findLastTransactionByCardIdAndMonth(Long cardId, int month);
 
+    Optional<TransactionDto> findLastTransactionByCardIdAndWeek(Long cardId, LocalDateTime startOfWeek, LocalDateTime endOfWeek);
+
+    Optional<TransactionDto> findTodayLastTransactionByCardId(Long cardId);
+
     List<TransactionDto> findTodayTransaction(Long cardId);
 
     List<DailyTransactionChart> todayChartTransaction(Long customerId);

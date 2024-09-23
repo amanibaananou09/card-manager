@@ -64,9 +64,17 @@ public class TransactionDaoImpl extends JpaGenericDao<Long, TransactionDto, Tran
     }
 
     @Override
-    public Optional<TransactionDto> findLastTransactionByCardIdAndMonth(Long cardId, int month) {
-        return Optional.ofNullable(getMapper().toDto(getRepository().findLastTransactionByCardIdAndMonth(cardId, month).orElse(null)));
+    public Optional<TransactionDto> findLastTransactionByCardIdAndMonth(Long cardId, int dateTime) {
+        return Optional.ofNullable(getMapper().toDto(getRepository().findLastTransactionByCardIdAndMonth(cardId, dateTime).orElse(null)));
+    }
 
+    @Override
+    public Optional<TransactionDto> findLastTransactionByCardIdAndWeek(Long cardId, LocalDateTime startOfWeek, LocalDateTime endOfWeek) {
+        return Optional.ofNullable(getMapper().toDto(getRepository().findLastTransactionByCardIdAndWeek(cardId, startOfWeek,endOfWeek).orElse(null)));
+    }
+    @Override
+    public Optional<TransactionDto> findTodayLastTransactionByCardId(Long cardId) {
+        return Optional.ofNullable(getMapper().toDto(getRepository().findTodayLastTransactionByCardId(cardId).orElse(null)));
     }
 
     @Override
