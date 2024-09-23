@@ -120,7 +120,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
                 .price(transaction.getPrice())
                 .quantity(transaction.getQuantity())
                 .dateTime(transaction.getDateTime());
-        if (Objects.nonNull(transaction.getAvailableVolume())) {
+        if (Objects.nonNull(transaction.getAvailableBalance())) {
             builder.availableBalance(transaction.getAvailableBalance());
         }        if (Objects.nonNull(transaction.getAvailableVolume())) {
             builder.availableVolume(transaction.getAvailableVolume());
