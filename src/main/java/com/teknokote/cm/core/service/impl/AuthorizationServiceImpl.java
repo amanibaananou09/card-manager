@@ -193,16 +193,16 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
     }
 
     private AuthorizationDto authorizeIfAuthorized(CardDto cardDto, CeilingDto ceilingDto, String generatedReference, BigDecimal cardLimit, AuthorizationRequest authorizationRequest) {
-        Optional<TransactionDto> lastTransaction = transactionService.findLastTransactionByCardId(cardDto.getId(),ceilingDto.getLimitType(), LocalDateTime.now());
-        BigDecimal availableAmountVolume=BigDecimal.ZERO;
+        Optional<TransactionDto> lastTransaction = transactionService.findLastTransactionByCardId(cardDto.getId(), ceilingDto.getLimitType(), LocalDateTime.now());
+        BigDecimal availableAmountVolume = BigDecimal.ZERO;
         if (lastTransaction.isPresent()) {
             if (ceilingDto.getCeilingType().equals(EnumCeilingType.AMOUNT)) {
                 availableAmountVolume = lastTransaction.get().getAvailableBalance();
-            }else {
-                availableAmountVolume=lastTransaction.get().getAvailableVolume();
+            } else {
+                availableAmountVolume = lastTransaction.get().getAvailableVolume();
             }
-            if (availableAmountVolume !=null && availableAmountVolume.compareTo(BigDecimal.ZERO) > 0 ) {
-                return authorizeBasedOnLastTransaction(cardDto, generatedReference, cardLimit, authorizationRequest);
+            if (availableAmountVolume != null && availableAmountVolume.compareTo(BigDecimal.ZERO) > 0) {
+                return authorizeBasedOnLastTransaction(cardDto, generatedReference, availableAmountVolume, authorizationRequest);
             } else {
                 return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), BigDecimal.ZERO, authorizationRequest);
             }
