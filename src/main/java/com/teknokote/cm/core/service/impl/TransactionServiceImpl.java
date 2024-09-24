@@ -57,21 +57,21 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         BigDecimal availableBalance = calculateAvailableBalance(dto, dto.getCardId(), ceilingDto, cardGroupDto);
         if (ceilingDto.getCeilingType().equals(EnumCeilingType.AMOUNT)) {
             dto.setAvailableBalance(availableBalance);
-        }else{
+        } else {
             dto.setAvailableVolume(availableBalance);
         }
         return create(dto);
     }
 
     @Override
-    public Optional<TransactionDto>  findLastTransactionByCardId(Long cardId, EnumCeilingLimitType limitType, LocalDateTime dateTime) {
-        if (limitType.equals(EnumCeilingLimitType.MONTHLY)){
+    public Optional<TransactionDto> findLastTransactionByCardId(Long cardId, EnumCeilingLimitType limitType, LocalDateTime dateTime) {
+        if (limitType.equals(EnumCeilingLimitType.MONTHLY)) {
             return getDao().findLastTransactionByCardIdAndMonth(cardId, dateTime.getMonthValue());
         } else if (limitType.equals(EnumCeilingLimitType.WEEKLY)) {
             LocalDateTime startOfWeek = LocalDate.now().with(DayOfWeek.MONDAY).atStartOfDay();
             LocalDateTime endOfWeek = startOfWeek.plusDays(7);
-            return getDao().findLastTransactionByCardIdAndWeek(cardId,startOfWeek,endOfWeek);
-        }else {
+            return getDao().findLastTransactionByCardIdAndWeek(cardId, startOfWeek, endOfWeek);
+        } else {
             return getDao().findTodayLastTransactionByCardId(cardId);
         }
     }
@@ -82,7 +82,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
     }
 
     private BigDecimal calculateAvailableBalance(TransactionDto transactionDto, Long cardId, CeilingDto ceilingDto, CardGroupDto groupDto) {
-        Optional<TransactionDto> lastTransaction = this.findLastTransactionByCardId(cardId,ceilingDto.getLimitType(),LocalDateTime.now());
+        Optional<TransactionDto> lastTransaction = this.findLastTransactionByCardId(cardId, ceilingDto.getLimitType(), LocalDateTime.now());
         BigDecimal valueToSubtract;
         if (lastTransaction.isEmpty()) {
             // First transaction on ceiling limit type
@@ -126,7 +126,8 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
                 .dateTime(transaction.getDateTime());
         if (Objects.nonNull(transaction.getAvailableBalance())) {
             builder.availableBalance(transaction.getAvailableBalance());
-        }        if (Objects.nonNull(transaction.getAvailableVolume())) {
+        }
+        if (Objects.nonNull(transaction.getAvailableVolume())) {
             builder.availableVolume(transaction.getAvailableVolume());
         }
 
@@ -145,7 +146,8 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         }
 
         if (Objects.nonNull(transaction.getSalePoint())) {
-            builder.salePointName(transaction.getSalePoint().getName())
+            SalePointDto salePointDto = mapToSalePointDto(transaction.getSalePoint());
+            builder.salePoint(salePointDto)
                     .salePointId(transaction.getSalePointId())
                     .salePointName(transaction.getSalePoint().getName())
                     .city(transaction.getSalePoint().getCity());
@@ -155,6 +157,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         builder.remainingBalancePerProduct(remainingBalancePerProduct);
         return builder.build();
     }
+
     private Map<String, BigDecimal> calculateRemainingBalance(Transaction transaction) {
         // Assuming getFuelPrices() gives you a map of product ID to price
         List<ProductDto> productList = productService.findBySupplier(transaction.getSalePoint().getSupplierId());
@@ -181,6 +184,24 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         }
 
         return remainingBalancePerProduct;
+    }
+
+    private SalePointDto mapToSalePointDto(SalePoint salePoint) {
+        CountryDto countryDto = mapToCountryDto(salePoint.getCountry());
+        return SalePointDto.builder()
+                .id(salePoint.getId())
+                .name(salePoint.getName())
+                .city(salePoint.getCity())
+                .country(countryDto)
+                .build();
+    }
+
+    private CountryDto mapToCountryDto(Country salePoint) {
+        return CountryDto.builder()
+                .id(salePoint.getId())
+                .name(salePoint.getName())
+                .code(salePoint.getCode())
+                .build();
     }
 
     @Override
