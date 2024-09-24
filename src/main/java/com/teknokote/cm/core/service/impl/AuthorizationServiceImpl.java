@@ -200,7 +200,7 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
             }else {
                 availableAmountVolume=lastTransaction.get().getAvailableVolume();
             }
-            if (availableAmountVolume.compareTo(BigDecimal.ZERO) > 0 && availableAmountVolume !=null ) {
+            if (availableAmountVolume !=null && availableAmountVolume.compareTo(BigDecimal.ZERO) > 0 ) {
                 return authorizeBasedOnLastTransaction(cardDto, generatedReference, cardLimit, authorizationRequest);
             } else {
                 return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), BigDecimal.ZERO, authorizationRequest);
