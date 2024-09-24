@@ -193,9 +193,14 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
 
     private AuthorizationDto authorizeIfAuthorized(CardDto cardDto, CeilingDto ceilingDto, String generatedReference, BigDecimal cardLimit, AuthorizationRequest authorizationRequest) {
         Optional<TransactionDto> lastTransaction = transactionService.findLastTransactionByCardId(cardDto.getId(),ceilingDto.getLimitType(), LocalDateTime.now());
+        BigDecimal availableAmountVolume=BigDecimal.ZERO;
         if (lastTransaction.isPresent()) {
-            BigDecimal availableBalance = lastTransaction.get().getAvailableBalance();
-            if (availableBalance.compareTo(BigDecimal.ZERO) > 0) {
+            if (ceilingDto.getCeilingType().equals(EnumCeilingType.AMOUNT)) {
+                availableAmountVolume = lastTransaction.get().getAvailableBalance();
+            }else {
+                availableAmountVolume=lastTransaction.get().getAvailableVolume();
+            }
+            if (availableAmountVolume.compareTo(BigDecimal.ZERO) > 0) {
                 return authorizeBasedOnLastTransaction(cardDto, generatedReference, cardLimit, authorizationRequest);
             } else {
                 return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), BigDecimal.ZERO, authorizationRequest);
