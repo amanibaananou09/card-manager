@@ -92,7 +92,11 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
             // Subsequent transaction within the same ceiling limit type
             TransactionDto transaction = lastTransaction.get();
             valueToSubtract = calculateAmountToSubtract(transactionDto, ceilingDto.getCeilingType());
-            return transaction.getAvailableBalance().subtract(valueToSubtract);
+            if (ceilingDto.getCeilingType().equals(EnumCeilingType.AMOUNT)) {
+                return transaction.getAvailableBalance().subtract(valueToSubtract);
+            }else {
+                return transaction.getAvailableVolume().subtract(valueToSubtract);
+            }
         }
     }
 
