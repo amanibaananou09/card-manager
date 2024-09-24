@@ -56,6 +56,19 @@ public class CustomerServiceImpl extends ActivatableGenericCheckedService<Long, 
         return create(dto, false);
     }
 
+    @Transactional
+    @Override
+    public CustomerDto update(CustomerDto dto) {
+        CustomerDto customerDto = getDao().update(dto);
+        Optional<UserDto> userDto = userService.findByUsername(dto.getIdentifier());
+        // Update users in Keycloak
+        if (userDto.isPresent()) {
+            keycloakService.updateUser(dto.getIdentifier(), dto.getUsers().stream().findFirst().get());
+        }
+
+        return customerDto;
+    }
+
     @Override
     public List<String> generateIdentiferSuggestions(String identifier) {
         return getDao().generateIdentiferSuggestions(identifier);
