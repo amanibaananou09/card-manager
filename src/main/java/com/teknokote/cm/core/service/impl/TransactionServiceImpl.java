@@ -252,21 +252,48 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
     }
 
     @Override
-    public List<TransactionChart> getTransactionChart(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate) {
-        List<DailyTransactionChart> dailyTransactionCharts = chartTransaction(customerId, cardId, period, startDate, endDate);
+    public List<DailyTransactionChart> getDailyTransactionChart(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate) {
+        List<DailyTransactionChart> dailyTransactionCharts = chartTransaction(customerId,cardId,period,startDate,endDate);
 
-        Map<String, TransactionChart> transactionChartMap = new HashMap<>();
-        if (dailyTransactionCharts != null && !dailyTransactionCharts.isEmpty()) {
-            for (DailyTransactionChart daily : dailyTransactionCharts) {
-                String key = daily.getFuelGrade() + "-" + daily.getCardIdentifier();
-                TransactionChart transactionChart = transactionChartMap.getOrDefault(key, new TransactionChart(daily.getFuelGrade(), daily.getCardIdentifier(), BigDecimal.ZERO));
-                transactionChart.setSum(transactionChart.getSum().add(daily.getSum()));
-                transactionChartMap.put(key, transactionChart);
-            }
-            return new ArrayList<>(transactionChartMap.values());
+        // Group only by cardIdentifier for DailyTransactionChart
+        Map<String, DailyTransactionChart> dailyTransactionChartMap = new HashMap<>();
+
+        for (DailyTransactionChart daily : dailyTransactionCharts) {
+            String key = daily.getCardIdentifier(); // Grouping by only cardId
+
+            // Create or update the DailyTransactionChart entry
+            DailyTransactionChart dailyChart = dailyTransactionChartMap.getOrDefault(
+                    key,
+                    new DailyTransactionChart(daily.getDate(), null, daily.getCardIdentifier(), BigDecimal.ZERO)
+            );
+
+            // Sum the quantities for the cardIdentifier
+            dailyChart.setSum(dailyChart.getSum().add(daily.getSum()));
+            dailyTransactionChartMap.put(key, dailyChart);
         }
-        return new ArrayList<>();
+
+        return new ArrayList<>(dailyTransactionChartMap.values());
     }
 
+    @Override
+    public List<TransactionChart> getTransactionChart(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate) {
+        List<DailyTransactionChart> dailyTransactionCharts = chartTransaction(customerId,cardId,period,startDate,endDate);
 
+        // Group by fuelGrade and cardIdentifier for TransactionChart
+        Map<String, TransactionChart> transactionChartMap = new HashMap<>();
+
+        for (DailyTransactionChart daily : dailyTransactionCharts) {
+            String key = daily.getFuelGrade() + "-" + daily.getCardIdentifier();
+
+            TransactionChart transactionChart = transactionChartMap.getOrDefault(
+                    key,
+                    new TransactionChart(daily.getFuelGrade(), daily.getCardIdentifier(), BigDecimal.ZERO)
+            );
+
+            // Sum the quantities
+            transactionChart.setSum(transactionChart.getSum().add(daily.getSum()));
+            transactionChartMap.put(key, transactionChart);
+        }
+        return new ArrayList<>(transactionChartMap.values());
+    }
 }

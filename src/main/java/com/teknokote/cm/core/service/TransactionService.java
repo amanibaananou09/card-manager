@@ -28,4 +28,5 @@ public interface TransactionService extends BaseService<Long, TransactionDto> {
     List<DailyTransactionChart> chartTransaction(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate);
 
     List<TransactionChart> getTransactionChart(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate);
+    List<DailyTransactionChart> getDailyTransactionChart(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate);
 }

@@ -69,7 +69,7 @@ public class TransactionController {
             realStartDate = LocalDateTime.parse(startDate);
             realEndDate = LocalDateTime.parse(endDate);
         }
-        return transactionService.chartTransaction(customerId,cardId,period,realStartDate,realEndDate);
+        return transactionService.getDailyTransactionChart(customerId,cardId,period,realStartDate,realEndDate);
     }
 
     @GetMapping(EndPoints.CHART)
