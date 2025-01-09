@@ -16,17 +16,10 @@ import java.util.Optional;
 public interface TransactionService extends BaseService<Long, TransactionDto> {
 
     TransactionDto createTransaction(TransactionDto dto);
-
     Optional<TransactionDto> findLastTransactionByCardId(Long id, EnumCeilingLimitType limitType, LocalDateTime dateTime);
-
-    List<TransactionDto> findTodayTransaction(Long cardId);
-
     Page<Transaction> findTransactionsByFilter(Long customerId, TransactionFilterDto filterDto, int page, int size);
-
     TransactionDto mapToTransactionDto(Transaction transaction);
-
     List<DailyTransactionChart> chartTransaction(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate);
-
     List<TransactionChart> getTransactionChart(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate);
     List<DailyTransactionChart> getDailyTransactionChart(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate);
 }
