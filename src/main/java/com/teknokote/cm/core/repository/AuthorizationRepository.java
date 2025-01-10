@@ -12,5 +12,5 @@ public interface AuthorizationRepository extends JpaRepository<Authorization, Lo
     Authorization findLatestAuthorization();
 
     Authorization findByReference(String authorizationReference);
-    Authorization findFirstByPtsIdAndPumpOrderByDateTimeDesc(String ptsId,Long pump);
+    Authorization findFirstByPtsIdAndPumpAndCard_CardIdOrderByDateTimeDesc(String ptsId,Long pump, String tag);
 }

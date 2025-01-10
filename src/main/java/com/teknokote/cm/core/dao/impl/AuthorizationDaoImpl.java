@@ -49,7 +49,7 @@ public class AuthorizationDaoImpl extends JpaGenericDao<Long, AuthorizationDto, 
       return getMapper().toDto(getRepository().findByReference(authorizationReference));
    }
    @Override
-   public AuthorizationDto findAuthorizationByPtsIdAndPump(String ptsId,Long pump) {
-      return getMapper().toDto(getRepository().findFirstByPtsIdAndPumpOrderByDateTimeDesc(ptsId,pump));
+   public AuthorizationDto findAuthorizationByPtsIdAndPump(String ptsId,Long pump, String tag) {
+      return getMapper().toDto(getRepository().findFirstByPtsIdAndPumpAndCard_CardIdOrderByDateTimeDesc(ptsId,pump,tag));
    }
 }
