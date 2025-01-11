@@ -104,14 +104,6 @@ pipelines:
     '*':
       - step: *build-and-test
       - step: *quality
-    master:
-      - step: *build-and-test
-      - step: *quality
-      - step: *build-docker-image
-      - step:
-          <<: *deploy-container
-          name: Deploy to preprod
-          deployment: preprod
   tags:
     '*':
       - step:
@@ -141,3 +133,10 @@ pipelines:
           <<: *deploy-container
           name: Deploy to formation
           deployment: formation
+    deploy-to-preprod:
+      - step: *build-and-test
+      - step: *build-docker-image
+      - step:
+          <<: *deploy-container
+          name: Deploy to preprod
+          deployment: preprod
