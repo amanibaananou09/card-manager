@@ -37,6 +37,11 @@ public class AuthorizationController
    {
       cardService.freeCard(authorizationReference,transactionReference);
    }
+   @PostMapping(EndPoints.BLOC_CARD)
+   public void blocCard(@RequestParam Long cardId)
+   {
+      cardService.blocCard(cardId);
+   }
    @PostMapping(EndPoints.AUTHORIZE)
    public AuthorizationDto createAuthorization(@RequestBody AuthorizationRequest authorizationRequest)
    {

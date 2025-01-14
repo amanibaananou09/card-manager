@@ -74,7 +74,14 @@ public class CardServiceImpl extends ActivatableGenericCheckedService<Long, Card
                 }
         }
     }
-
+    @Override
+    public void blocCard(Long cardId) {
+            CardDto cardDto = checkedFindById(cardId);
+            if (cardDto != null) {
+                cardDto.setStatus(EnumCardStatus.IN_USE);
+                update(cardDto);
+        }
+    }
     @Override
     public CardDto create(CardDto dto) {
         final ESSValidationResult cardValidation = getValidator().validateOnCreate(dto);
