@@ -76,11 +76,6 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         }
     }
 
-    @Override
-    public List<TransactionDto> findTodayTransaction(Long cardId) {
-        return getDao().findTodayTransaction(cardId);
-    }
-
     private BigDecimal calculateAvailableBalance(TransactionDto transactionDto, Long cardId, CeilingDto ceilingDto, CardGroupDto groupDto) {
         Optional<TransactionDto> lastTransaction = this.findLastTransactionByCardId(cardId, ceilingDto.getLimitType(), LocalDateTime.now());
         BigDecimal valueToSubtract;
@@ -253,13 +248,14 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
 
     @Override
     public List<DailyTransactionChart> getDailyTransactionChart(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate) {
-        List<DailyTransactionChart> dailyTransactionCharts = chartTransaction(customerId,cardId,period,startDate,endDate);
+        List<DailyTransactionChart> dailyTransactionCharts = chartTransaction(customerId, cardId, period, startDate, endDate);
 
-        // Group only by cardIdentifier for DailyTransactionChart
+        // Group by both date and cardIdentifier for DailyTransactionChart
         Map<String, DailyTransactionChart> dailyTransactionChartMap = new HashMap<>();
 
         for (DailyTransactionChart daily : dailyTransactionCharts) {
-            String key = daily.getCardIdentifier(); // Grouping by only cardId
+            // Use a composite key combining date and cardIdentifier
+            String key = daily.getDate() + "|" + daily.getCardIdentifier();
 
             // Create or update the DailyTransactionChart entry
             DailyTransactionChart dailyChart = dailyTransactionChartMap.getOrDefault(
@@ -267,12 +263,16 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
                     new DailyTransactionChart(daily.getDate(), null, daily.getCardIdentifier(), BigDecimal.ZERO)
             );
 
-            // Sum the quantities for the cardIdentifier
+            // Sum the quantities for the specific date and cardIdentifier
             dailyChart.setSum(dailyChart.getSum().add(daily.getSum()));
             dailyTransactionChartMap.put(key, dailyChart);
         }
 
-        return new ArrayList<>(dailyTransactionChartMap.values());
+        // Convert map values to list and sort by date in ascending order
+        List<DailyTransactionChart> sortedList = new ArrayList<>(dailyTransactionChartMap.values());
+        sortedList.sort(Comparator.comparing(DailyTransactionChart::getDate));
+
+        return sortedList;
     }
 
     @Override

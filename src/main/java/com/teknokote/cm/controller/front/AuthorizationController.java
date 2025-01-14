@@ -37,6 +37,11 @@ public class AuthorizationController
    {
       cardService.freeCard(authorizationReference,transactionReference);
    }
+   @PostMapping(EndPoints.BLOC_CARD)
+   public void blocCard(@RequestParam Long cardId)
+   {
+      cardService.blocCard(cardId);
+   }
    @PostMapping(EndPoints.AUTHORIZE)
    public AuthorizationDto createAuthorization(@RequestBody AuthorizationRequest authorizationRequest)
    {
@@ -64,9 +69,9 @@ public class AuthorizationController
       return authorizationService.findAll();
    }
    @GetMapping(EndPoints.FIND)
-   public AuthorizationDto getAuthorization(@RequestParam String ptsId,@RequestParam Long pump)
+   public AuthorizationDto getAuthorization(@RequestParam String ptsId,@RequestParam Long pump, @RequestParam String tag)
    {
-      return authorizationService.findByPtsIdAndPump(ptsId,pump);
+      return authorizationService.findByPtsIdAndPump(ptsId,pump ,tag);
    }
 
 }

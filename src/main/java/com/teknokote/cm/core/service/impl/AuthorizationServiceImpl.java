@@ -46,6 +46,7 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
             if (salePoint != null) {
                 CardDto cardDto = cardService.findByTag(authorizationRequest.getTag());
                 if (cardDto != null && cardDto.getExpirationDate().isAfter(LocalDate.now()) && cardDto.getActif().equals(true)) {
+                    if(cardDto.getStatus().equals(EnumCardStatus.FREE)){
                     CardGroupDto cardGroupDto = cardGroupService.checkedFindById(cardDto.getCardGroupId());
                     BigDecimal cardLimit = calculateCardLimit(cardDto);
                     if (cardGroupDto != null && cardGroupDto.getActif().equals(true)) {
@@ -59,6 +60,9 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
                         } else {
                             return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), cardLimit, authorizationRequest);
                         }
+                    }
+                }else{
+                        return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), BigDecimal.ZERO, authorizationRequest);
                     }
                 }
                 return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, null, BigDecimal.ZERO, authorizationRequest);
@@ -210,38 +214,9 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
             return authorizeBasedOnLastTransaction(cardDto, generatedReference, cardLimit, authorizationRequest);
         }
     }
-
-    /*private AuthorizationDto authorizeBasedOnAvailableBalance(CardDto cardDto, CeilingDto ceilingDto, String generatedReference, BigDecimal cardLimit, AuthorizationRequest authorizationRequest) {
-        List<TransactionDto> dailyTransaction = transactionService.findTodayTransaction(cardDto.getId());
-        if (!dailyTransaction.isEmpty()) {
-            BigDecimal totalDailyAmount = calculateTotalDailyAmount(ceilingDto.getCeilingType(), dailyTransaction);
-            if (totalDailyAmount.compareTo(cardLimit) < 0) {
-                cardDto.setStatus(EnumCardStatus.IN_USE);
-                cardService.update(cardDto);
-                return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), cardLimit.subtract(totalDailyAmount), authorizationRequest);
-            } else {
-                return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), BigDecimal.ZERO, authorizationRequest);
-            }
-        } else {
-            cardDto.setStatus(EnumCardStatus.IN_USE);
-            cardService.update(cardDto);
-            return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), cardLimit, authorizationRequest);
-        }
-    }*/
-
     private AuthorizationDto authorizeBasedOnLastTransaction(CardDto cardDto, String generatedReference, BigDecimal cardLimit, AuthorizationRequest authorizationRequest) {
-        cardDto.setStatus(EnumCardStatus.IN_USE);
-        cardService.update(cardDto);
         return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), cardLimit, authorizationRequest);
     }
-
-    /*private BigDecimal calculateTotalDailyAmount(EnumCeilingType ceilingType, List<TransactionDto> dailyTransaction) {
-        if (ceilingType.equals(EnumCeilingType.AMOUNT)) {
-            return dailyTransaction.stream().map(TransactionDto::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-        } else {
-            return dailyTransaction.stream().map(TransactionDto::getQuantity).reduce(BigDecimal.ZERO, BigDecimal::add);
-        }
-    }*/
 
     private SalePointDto findSalePoint(SupplierDto supplierDto, String salePointIdentifier) {
         return supplierDto != null ? supplierDto.getSalePoints().stream()
@@ -250,8 +225,8 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
     }
 
     @Override
-    public AuthorizationDto findByPtsIdAndPump(String ptsId, Long pump) {
-        return getDao().findAuthorizationByPtsIdAndPump(ptsId, pump);
+    public AuthorizationDto findByPtsIdAndPump(String ptsId, Long pump ,String tag) {
+        return getDao().findAuthorizationByPtsIdAndPump(ptsId, pump, tag);
     }
 }
 

@@ -3,9 +3,11 @@ package com.teknokote.cm.core.dao.impl;
 import com.teknokote.cm.core.dao.SupplierDao;
 import com.teknokote.cm.core.dao.mappers.SupplierMapper;
 import com.teknokote.cm.core.dao.mappers.UserMapper;
+import com.teknokote.cm.core.model.Country;
 import com.teknokote.cm.core.model.Supplier;
 import com.teknokote.cm.core.model.User;
 import com.teknokote.cm.core.repository.SupplierRepository;
+import com.teknokote.cm.dto.SalePointDto;
 import com.teknokote.cm.dto.SupplierDto;
 import com.teknokote.core.dao.JpaActivatableGenericDao;
 import lombok.Getter;
@@ -33,7 +35,16 @@ public class SupplierDaoImpl extends JpaActivatableGenericDao<Long,User ,Supplie
         supplier.setDateStatusChange(LocalDateTime.now());
         Supplier savedSupplier = super.beforeCreate(supplier, dto);
         if (Objects.nonNull(dto.getSalePoints())) {
-            savedSupplier.getSalePoints().forEach(salePoint -> salePoint.setSupplier(savedSupplier));
+            savedSupplier.getSalePoints().forEach(salePoint -> {
+                salePoint.setSupplier(savedSupplier);
+                SalePointDto salePointDto = dto.getSalePoints().stream()
+                        .filter(spDto -> spDto.getIdentifier().equals(salePoint.getIdentifier()))
+                        .findFirst()
+                        .orElse(null);
+                if (salePointDto != null && salePointDto.getCountryId() != null) {
+                    salePoint.setCountry(getEntityManager().getReference(Country.class,salePointDto.getCountryId()));
+                }
+            });
         }
         if (Objects.nonNull(dto.getUsers())) {
             savedSupplier.getUsers().forEach(user -> user.setDateStatusChange(LocalDateTime.now()));
