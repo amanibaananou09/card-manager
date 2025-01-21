@@ -33,9 +33,9 @@ public class AuthorizationController
       return new ResponseEntity<>(savedAuthorization, HttpStatus.CREATED);
    }
    @PostMapping(EndPoints.FREE_CARD)
-   public void freeCard(@RequestParam String authorizationReference,@RequestParam String transactionReference)
+   public void freeCard(@RequestParam Long cardId)
    {
-      cardService.freeCard(authorizationReference,transactionReference);
+      cardService.freeCard(cardId);
    }
    @PostMapping(EndPoints.BLOC_CARD)
    public void blocCard(@RequestParam Long cardId)
@@ -45,8 +45,7 @@ public class AuthorizationController
    @PostMapping(EndPoints.AUTHORIZE)
    public AuthorizationDto createAuthorization(@RequestBody AuthorizationRequest authorizationRequest)
    {
-      AuthorizationDto savedAuthorization = authorizationService.createAuthorization(authorizationRequest);
-      return savedAuthorization;
+      return authorizationService.createAuthorization(authorizationRequest);
    }
 
    @PutMapping(EndPoints.UPDATE)

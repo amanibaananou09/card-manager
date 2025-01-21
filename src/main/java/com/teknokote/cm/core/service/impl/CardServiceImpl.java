@@ -2,11 +2,8 @@ package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.AuthorizationDao;
 import com.teknokote.cm.core.dao.CardDao;
-import com.teknokote.cm.core.model.EnumAuthorizationStatus;
 import com.teknokote.cm.core.model.EnumCardStatus;
-import com.teknokote.cm.core.service.AuthorizationService;
 import com.teknokote.cm.core.service.CardService;
-import com.teknokote.cm.dto.AuthorizationDto;
 import com.teknokote.cm.dto.CardDto;
 import com.teknokote.core.exceptions.ServiceValidationException;
 import com.teknokote.core.service.ActivatableGenericCheckedService;
@@ -64,15 +61,12 @@ public class CardServiceImpl extends ActivatableGenericCheckedService<Long, Card
     }
 
     @Override
-    public void freeCard(String authorizationReference, String transactionReference) {
-        AuthorizationDto authorizationDto = authorizationDao.findByReference(authorizationReference);
-        if (authorizationDto != null) {
-                CardDto cardDto = checkedFindById(authorizationDto.getCardId());
+    public void freeCard(Long cardId) {
+                CardDto cardDto = checkedFindById(cardId);
                 if (cardDto != null) {
                     cardDto.setStatus(EnumCardStatus.FREE);
                     update(cardDto);
                 }
-        }
     }
     @Override
     public void blocCard(Long cardId) {
