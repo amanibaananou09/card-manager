@@ -215,6 +215,8 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
         }
     }
     private AuthorizationDto authorizeBasedOnLastTransaction(CardDto cardDto, String generatedReference, BigDecimal cardLimit, AuthorizationRequest authorizationRequest) {
+        cardDto.setStatus(EnumCardStatus.AUTHORIZED);
+        cardService.update(cardDto);
         return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), cardLimit, authorizationRequest);
     }
 

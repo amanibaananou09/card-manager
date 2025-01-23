@@ -61,19 +61,11 @@ public class CardServiceImpl extends ActivatableGenericCheckedService<Long, Card
     }
 
     @Override
-    public void freeCard(Long cardId) {
-                CardDto cardDto = checkedFindById(cardId);
-                if (cardDto != null) {
-                    cardDto.setStatus(EnumCardStatus.FREE);
-                    update(cardDto);
-                }
-    }
-    @Override
-    public void blocCard(Long cardId) {
-            CardDto cardDto = checkedFindById(cardId);
-            if (cardDto != null) {
-                cardDto.setStatus(EnumCardStatus.IN_USE);
-                update(cardDto);
+    public void updateCardStatus(Long cardId, EnumCardStatus status) {
+        CardDto cardDto = checkedFindById(cardId);
+        if (cardDto != null) {
+            cardDto.setStatus(status);
+            update(cardDto);
         }
     }
     @Override
