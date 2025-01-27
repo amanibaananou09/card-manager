@@ -33,6 +33,7 @@ public class EndPoints {
     public static final String CUSTOMER_BASE_ROOT = "/customer/{customerId}";
     public static final String CUSTOMER_CARD_GROUP_ROOT = CUSTOMER_BASE_ROOT + CARD_GROUP_ROOT;
     public static final String CUSTOMER_CARD_ROOT = CUSTOMER_BASE_ROOT + CARD_ROOT;
+    public static final String CUSTOMER_CARD_MOVEMENT = CUSTOMER_CARD_ROOT + "/{id}/movement/" ;
     public static final String CUSTOMER_ACCOUNT_ROOT = CUSTOMER_BASE_ROOT + ACCOUNT_ROOT;
     public static final String UPDATE_CARD = "/card/{cardId}/update";
     public static final String AUTHORIZE = "/authorize";

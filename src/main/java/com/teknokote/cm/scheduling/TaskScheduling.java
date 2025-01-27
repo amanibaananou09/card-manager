@@ -29,7 +29,7 @@ public class TaskScheduling {
             Duration range = Duration.between(cardDto.getDateStatusChange(),now);
             if (!cardDto.getStatus().equals(EnumCardStatus.FREE) && !cardDto.getStatus().equals(EnumCardStatus.IN_USE)){
                 if (range.toMinutes() >= 3){
-                    cardService.updateCardStatus(cardDto.getId(),EnumCardStatus.FREE);
+                    cardService.updateCardStatus(cardDto.getId(),null,null,EnumCardStatus.FREE);
                     log.info("Card {} has been freed after timeout", cardDto.getCardId());
                 }
             }

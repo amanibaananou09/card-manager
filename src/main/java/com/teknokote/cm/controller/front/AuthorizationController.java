@@ -35,9 +35,9 @@ public class AuthorizationController
    }
 
    @PostMapping(EndPoints.UPDATE_CARD)
-   public void freeCard(@PathVariable Long cardId, @RequestParam EnumCardStatus status)
+   public void freeCard(@PathVariable Long cardId,@RequestParam Long authorizationId,@RequestParam Long transactionId, @RequestParam EnumCardStatus status)
    {
-      cardService.updateCardStatus(cardId,status);
+      cardService.updateCardStatus(cardId,authorizationId,transactionId,status);
    }
    @PostMapping(EndPoints.AUTHORIZE)
    public AuthorizationDto createAuthorization(@RequestBody AuthorizationRequest authorizationRequest)
