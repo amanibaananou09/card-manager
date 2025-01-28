@@ -12,11 +12,10 @@ CREATE TABLE cm_card_movement_history (
                                        "version" int8 NULL,
                                        card_id int8 NULL,
                                        authorization_id int8 NULL,
-                                       transaction_id int8 NULL,
+                                       ctr_transaction_ref int8 NULL,
                                        old_status VARCHAR(50),
                                        new_status VARCHAR(50),
                                        date_time timestamp(6) NULL,
-                                       description varchar(255) NULL,
                                        CONSTRAINT cm_card_movement_history_pkey PRIMARY KEY (id),
                                        CONSTRAINT fk_card FOREIGN KEY (card_id) REFERENCES public.cm_card(id),
                                        CONSTRAINT fk_authorization FOREIGN KEY (authorization_id) REFERENCES public.cm_authorization(id)

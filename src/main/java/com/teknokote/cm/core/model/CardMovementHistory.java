@@ -24,8 +24,6 @@ public class CardMovementHistory extends SimpleESSEntity<Long> {
     private EnumCardStatus oldStatus;
     @Enumerated(EnumType.STRING)
     private EnumCardStatus newStatus;
-    private Long transactionId;
+    private Long ctrTransactionRef;
     private LocalDateTime dateTime;
-    private String description;
-
 }

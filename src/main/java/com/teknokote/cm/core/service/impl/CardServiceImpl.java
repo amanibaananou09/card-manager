@@ -70,7 +70,7 @@ public class CardServiceImpl extends ActivatableGenericCheckedService<Long, Card
         CardDto cardDto = checkedFindById(cardId);
         if (cardDto != null) {
             CardMovementHistoryDto cardMovementHistoryDto = CardMovementHistoryDto.builder().cardId(cardDto.getId()).authorizationId(authorizationId)
-                    .transactionId(transactionId).dateTime(LocalDateTime.now()).oldStatus(cardDto.getStatus()).newStatus(status).build();
+                    .ctrTransactionRef(transactionId).dateTime(LocalDateTime.now()).oldStatus(cardDto.getStatus()).newStatus(status).build();
             cardMovementHistoryDao.create(cardMovementHistoryDto);
             cardDto.setStatus(status);
             update(cardDto);
