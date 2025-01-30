@@ -1,6 +1,7 @@
 package com.teknokote.cm.controller.front;
 
 import com.teknokote.cm.controller.EndPoints;
+import com.teknokote.cm.core.model.EnumCardStatus;
 import com.teknokote.cm.core.service.AuthorizationService;
 import com.teknokote.cm.core.service.CardService;
 import com.teknokote.cm.dto.AuthorizationDto;
@@ -32,21 +33,16 @@ public class AuthorizationController
       AuthorizationDto savedAuthorization = authorizationService.create(dto);
       return new ResponseEntity<>(savedAuthorization, HttpStatus.CREATED);
    }
-   @PostMapping(EndPoints.FREE_CARD)
-   public void freeCard(@RequestParam String authorizationReference,@RequestParam String transactionReference)
+
+   @PostMapping(EndPoints.UPDATE_CARD)
+   public void freeCard(@PathVariable Long cardId,@RequestParam Long authorizationId,@RequestParam Long transactionId, @RequestParam EnumCardStatus status)
    {
-      cardService.freeCard(authorizationReference,transactionReference);
-   }
-   @PostMapping(EndPoints.BLOC_CARD)
-   public void blocCard(@RequestParam Long cardId)
-   {
-      cardService.blocCard(cardId);
+      cardService.updateCardStatus(cardId,authorizationId,transactionId,status);
    }
    @PostMapping(EndPoints.AUTHORIZE)
    public AuthorizationDto createAuthorization(@RequestBody AuthorizationRequest authorizationRequest)
    {
-      AuthorizationDto savedAuthorization = authorizationService.createAuthorization(authorizationRequest);
-      return savedAuthorization;
+      return authorizationService.createAuthorization(authorizationRequest);
    }
 
    @PutMapping(EndPoints.UPDATE)

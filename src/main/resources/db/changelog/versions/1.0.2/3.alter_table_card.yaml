@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: amjed
+      changes:
+        - sql:
+            sql: >
+              ALTER TABLE public.cm_card DROP CONSTRAINT IF EXISTS cm_card_status_check;
+        - sql:
+            sql: >
+              ALTER TABLE public.cm_card
+              ADD CONSTRAINT cm_card_status_check
+              CHECK (status IN ('FREE', 'BLOCKED', 'IN_USE', 'AUTHORIZED', 'CONFIRMATION', 'LOST'));

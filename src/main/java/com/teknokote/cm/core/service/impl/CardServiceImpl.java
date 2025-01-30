@@ -2,12 +2,11 @@ package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.AuthorizationDao;
 import com.teknokote.cm.core.dao.CardDao;
-import com.teknokote.cm.core.model.EnumAuthorizationStatus;
+import com.teknokote.cm.core.dao.CardMovementHistoryDao;
 import com.teknokote.cm.core.model.EnumCardStatus;
-import com.teknokote.cm.core.service.AuthorizationService;
 import com.teknokote.cm.core.service.CardService;
-import com.teknokote.cm.dto.AuthorizationDto;
 import com.teknokote.cm.dto.CardDto;
+import com.teknokote.cm.dto.CardMovementHistoryDto;
 import com.teknokote.core.exceptions.ServiceValidationException;
 import com.teknokote.core.service.ActivatableGenericCheckedService;
 import com.teknokote.core.service.ESSValidationResult;
@@ -18,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -30,6 +30,8 @@ public class CardServiceImpl extends ActivatableGenericCheckedService<Long, Card
     private CardDao dao;
     @Autowired
     private AuthorizationDao authorizationDao;
+    @Autowired
+    private CardMovementHistoryDao cardMovementHistoryDao;
 
     @Override
     public List<CardDto> findAllByCustomer(Long customerId) {
@@ -64,22 +66,14 @@ public class CardServiceImpl extends ActivatableGenericCheckedService<Long, Card
     }
 
     @Override
-    public void freeCard(String authorizationReference, String transactionReference) {
-        AuthorizationDto authorizationDto = authorizationDao.findByReference(authorizationReference);
-        if (authorizationDto != null) {
-                CardDto cardDto = checkedFindById(authorizationDto.getCardId());
-                if (cardDto != null) {
-                    cardDto.setStatus(EnumCardStatus.FREE);
-                    update(cardDto);
-                }
-        }
-    }
-    @Override
-    public void blocCard(Long cardId) {
-            CardDto cardDto = checkedFindById(cardId);
-            if (cardDto != null) {
-                cardDto.setStatus(EnumCardStatus.IN_USE);
-                update(cardDto);
+    public void updateCardStatus(Long cardId,Long authorizationId,Long transactionId, EnumCardStatus status) {
+        CardDto cardDto = checkedFindById(cardId);
+        if (cardDto != null) {
+            CardMovementHistoryDto cardMovementHistoryDto = CardMovementHistoryDto.builder().cardId(cardDto.getId()).authorizationId(authorizationId)
+                    .ctrTransactionRef(transactionId).dateTime(LocalDateTime.now()).oldStatus(cardDto.getStatus()).newStatus(status).build();
+            cardMovementHistoryDao.create(cardMovementHistoryDto);
+            cardDto.setStatus(status);
+            update(cardDto);
         }
     }
     @Override

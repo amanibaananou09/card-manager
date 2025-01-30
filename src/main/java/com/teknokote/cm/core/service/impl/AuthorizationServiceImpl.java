@@ -28,6 +28,8 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
     @Autowired
     private CardService cardService;
     @Autowired
+    private CardMovementHistoryService cardMovementHistoryService;
+    @Autowired
     private CardGroupService cardGroupService;
     @Autowired
     private SalePointService salePointService;
@@ -215,7 +217,9 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
         }
     }
     private AuthorizationDto authorizeBasedOnLastTransaction(CardDto cardDto, String generatedReference, BigDecimal cardLimit, AuthorizationRequest authorizationRequest) {
-        return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), cardLimit, authorizationRequest);
+        AuthorizationDto authorizationDto = createAuthorizationDto(generatedReference, EnumAuthorizationStatus.GRANTED, cardDto.getId(), cardLimit, authorizationRequest);
+        cardService.updateCardStatus(cardDto.getId(),authorizationDto.getId(),null,EnumCardStatus.AUTHORIZED);
+        return authorizationDto;
     }
 
     private SalePointDto findSalePoint(SupplierDto supplierDto, String salePointIdentifier) {
