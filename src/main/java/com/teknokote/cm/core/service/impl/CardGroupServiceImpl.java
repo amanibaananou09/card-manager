@@ -72,7 +72,7 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
 
     @Override
     public CardGroupDto updateCardGroup(CardGroupDto dto) {
-        CardGroupDto cardGroup = checkedFindById(dto.getId());
+        checkedFindById(dto.getId());
         List<CardGroupDto> cardGroups = getDao().findAllByCustomer(dto.getCustomerId()).stream().filter(cardGroupDto->!cardGroupDto.getId().equals(dto.getId())).toList();
         for (CardGroupDto cardGroupDto : cardGroups){
             if (cardGroupDto.getName().equals(dto.getName())){

@@ -61,10 +61,13 @@ public class LoginService {
 
     public LoginResponse login(LoginRequest loginrequest, boolean doCheckUser) {
         if (doCheckUser) {
-            if (Objects.isNull(loginrequest.getUsername()))
+            if (Objects.isNull(loginrequest.getUsername())) {
                 throw new BadCredentialsException("username or password mismatch");
+            }
             final Optional<User> user = getUserDao().getRepository().findAllByUsernameIgnoreCase(loginrequest.getUsername());
-            if (user.isEmpty()) throw new BadCredentialsException("username or password mismatch");
+            if (user.isEmpty()) {
+                throw new BadCredentialsException("username or password mismatch");
+            }
         }
 
         HttpHeaders headers = new HttpHeaders();
@@ -77,14 +80,16 @@ public class LoginService {
         map.add("username", loginrequest.getUsername());
         map.add("password", loginrequest.getPassword());
 
-
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
 
         log.info("Trying to log in: {}", loginrequest.getUsername());
         ResponseEntity<LoginResponse> response = restTemplate.postForEntity(tokenEndpoint, httpEntity, LoginResponse.class);
-        if (response.hasBody()) {
+
+        // Check if the response is successful and has a body
+        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
             userService.updateLastConnection(loginrequest.getUsername());
             log.info("{} -> logged in", loginrequest.getUsername());
+
             final Optional<User> optionalUser = getUserDao().getRepository().findAllByUsernameIgnoreCase(loginrequest.getUsername());
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
@@ -98,10 +103,10 @@ public class LoginService {
                     response.getBody().setSupplierId(optionalCustomer.get().getSupplaierId());
                 }
             }
+            return response.getBody();
         } else {
-            log.info("{} -> Failed to log in, result:{}", loginrequest.getUsername(), response.getBody());
+            log.info("{} -> Failed to log in, result: {}", loginrequest.getUsername(), response.getBody());
+            throw new BadCredentialsException("Invalid login response");
         }
-        return response.getBody();
-
     }
 }

@@ -46,19 +46,27 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
             if (productDto != null) {
                 dto.setProductId(productDto.getId());
             }
-            List<SalePointDto> salePoints = supplierDto.getSalePoints().stream().filter(salePointDto -> salePointDto.getName().equals(dto.getSalePointName())).toList();
+            List<SalePointDto> salePoints = supplierDto.getSalePoints().stream()
+                    .filter(salePointDto -> salePointDto.getName().equals(dto.getSalePointName()))
+                    .toList();
             if (salePoints != null && !salePoints.isEmpty()) {
                 dto.setSalePointId(salePoints.get(0).getId());
             }
         }
         CardDto card = cardService.checkedFindById(dto.getCardId());
-        CardGroupDto cardGroupDto = cardGroupService.checkedFindById(card.getCardGroupId());
-        CeilingDto ceilingDto = cardGroupDto.getCeilings().stream().findFirst().get();
-        BigDecimal availableBalance = calculateAvailableBalance(dto, dto.getCardId(), ceilingDto, cardGroupDto);
-        if (ceilingDto.getCeilingType().equals(EnumCeilingType.AMOUNT)) {
-            dto.setAvailableBalance(availableBalance);
-        } else {
-            dto.setAvailableVolume(availableBalance);
+        if (card != null) {
+            CardGroupDto cardGroupDto = cardGroupService.checkedFindById(card.getCardGroupId());
+            if (cardGroupDto != null) {
+                CeilingDto ceilingDto = cardGroupDto.getCeilings().stream().findFirst().orElse(null);
+                if (ceilingDto != null) {
+                    BigDecimal availableBalance = calculateAvailableBalance(dto, dto.getCardId(), ceilingDto, cardGroupDto);
+                    if (ceilingDto.getCeilingType().equals(EnumCeilingType.AMOUNT)) {
+                        dto.setAvailableBalance(availableBalance);
+                    } else {
+                        dto.setAvailableVolume(availableBalance);
+                    }
+                }
+            }
         }
         return create(dto);
     }
@@ -277,7 +285,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
 
     @Override
     public List<TransactionChart> getTransactionChart(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate) {
-        List<DailyTransactionChart> dailyTransactionCharts = chartTransaction(customerId,cardId,period,startDate,endDate);
+        List<DailyTransactionChart> dailyTransactionCharts = chartTransaction(customerId, cardId, period, startDate, endDate);
 
         // Group by fuelGrade and cardIdentifier for TransactionChart
         Map<String, TransactionChart> transactionChartMap = new HashMap<>();

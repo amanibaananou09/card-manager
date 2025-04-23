@@ -8,6 +8,7 @@ import com.teknokote.cm.dto.UserDto;
 import com.teknokote.core.service.ActivatableGenericCheckedService;
 import com.teknokote.core.service.ESSValidator;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 @Service
 @Getter
+@Slf4j
 public class CustomerServiceImpl extends ActivatableGenericCheckedService<Long, CustomerDto> implements CustomerService {
     @Autowired
     private ESSValidator<CustomerDto> validator;
@@ -55,15 +57,20 @@ public class CustomerServiceImpl extends ActivatableGenericCheckedService<Long, 
         }
         return create(dto, false);
     }
-
     @Transactional
     @Override
     public CustomerDto update(CustomerDto dto) {
         CustomerDto customerDto = getDao().update(dto);
-        Optional<UserDto> userDto = userService.findByUsername(dto.getIdentifier());
-        // Update users in Keycloak
-        if (userDto.isPresent()) {
-            keycloakService.updateUser(dto.getIdentifier(), dto.getUsers().stream().findFirst().get());
+
+        // Check if the user is present
+        Optional<UserDto> userDtoOptional = userService.findByUsername(dto.getIdentifier());
+        if (userDtoOptional.isPresent()) {
+            userDtoOptional.get();
+            if (!dto.getUsers().isEmpty()) {
+                keycloakService.updateUser(dto.getIdentifier(), dto.getUsers().iterator().next());
+            }
+        } else {
+            log.warn("User with identifier {} not found for update.", dto.getIdentifier());
         }
 
         return customerDto;
