@@ -95,23 +95,27 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
     }
 
     @Override
-    public UserDto createUser(Long supplierId,UserDto userDto) {
+    public UserDto createUser(Long supplierId, UserDto userDto) {
         SupplierDto supplier = checkedFindById(supplierId);
+        if (supplier == null) {
+            throw new ServiceValidationException("supplier not existing on card manager !!!");
+        }
+
         Set<UserDto> existingUsers = supplier.getUsers();
-        if (supplier != null) {
-            supplier.getUsers().add(userDto);
-            SupplierDto supplierDto=dao.update(supplier);
-            for (UserDto existingUser : existingUsers.stream().filter(userDto1 -> userDto1.getId()!=null).toList()) {
-                if (!supplierDto.getUsers().contains(existingUser)) {
-                    supplier.getUsers().remove(existingUser);
-                    userDao.deleteById(existingUser.getId());
-                }
-            }
-            }else{
-                throw new ServiceValidationException("supplier not existing on card manager !!!");
-            }
+        supplier.getUsers().add(userDto);
+        SupplierDto supplierDto = dao.update(supplier);
+
+        // Cleanup des users deleted
+        existingUsers.stream()
+                .filter(user -> user.getId() != null && !supplierDto.getUsers().contains(user))
+                .forEach(user -> {
+                    supplier.getUsers().remove(user);
+                    userDao.deleteById(user.getId());
+                });
+
         return userDto;
     }
+
 
     @Override
     @Transactional

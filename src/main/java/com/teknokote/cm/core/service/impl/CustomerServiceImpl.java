@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -31,58 +32,72 @@ public class CustomerServiceImpl extends ActivatableGenericCheckedService<Long, 
     private UserService userService;
 
     public List<CustomerDto> findCustomerByFilter(String identifier) {
-        List<CustomerDto> customerList = null;
-
-        if (identifier != null) {
-            customerList = getDao().findCustomerByIdentifier(identifier);
-        } else {
-            return null;
+        if (identifier == null) {
+            log.warn("Null identifier provided to findCustomerByFilter");
+            return List.of();
         }
-        return customerList;
+        return getDao().findCustomerByIdentifier(identifier);
     }
 
     @Override
     public List<CustomerDto> findCustomerBySupplier(Long supplierId) {
+        if (supplierId == null) {
+            log.warn("Null supplierId provided to findCustomerBySupplier");
+            return List.of();
+        }
         return getDao().findCustomerBySupplier(supplierId);
     }
 
     @Transactional
     public CustomerDto addCustomer(CustomerDto dto) {
+        Objects.requireNonNull(dto, "CustomerDto cannot be null");
+
         Set<UserDto> users = dto.getUsers();
-        // Create users in Keycloak
-        if (!users.isEmpty()) {
-            for (UserDto userDto : users) {
+        if (users != null && !users.isEmpty()) {
+            users.forEach(userDto -> {
+                Objects.requireNonNull(userDto, "UserDto in users set cannot be null");
                 keycloakService.createUser(userDto);
-            }
+            });
         }
         return create(dto, false);
     }
+
     @Transactional
     @Override
     public CustomerDto update(CustomerDto dto) {
+        Objects.requireNonNull(dto, "CustomerDto cannot be null");
+
         CustomerDto customerDto = getDao().update(dto);
 
-        // Check if the user is present
-        Optional<UserDto> userDtoOptional = userService.findByUsername(dto.getIdentifier());
-        if (userDtoOptional.isPresent()) {
-            userDtoOptional.get();
-            if (!dto.getUsers().isEmpty()) {
-                keycloakService.updateUser(dto.getIdentifier(), dto.getUsers().iterator().next());
-            }
-        } else {
-            log.warn("User with identifier {} not found for update.", dto.getIdentifier());
-        }
+        userService.findByUsername(dto.getIdentifier())
+                .ifPresentOrElse(
+                        user -> {
+                            if (dto.getUsers() != null && !dto.getUsers().isEmpty()) {
+                                UserDto updatedUser = dto.getUsers().iterator().next();
+                                keycloakService.updateUser(dto.getIdentifier(), updatedUser);
+                            }
+                        },
+                        () -> log.warn("User with identifier {} not found for update.", dto.getIdentifier())
+                );
 
         return customerDto;
     }
 
     @Override
     public List<String> generateIdentiferSuggestions(String identifier) {
+        if (identifier == null || identifier.isBlank()) {
+            log.warn("Empty identifier provided for suggestions");
+            return List.of();
+        }
         return getDao().generateIdentiferSuggestions(identifier);
     }
 
     @Override
     public Optional<CustomerDto> findByIdentifier(String identifier) {
+        if (identifier == null || identifier.isBlank()) {
+            log.warn("Null or blank identifier provided");
+            return Optional.empty();
+        }
         return getDao().findByIdentifier(identifier);
     }
 }
