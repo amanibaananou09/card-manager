@@ -1,8 +1,8 @@
 package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.CustomerDao;
-import com.teknokote.cm.core.service.CustomerService;
-import com.teknokote.cm.core.service.UserService;
+import com.teknokote.cm.core.service.interfaces.CustomerService;
+import com.teknokote.cm.core.service.interfaces.UserService;
 import com.teknokote.cm.dto.CustomerDto;
 import com.teknokote.cm.dto.UserDto;
 import com.teknokote.core.service.ActivatableGenericCheckedService;

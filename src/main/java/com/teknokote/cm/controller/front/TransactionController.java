@@ -1,7 +1,7 @@
 package com.teknokote.cm.controller.front;
 
 import com.teknokote.cm.controller.EndPoints;
-import com.teknokote.cm.core.service.TransactionService;
+import com.teknokote.cm.core.service.interfaces.TransactionService;
 import com.teknokote.cm.dto.DailyTransactionChart;
 import com.teknokote.cm.dto.TransactionChart;
 import com.teknokote.cm.dto.TransactionDto;

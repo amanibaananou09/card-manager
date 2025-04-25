@@ -2,7 +2,7 @@ package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.CardDao;
 import com.teknokote.cm.core.dao.CardGroupDao;
-import com.teknokote.cm.core.service.CardGroupService;
+import com.teknokote.cm.core.service.interfaces.CardGroupService;
 import com.teknokote.cm.dto.CardDto;
 import com.teknokote.cm.dto.CardGroupDto;
 import com.teknokote.cm.dto.CeilingDto;

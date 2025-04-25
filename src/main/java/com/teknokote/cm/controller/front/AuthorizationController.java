@@ -2,8 +2,8 @@ package com.teknokote.cm.controller.front;
 
 import com.teknokote.cm.controller.EndPoints;
 import com.teknokote.cm.core.model.EnumCardStatus;
-import com.teknokote.cm.core.service.AuthorizationService;
-import com.teknokote.cm.core.service.CardService;
+import com.teknokote.cm.core.service.interfaces.AuthorizationService;
+import com.teknokote.cm.core.service.interfaces.CardService;
 import com.teknokote.cm.dto.AuthorizationDto;
 import com.teknokote.cm.dto.AuthorizationRequest;
 import lombok.AllArgsConstructor;

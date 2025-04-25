@@ -1,7 +1,7 @@
 package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.MovementDao;
-import com.teknokote.cm.core.service.MovementService;
+import com.teknokote.cm.core.service.interfaces.MovementService;
 import com.teknokote.cm.dto.MovementDto;
 import com.teknokote.core.service.ESSValidator;
 import com.teknokote.core.service.GenericCheckedService;

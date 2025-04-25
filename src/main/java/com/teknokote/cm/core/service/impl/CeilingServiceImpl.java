@@ -1,7 +1,7 @@
 package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.CeilingDao;
-import com.teknokote.cm.core.service.CeilingService;
+import com.teknokote.cm.core.service.interfaces.CeilingService;
 import com.teknokote.cm.dto.CeilingDto;
 import com.teknokote.core.service.ESSValidator;
 import com.teknokote.core.service.GenericCheckedService;

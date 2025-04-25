@@ -4,7 +4,7 @@ import com.teknokote.cm.core.dao.AuthorizationDao;
 import com.teknokote.cm.core.dao.CardDao;
 import com.teknokote.cm.core.dao.CardMovementHistoryDao;
 import com.teknokote.cm.core.model.EnumCardStatus;
-import com.teknokote.cm.core.service.CardService;
+import com.teknokote.cm.core.service.interfaces.CardService;
 import com.teknokote.cm.dto.CardDto;
 import com.teknokote.cm.dto.CardMovementHistoryDto;
 import com.teknokote.core.exceptions.ServiceValidationException;

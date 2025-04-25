@@ -4,7 +4,7 @@ import com.teknokote.cm.core.dao.ProductDao;
 import com.teknokote.cm.core.dao.SalePointDao;
 import com.teknokote.cm.core.dao.SupplierDao;
 import com.teknokote.cm.core.dao.UserDao;
-import com.teknokote.cm.core.service.SupplierService;
+import com.teknokote.cm.core.service.interfaces.SupplierService;
 import com.teknokote.cm.dto.ProductDto;
 import com.teknokote.cm.dto.SalePointDto;
 import com.teknokote.cm.dto.SupplierDto;

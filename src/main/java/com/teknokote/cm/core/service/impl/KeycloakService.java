@@ -1,8 +1,8 @@
 package com.teknokote.cm.core.service.impl;
 
-import com.teknokote.cm.exception.KeycloakUserCreationException;
 import com.teknokote.cm.core.dao.mappers.UserMapper;
 import com.teknokote.cm.dto.UserDto;
+import com.teknokote.cm.exception.KeycloakUserCreationException;
 import com.teknokote.core.exceptions.EntityNotFoundException;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
@@ -113,7 +113,9 @@ public class KeycloakService {
             if (response.getStatusInfo().getStatusCode() != 201) {
                 throw new KeycloakUserCreationException(response.getStatusInfo().getReasonPhrase());
             }
-            String userId = response.getLocation().getPath().replaceAll(".*/([^/]+)$", "$1");
+            String locationPath = response.getLocation().getPath();
+            String userId = locationPath.substring(locationPath.lastIndexOf('/') + 1);
+
             if (StringUtils.hasText(createUserRequest.getRole())) {
                 UserResource userResource = realmResource.users().get(userId);
                 RolesResource rolesResource = realmResource.roles();

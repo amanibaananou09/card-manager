@@ -1,7 +1,7 @@
 package com.teknokote.cm.scheduling;
 
 import com.teknokote.cm.core.model.EnumCardStatus;
-import com.teknokote.cm.core.service.CardService;
+import com.teknokote.cm.core.service.interfaces.CardService;
 import com.teknokote.cm.dto.CardDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.AccountDao;
-import com.teknokote.cm.core.service.AccountService;
+import com.teknokote.cm.core.service.interfaces.AccountService;
 import com.teknokote.cm.dto.AccountDto;
 import com.teknokote.core.service.ActivatableGenericCheckedService;
 import com.teknokote.core.service.ESSValidator;

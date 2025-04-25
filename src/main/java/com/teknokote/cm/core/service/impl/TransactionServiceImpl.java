@@ -2,7 +2,7 @@ package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.TransactionDao;
 import com.teknokote.cm.core.model.*;
-import com.teknokote.cm.core.service.*;
+import com.teknokote.cm.core.service.interfaces.*;
 import com.teknokote.cm.dto.*;
 import com.teknokote.core.exceptions.ServiceValidationException;
 import com.teknokote.core.service.ESSValidator;
