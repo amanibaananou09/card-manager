@@ -84,7 +84,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         }
     }
 
-    private BigDecimal calculateAvailableBalance(TransactionDto transactionDto, Long cardId, CeilingDto ceilingDto, CardGroupDto groupDto) {
+    public BigDecimal calculateAvailableBalance(TransactionDto transactionDto, Long cardId, CeilingDto ceilingDto, CardGroupDto groupDto) {
         Optional<TransactionDto> lastTransaction = this.findLastTransactionByCardId(cardId, ceilingDto.getLimitType(), LocalDateTime.now());
         BigDecimal valueToSubtract;
         if (lastTransaction.isEmpty()) {
@@ -189,7 +189,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         return remainingBalancePerProduct;
     }
 
-    private SalePointDto mapToSalePointDto(SalePoint salePoint) {
+    public SalePointDto mapToSalePointDto(SalePoint salePoint) {
         CountryDto countryDto = mapToCountryDto(salePoint.getCountry());
         return SalePointDto.builder()
                 .id(salePoint.getId())
@@ -199,7 +199,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
                 .build();
     }
 
-    private CountryDto mapToCountryDto(Country salePoint) {
+    public CountryDto mapToCountryDto(Country salePoint) {
         return CountryDto.builder()
                 .id(salePoint.getId())
                 .name(salePoint.getName())

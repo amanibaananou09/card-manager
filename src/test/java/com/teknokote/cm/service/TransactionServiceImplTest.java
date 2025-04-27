@@ -1,7 +1,7 @@
 package com.teknokote.cm.service;
 
 import com.teknokote.cm.core.dao.TransactionDao;
-import com.teknokote.cm.core.model.EnumCeilingLimitType;
+import com.teknokote.cm.core.model.*;
 import com.teknokote.cm.core.service.impl.TransactionServiceImpl;
 import com.teknokote.cm.core.service.interfaces.*;
 import com.teknokote.cm.dto.*;
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,8 +25,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TransactionServiceImplTest {
@@ -167,4 +167,119 @@ class TransactionServiceImplTest {
         assertNotNull(result);
         assertFalse(result.isEmpty());
     }
+
+    @Test
+    void findTransactionsByFilter_Success() {
+        // Arrange
+        Long customerId = 1L;
+        TransactionFilterDto filterDto = new TransactionFilterDto(); // Set up filters as necessary
+        int page = 0;
+        int size = 10;
+
+        // Mocking a returned Page object
+        Page<Transaction> mockPage = mock(Page.class);
+        when(transactionDao.findByCriteria(customerId, filterDto, page, size)).thenReturn(mockPage);
+
+        // Act
+        Page<Transaction> result = transactionService.findTransactionsByFilter(customerId, filterDto, page, size);
+
+        // Assert
+        assertNotNull(result);
+        verify(transactionDao).findByCriteria(customerId, filterDto, page, size);
+    }
+
+    @Test
+    void mapToTransactionDto_Success() {
+        // Arrange
+        SalePoint salePoint = new SalePoint();
+        salePoint.setId(1L);
+        salePoint.setName("Test SalePoint");
+        salePoint.setCity("Test City");
+
+        Country country = new Country();
+        country.setId(1L);
+        country.setName("Test Country");
+        country.setCode("TC");
+
+        salePoint.setCountry(country); // Set the Country object to SalePoint
+
+        Transaction transaction = new Transaction();
+        transaction.setId(1L);
+        transaction.setVersion(1L);
+        transaction.setAmount(new BigDecimal("100.00"));
+        transaction.setPrice(10.00);
+        transaction.setQuantity(new BigDecimal("10"));
+        transaction.setDateTime(LocalDateTime.now());
+        transaction.setAvailableBalance(new BigDecimal("50.00"));
+        transaction.setAvailableVolume(new BigDecimal("5"));
+
+        Card card = new Card();
+        card.setCardId("Card123");
+        transaction.setCard(card);
+
+        Product product = new Product();
+        product.setName("Test Product");
+        transaction.setProduct(product);
+
+        transaction.setSalePoint(salePoint); // Set the SalePoint object to Transaction
+
+        // Act
+        TransactionDto result = transactionService.mapToTransactionDto(transaction);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(transaction.getId(), result.getId());
+        assertEquals(transaction.getAmount(), result.getAmount());
+        assertEquals(transaction.getAvailableBalance(), result.getAvailableBalance());
+        assertEquals(transaction.getProduct().getName(), result.getProductName());
+        assertEquals(transaction.getSalePoint().getName(), result.getSalePointName());
+        assertEquals(transaction.getSalePoint().getCity(), result.getCity()); // Optional, based on your DTO structure
+    }
+
+    @Test
+    void mapToSalePointDto_Success() {
+        // Arrange
+        SalePoint salePoint = new SalePoint();
+        salePoint.setId(1L);
+        salePoint.setName("Test SalePoint");
+        salePoint.setCity("Test City");
+        Country country = new Country();
+        country.setId(1L);
+        country.setName("Test Country");
+        salePoint.setCountry(country);
+
+        // Act
+        SalePointDto result = transactionService.mapToSalePointDto(salePoint);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(salePoint.getId(), result.getId());
+        assertEquals(salePoint.getName(), result.getName());
+        assertEquals(salePoint.getCity(), result.getCity());
+        assertEquals(country.getName(), result.getCountry().getName());
+    }
+
+    @Test
+    void getDailyTransactionChart_Success() {
+        // Arrange
+        Long customerId = 1L;
+        Long cardId = 1L;
+        String period = null;
+        LocalDateTime startDate = LocalDateTime.now().minusDays(7);
+        LocalDateTime endDate = LocalDateTime.now();
+
+        DailyTransactionChart dailyChart = new DailyTransactionChart();
+        dailyChart.setSum(BigDecimal.ZERO);
+        List<DailyTransactionChart> mockCharts = Collections.singletonList(dailyChart);
+
+        when(transactionService.chartTransaction(customerId, cardId, period, startDate, endDate)).thenReturn(mockCharts);
+
+        // Act
+        List<DailyTransactionChart> result = transactionService.getDailyTransactionChart(customerId, cardId, period, startDate, endDate);
+
+        // Assert
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+    }
+
 }
