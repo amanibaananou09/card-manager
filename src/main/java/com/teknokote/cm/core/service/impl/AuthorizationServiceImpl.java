@@ -57,10 +57,13 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
                         boolean isAuthorized = evaluateCondition(condition, authorizationRequest.getProductName(),
                                 authorizationRequest.getSalePointName(), LocalDate.now().getDayOfWeek().toString(), salePoint.getCity());
                         if (isAuthorized) {
-                            CeilingDto ceilingDto = cardGroupDto.getCeilings().stream().findFirst().get();
-                            return authorizeIfAuthorized(cardDto, ceilingDto, generatedReference, cardLimit, authorizationRequest);
-                        } else {
-                            return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), cardLimit, authorizationRequest);
+                            Optional<CeilingDto> optionalCeiling = cardGroupDto.getCeilings().stream().findFirst();
+                            if (optionalCeiling.isPresent()) {
+                                CeilingDto ceilingDto = optionalCeiling.get();
+                                return authorizeIfAuthorized(cardDto, ceilingDto, generatedReference, cardLimit, authorizationRequest);
+                            } else {
+                                return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), BigDecimal.ZERO, authorizationRequest);
+                            }
                         }
                     }
                 }else{
