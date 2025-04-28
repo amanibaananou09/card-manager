@@ -3,7 +3,9 @@ package com.teknokote.cm.service;
 import com.teknokote.cm.core.dao.TransactionDao;
 import com.teknokote.cm.core.model.*;
 import com.teknokote.cm.core.service.impl.TransactionServiceImpl;
-import com.teknokote.cm.core.service.interfaces.*;
+import com.teknokote.cm.core.service.interfaces.CardService;
+import com.teknokote.cm.core.service.interfaces.ProductService;
+import com.teknokote.cm.core.service.interfaces.SupplierService;
 import com.teknokote.cm.dto.*;
 import com.teknokote.core.exceptions.ServiceValidationException;
 import com.teknokote.core.service.ESSValidationResult;
@@ -32,29 +34,21 @@ class TransactionServiceImplTest {
 
     @InjectMocks
     private TransactionServiceImpl transactionService;
-
     @Mock
     private TransactionDao transactionDao;
-
     @Mock
     private SupplierService supplierService;
-
     @Mock
     private ProductService productService;
-
     @Mock
     private CardService cardService;
-
-    @Mock
-    private CardGroupService cardGroupService;
-
-    @Mock
-    private SalePointService salePointService;
-
     @Mock
     private ESSValidator<TransactionDto> validator;
 
     private TransactionDto transactionDto;
+    private CeilingDto ceilingDto;
+    private Long customerId;
+    private Long cardId;
     private CardDto cardDto;
 
     @BeforeEach
@@ -66,6 +60,10 @@ class TransactionServiceImplTest {
         transactionDto.setSalePointName("Test SalePoint");
         transactionDto.setAmount(new BigDecimal("100.00"));
         transactionDto.setQuantity(new BigDecimal("10"));
+
+        ceilingDto = CeilingDto.builder().build();
+        cardId = 1L;
+        customerId = 2L;
     }
 
     @Test
@@ -86,8 +84,8 @@ class TransactionServiceImplTest {
 
         when(supplierService.findByReference(transactionDto.getReference())).thenReturn(supplierDto);
         when(productService.findBySupplierAndName(transactionDto.getProductName(), supplierDto.getId())).thenReturn(productDto);
-        when(cardService.checkedFindById(anyLong())).thenReturn(cardDto);
-        when(transactionDao.create(any())).thenReturn(TransactionDto.builder().build()); // You might want to adjust this
+        lenient().when(cardService.findById(anyLong())).thenReturn(Optional.ofNullable(cardDto));
+        when(transactionDao.create(any())).thenReturn(TransactionDto.builder().build());
 
         // Act
         TransactionDto result = transactionService.createTransaction(transactionDto);
@@ -117,7 +115,7 @@ class TransactionServiceImplTest {
     @Test
     void findLastTransactionByCardId_Success() {
         // Arrange
-        Long cardId = 1L;
+        cardId = 1L;
         EnumCeilingLimitType limitType = EnumCeilingLimitType.MONTHLY;
         LocalDateTime dateTime = LocalDateTime.now();
         TransactionDto transaction = TransactionDto.builder().build();
@@ -136,7 +134,7 @@ class TransactionServiceImplTest {
     @Test
     void chartTransaction_ThrowServiceValidationException() {
         // Arrange
-        Long customerId = 1L;
+        customerId = 1L;
         LocalDateTime startDate = null;
         LocalDateTime endDate = null;
 
@@ -149,7 +147,7 @@ class TransactionServiceImplTest {
     @Test
     void getTransactionChart_Success() {
         // Arrange
-        Long customerId = 1L;
+        customerId = 1L;
         LocalDateTime startDate = LocalDateTime.now().minusDays(7); // Start date set to one week ago
         LocalDateTime endDate = LocalDateTime.now(); // End date set to now
         DailyTransactionChart dailyChart = new DailyTransactionChart();
@@ -171,7 +169,7 @@ class TransactionServiceImplTest {
     @Test
     void findTransactionsByFilter_Success() {
         // Arrange
-        Long customerId = 1L;
+        customerId = 1L;
         TransactionFilterDto filterDto = new TransactionFilterDto(); // Set up filters as necessary
         int page = 0;
         int size = 10;
@@ -262,8 +260,8 @@ class TransactionServiceImplTest {
     @Test
     void getDailyTransactionChart_Success() {
         // Arrange
-        Long customerId = 1L;
-        Long cardId = 1L;
+        customerId = 1L;
+        cardId = 1L;
         String period = null;
         LocalDateTime startDate = LocalDateTime.now().minusDays(7);
         LocalDateTime endDate = LocalDateTime.now();
@@ -282,4 +280,102 @@ class TransactionServiceImplTest {
         assertFalse(result.isEmpty());
     }
 
+    @Test
+    void createTransaction_ProductNotFound() {
+        // Arrange
+        SupplierDto supplierDto = SupplierDto.builder().build();
+        supplierDto.setId(1L);
+        supplierDto.setSalePoints(Collections.singleton(SalePointDto.builder().name("Test SalePoint").build()));
+
+        ESSValidationResult validationResult = new ESSValidationResult();
+        validationResult.hasErrors();
+
+        when(validator.validateOnCreate(transactionDto)).thenReturn(validationResult);
+
+        when(supplierService.findByReference(transactionDto.getReference())).thenReturn(supplierDto);
+        when(productService.findBySupplierAndName(transactionDto.getProductName(), supplierDto.getId())).thenReturn(null); // Product not found
+        lenient().when(cardService.findById(anyLong())).thenReturn(Optional.ofNullable(cardDto));
+
+        // Act
+        TransactionDto result = transactionService.createTransaction(transactionDto);
+
+        // Assert
+        assertNull(result); // Expecting result to be null if product not found
+    }
+
+    @Test
+    void findLastTransactionByCardId_NoTransactions() {
+        // Arrange
+        cardId = 1L;
+        EnumCeilingLimitType limitType = EnumCeilingLimitType.MONTHLY;
+        LocalDateTime dateTime = LocalDateTime.now();
+
+        when(transactionDao.findLastTransactionByCardIdAndMonth(cardId, dateTime.getMonthValue())).thenReturn(Optional.empty());
+
+        // Act
+        Optional<TransactionDto> result = transactionService.findLastTransactionByCardId(cardId, limitType, dateTime);
+
+        // Assert
+        assertFalse(result.isPresent()); // Expecting no result when no transactions found
+    }
+
+    @Test
+    void calculateAvailableBalance_FirstTransaction() {
+        // Arrange
+        ceilingDto = CeilingDto.builder().build();
+        ceilingDto.setValue(new BigDecimal("1000.00"));
+        ceilingDto.setCeilingType(EnumCeilingType.AMOUNT);
+        EnumCeilingLimitType limitType = EnumCeilingLimitType.MONTHLY;
+        ceilingDto.setLimitType(limitType);
+
+        // Simulate no last transaction
+        when(transactionService.findLastTransactionByCardId(1L, EnumCeilingLimitType.MONTHLY, LocalDateTime.now())).thenReturn(Optional.empty());
+
+        BigDecimal availableBalance = transactionService.calculateAvailableBalance(transactionDto, transactionDto.getCardId(), ceilingDto, null);
+
+        // Assert
+        assertEquals(new BigDecimal("900.00"), availableBalance); // Expecting ceiling value minus amount
+    }
+
+    @Test
+    void getWeeklyTransactionChart_Success() {
+        // Arrange
+        customerId = 1L;
+        cardId = 1L;
+        String period = "Weekly"; // Assuming this is the period you're filtering by
+        LocalDateTime startDate = LocalDateTime.now().minusDays(7);
+        LocalDateTime endDate = LocalDateTime.now();
+
+        DailyTransactionChart dailyChart = new DailyTransactionChart();
+        dailyChart.setSum(BigDecimal.ZERO);
+        List<DailyTransactionChart> mockCharts = Collections.singletonList(dailyChart);
+
+        when(transactionService.chartTransaction(customerId, cardId, period, startDate, endDate)).thenReturn(mockCharts);
+
+        // Act
+        List<DailyTransactionChart> result = transactionService.getDailyTransactionChart(customerId, cardId, period, startDate, endDate);
+
+        // Assert
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+    }
+
+    @Test
+    void calculateAvailableBalance_FirstTransaction_AmountCeilingType() {
+        // Arrange
+        ceilingDto.setValue(new BigDecimal("1000.00"));
+        ceilingDto.setCeilingType(EnumCeilingType.AMOUNT);
+        EnumCeilingLimitType limitType = EnumCeilingLimitType.MONTHLY;
+        ceilingDto.setLimitType(limitType);
+        transactionDto.setAmount(new BigDecimal("100.00")); // Amount to subtract
+
+        when(transactionService.findLastTransactionByCardId(1L, EnumCeilingLimitType.MONTHLY, LocalDateTime.now())).thenReturn(Optional.empty());
+
+
+        // Act
+        BigDecimal availableBalance = transactionService.calculateAvailableBalance(transactionDto, cardId, ceilingDto, null);
+
+        // Assert
+        assertEquals(new BigDecimal("900.00"), availableBalance); // 1000 - 100
+    }
 }
