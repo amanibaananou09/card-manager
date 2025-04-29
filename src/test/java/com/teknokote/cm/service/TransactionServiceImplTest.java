@@ -19,7 +19,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -378,4 +381,145 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(new BigDecimal("900.00"), availableBalance); // 1000 - 100
     }
+
+    @Test
+    void calculateAvailableBalance_SubsequentTransaction_AmountCeilingType() {
+        // Arrange
+        ceilingDto.setValue(new BigDecimal("1000.00"));
+        ceilingDto.setCeilingType(EnumCeilingType.AMOUNT);
+        ceilingDto.setLimitType(EnumCeilingLimitType.MONTHLY);
+
+        transactionDto.setAmount(new BigDecimal("100.00")); // Amount to subtract
+
+        TransactionDto lastTransaction = TransactionDto.builder().build();
+        lastTransaction.setAvailableBalance(new BigDecimal("900.00")); // Previous balance
+
+        // Simulate existing last transaction
+        when(transactionService.findLastTransactionByCardId(cardId, ceilingDto.getLimitType(), LocalDateTime.now()))
+                .thenReturn(Optional.of(lastTransaction));
+
+        // Act
+        BigDecimal availableBalance = transactionService.calculateAvailableBalance(transactionDto, cardId, ceilingDto, null);
+
+        // Assert
+        assertEquals(new BigDecimal("800.00"), availableBalance); // 900 - 100
+    }
+
+    @Test
+    void calculateAvailableBalance_FirstTransaction_VolumeCeilingType() {
+        // Arrange
+        ceilingDto.setValue(new BigDecimal("2000.00"));
+        ceilingDto.setCeilingType(EnumCeilingType.VOLUME);
+        EnumCeilingLimitType limitType = EnumCeilingLimitType.MONTHLY;
+        ceilingDto.setLimitType(limitType);
+
+        transactionDto.setQuantity(new BigDecimal("150.00")); // Quantity to subtract
+
+        // Simulate no last transaction
+        when(transactionService.findLastTransactionByCardId(1L, EnumCeilingLimitType.MONTHLY, LocalDateTime.now())).thenReturn(Optional.empty());
+
+        // Act
+        BigDecimal availableBalance = transactionService.calculateAvailableBalance(transactionDto, cardId, ceilingDto, null);
+
+        // Assert
+        assertEquals(new BigDecimal("1850.00"), availableBalance); // 2000 - 150
+    }
+
+    @Test
+    void calculateAvailableBalance_SubsequentTransaction_VolumeCeilingType() {
+        // Arrange
+        ceilingDto.setValue(new BigDecimal("3000.00"));
+        ceilingDto.setCeilingType(EnumCeilingType.VOLUME);
+        ceilingDto.setLimitType(EnumCeilingLimitType.MONTHLY);
+
+        transactionDto.setQuantity(new BigDecimal("200.00")); // Quantity to subtract
+
+        TransactionDto lastTransaction = TransactionDto.builder().build();
+        lastTransaction.setAvailableVolume(new BigDecimal("2800.00")); // Previous available volume
+
+        // Simulate existing last transaction
+        when(transactionService.findLastTransactionByCardId(cardId, ceilingDto.getLimitType(), LocalDateTime.now()))
+                .thenReturn(Optional.of(lastTransaction));
+
+        // Act
+        BigDecimal availableBalance = transactionService.calculateAvailableBalance(transactionDto, cardId, ceilingDto, null);
+
+        // Assert
+        assertEquals(new BigDecimal("2600.00"), availableBalance); // 2800 - 200
+    }
+
+    @Test
+    void chartTransaction_Today_NoCardId() {
+        // Arrange
+        List<DailyTransactionChart> expectedChart = new ArrayList<>();
+        when(transactionService.getDao().todayChartTransaction(customerId)).thenReturn(expectedChart);
+
+        // Act
+        List<DailyTransactionChart> result = transactionService.chartTransaction(customerId, null, "today", null, null);
+
+        // Assert
+        assertEquals(expectedChart, result);
+    }
+
+    @Test
+    void chartTransaction_Today_WithCardId() {
+        // Arrange
+        List<DailyTransactionChart> expectedChart = new ArrayList<>();
+        when(transactionService.getDao().todayChartTransactionWithCardId(customerId, cardId)).thenReturn(expectedChart);
+
+        // Act
+        List<DailyTransactionChart> result = transactionService.chartTransaction(customerId, cardId, "today", null, null);
+
+        // Assert
+        assertEquals(expectedChart, result);
+    }
+
+    @Test
+    void chartTransaction_Yesterday_NoCardId() {
+        // Arrange
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        LocalDateTime startOfDay = yesterday.atStartOfDay();
+        LocalDateTime endOfDay = yesterday.atTime(LocalTime.MAX);
+        List<DailyTransactionChart> expectedChart = new ArrayList<>();
+        when(transactionService.getDao().findTransactionBetween(customerId, startOfDay, endOfDay))
+                .thenReturn(expectedChart);
+
+        // Act
+        List<DailyTransactionChart> result = transactionService.chartTransaction(customerId, null, "yesterday", null, null);
+
+        // Assert
+        assertEquals(expectedChart, result);
+    }
+
+    @Test
+    void chartTransaction_Yesterday_WithCardId() {
+        // Arrange
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        LocalDateTime startOfDay = yesterday.atStartOfDay();
+        LocalDateTime endOfDay = yesterday.atTime(LocalTime.MAX);
+        List<DailyTransactionChart> expectedChart = new ArrayList<>();
+        when(transactionService.getDao().findTransactionBetweenDateWithCardId(customerId, cardId, startOfDay, endOfDay))
+                .thenReturn(expectedChart);
+
+        // Act
+        List<DailyTransactionChart> result = transactionService.chartTransaction(customerId, cardId, "yesterday", null, null);
+
+        // Assert
+        assertEquals(expectedChart, result);
+    }
+
+    @Test
+    void chartTransaction_Weekly_NoCardId() {
+        // Arrange
+        List<DailyTransactionChart> expectedChart = new ArrayList<>();
+        when(transactionService.getDao().weeklyChartTransaction(customerId)).thenReturn(expectedChart);
+
+        // Act
+        List<DailyTransactionChart> result = transactionService.chartTransaction(customerId, null, "weekly", null, null);
+
+        // Assert
+        assertEquals(expectedChart, result);
+    }
+
+
 }
