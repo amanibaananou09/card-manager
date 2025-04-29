@@ -521,5 +521,30 @@ class TransactionServiceImplTest {
         assertEquals(expectedChart, result);
     }
 
+    @Test
+    void chartTransaction_Weekly_WithCardId() {
+        // Arrange
+        List<DailyTransactionChart> expectedChart = new ArrayList<>();
+        when(transactionService.getDao().weeklyChartTransactionWithCardId(customerId, cardId)).thenReturn(expectedChart);
+
+        // Act
+        List<DailyTransactionChart> result = transactionService.chartTransaction(customerId, cardId, "weekly", null, null);
+
+        // Assert
+        assertEquals(expectedChart, result);
+    }
+
+    @Test
+    void chartTransaction_Monthly_NoCardId() {
+        // Arrange
+        List<DailyTransactionChart> expectedChart = new ArrayList<>();
+        when(transactionService.getDao().monthlyChartTransaction(customerId)).thenReturn(expectedChart);
+
+        // Act
+        List<DailyTransactionChart> result = transactionService.chartTransaction(customerId, null, "monthly", null, null);
+
+        // Assert
+        assertEquals(expectedChart, result);
+    }
 
 }
