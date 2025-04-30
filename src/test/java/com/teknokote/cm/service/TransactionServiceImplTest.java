@@ -19,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -545,6 +546,113 @@ class TransactionServiceImplTest {
 
         // Assert
         assertEquals(expectedChart, result);
+    }
+
+    @Test
+    void chartTransaction_Monthly_WithCardId() {
+        // Arrange
+        List<DailyTransactionChart> expectedChart = new ArrayList<>();
+        when(transactionService.getDao().monthlyChartTransactionWithCardId(customerId, cardId)).thenReturn(expectedChart);
+
+        // Act
+        List<DailyTransactionChart> result = transactionService.chartTransaction(customerId, cardId, "monthly", null, null);
+
+        // Assert
+        assertEquals(expectedChart, result);
+    }
+
+    @Test
+    void chartTransaction_NullPeriod_ThrowsException() {
+        // Arrange
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
+
+        // Act & Assert
+        ServiceValidationException exception = assertThrows(ServiceValidationException.class, () -> {
+            transactionService.chartTransaction(customerId, cardId, null, startDate, endDate);
+        });
+        assertEquals("startDate and endDate must not be null", exception.getMessage());
+    }
+
+    @Test
+    void chartTransaction_EmptyPeriod_ValidDates() {
+        // Arrange
+        LocalDateTime startDate = LocalDateTime.now().minusDays(7);
+        LocalDateTime endDate = LocalDateTime.now();
+        List<DailyTransactionChart> expectedChart = new ArrayList<>();
+
+        // This is the stub you can keep as it is being used in the test
+        when(transactionService.getDao().findTransactionBetween(customerId, startDate, endDate))
+                .thenReturn(expectedChart);
+
+        // Act
+        List<DailyTransactionChart> result = transactionService.chartTransaction(customerId, null, null, startDate, endDate);
+
+        // Assert
+        assertEquals(expectedChart, result);
+    }
+
+    @Test
+    void findLastTransactionByCardId_Monthly() {
+        cardId = 1L;
+        LocalDateTime dateTime = LocalDateTime.now();
+        TransactionDto expectedTransaction = TransactionDto.builder().build();
+
+        // Arrange: Stubbing the DAO method
+        when(transactionDao.findLastTransactionByCardIdAndMonth(eq(cardId), anyInt()))
+                .thenReturn(Optional.of(expectedTransaction));
+
+        // Act: Call the method
+        Optional<TransactionDto> result = transactionService.findLastTransactionByCardId(cardId, EnumCeilingLimitType.MONTHLY, dateTime);
+
+        // Assert: Verify the result
+        assertTrue(result.isPresent());
+        assertEquals(expectedTransaction, result.get());
+        // Verify that the DAO method was called correctly
+        verify(transactionDao).findLastTransactionByCardIdAndMonth(cardId, dateTime.getMonthValue());
+    }
+
+    @Test
+    void findLastTransactionByCardId_Weekly() {
+        cardId = 1L;
+        LocalDateTime dateTime = LocalDateTime.now();
+        TransactionDto expectedTransaction = TransactionDto.builder().build();
+
+        // Arrange: Set start and end of the week
+        LocalDateTime startOfWeek = LocalDate.now().with(DayOfWeek.MONDAY).atStartOfDay();
+        LocalDateTime endOfWeek = startOfWeek.plusDays(7);
+
+        // Stubbing the DAO method
+        when(transactionDao.findLastTransactionByCardIdAndWeek(eq(cardId), eq(startOfWeek), eq(endOfWeek)))
+                .thenReturn(Optional.of(expectedTransaction));
+
+        // Act: Call the method
+        Optional<TransactionDto> result = transactionService.findLastTransactionByCardId(cardId, EnumCeilingLimitType.WEEKLY, dateTime);
+
+        // Assert: Verify the result
+        assertTrue(result.isPresent());
+        assertEquals(expectedTransaction, result.get());
+        // Verify that the DAO method was called correctly
+        verify(transactionDao).findLastTransactionByCardIdAndWeek(cardId, startOfWeek, endOfWeek);
+    }
+
+    @Test
+    void findLastTransactionByCardId_Today() {
+        cardId = 1L;
+        TransactionDto expectedTransaction = TransactionDto.builder().build();
+
+        // Arrange: Stubbing the DAO method
+        when(transactionDao.findTodayLastTransactionByCardId(eq(cardId)))
+                .thenReturn(Optional.of(expectedTransaction));
+
+        // Act: Call the method
+        Optional<TransactionDto> result = transactionService.findLastTransactionByCardId(cardId, EnumCeilingLimitType.DAILY, LocalDateTime.now());
+
+        // Assert: Verify the result
+        assertTrue(result.isPresent());
+        assertEquals(expectedTransaction, result.get());
+        // Verify that the DAO method was called correctly
+        verify(transactionDao).findTodayLastTransactionByCardId(cardId);
     }
 
 }
