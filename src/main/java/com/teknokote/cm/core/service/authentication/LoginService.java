@@ -53,8 +53,12 @@ public class LoginService {
     private final RestTemplate restTemplate;
 
     @Autowired
-    public LoginService(RestTemplate restTemplate) {
+    public LoginService(RestTemplate restTemplate,UserDao userDao, UserService userService,SupplierDao supplierDao, CustomerDao customerDao) {
         this.restTemplate = restTemplate;
+        this.userDao = userDao;
+        this.userService = userService;
+        this.supplierDao = supplierDao;
+        this.customerDao = customerDao;
     }
 
     public LoginResponse login(LoginRequest loginrequest, boolean doCheckUser) {
