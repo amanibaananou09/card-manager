@@ -62,4 +62,28 @@ class CustomerServiceImplTest {
         verify(customerDao, times(1)).findCustomerByIdentifier(identifier);
     }
 
+    @Test
+    void findCustomerBySupplier_ShouldReturnEmptyList_WhenSupplierIdIsNull() {
+        // Act
+        List<CustomerDto> result = customerService.findCustomerBySupplier(null);
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(customerDao, never()).findCustomerBySupplier(any());
+    }
+
+    @Test
+    void findCustomerBySupplier_ShouldReturnCustomers_WhenSupplierIdIsProvided() {
+        // Arrange
+        Long supplierId = 1L;
+        List<CustomerDto> expectedCustomers = List.of(CustomerDto.builder().build());
+        when(customerDao.findCustomerBySupplier(supplierId)).thenReturn(expectedCustomers);
+
+        // Act
+        List<CustomerDto> result = customerService.findCustomerBySupplier(supplierId);
+
+        // Assert
+        assertEquals(expectedCustomers, result);
+        verify(customerDao, times(1)).findCustomerBySupplier(supplierId);
+    }
 }
