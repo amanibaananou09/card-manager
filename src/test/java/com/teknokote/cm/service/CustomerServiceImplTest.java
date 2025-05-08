@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -86,4 +87,30 @@ class CustomerServiceImplTest {
         assertEquals(expectedCustomers, result);
         verify(customerDao, times(1)).findCustomerBySupplier(supplierId);
     }
-}
+
+    @Test
+    void findByIdentifier_ShouldReturnEmpty_WhenIdentifierIsBlank() {
+        // Act
+        Optional<CustomerDto> result = customerService.findByIdentifier(" ");
+
+        // Assert
+        assertTrue(result.isEmpty());
+        verify(customerDao, never()).findByIdentifier(any());
+    }
+
+    @Test
+    void findByIdentifier_ShouldReturnCustomer_WhenIdentifierIsProvided() {
+        // Arrange
+        String identifier = "customer1";
+        CustomerDto expectedCustomer = CustomerDto.builder().build();
+        when(customerDao.findByIdentifier(identifier)).thenReturn(Optional.of(expectedCustomer));
+
+        // Act
+        Optional<CustomerDto> result = customerService.findByIdentifier(identifier);
+
+        // Assert
+        assertEquals(Optional.of(expectedCustomer), result);
+        verify(customerDao, times(1)).findByIdentifier(identifier);
+    }
+
+    }
