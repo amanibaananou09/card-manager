@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.*;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -246,5 +247,258 @@ class KeycloakServiceTest {
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertEquals(1, responseEntity.getBody().size());
         assertEquals("user1", responseEntity.getBody().get(0).getUsername());
+    }
+    @Test
+    void updateUser_Success() {
+        // Arrange: Mock the existing user to be updated
+        UserRepresentation existingUser = new UserRepresentation();
+        existingUser.setId("123");
+        existingUser.setUsername(userDto.getUsername());
+
+        // Mocking the Keycloak interactions
+        lenient().when(keycloak.realm(realm)).thenReturn(realmResource);
+        when(realmResource.users()).thenReturn(usersResource);
+        when(usersResource.searchByUsername(userDto.getUsername(), true)).thenReturn(Collections.singletonList(existingUser));
+
+        // Mocking UserResource return when get is called with ID
+        when(usersResource.get(existingUser.getId())).thenReturn(userResource);
+        when(userMapper.toUserRepresentation(userDto)).thenReturn(userRepresentation);
+
+        // Act: Call the updateUser method
+        keycloakService.updateUser(userDto.getUsername(), userDto);
+
+        // Verify that the user was updated with the expected details
+        verify(userResource, times(1)).update(any(UserRepresentation.class));
+    }
+    @Test
+    void testGetInstance_ReturnsExistingInstance() {
+        // Arrange
+        Keycloak existingInstance = keycloakService.getInstance();
+
+        // When invoked again, it should return the same instance
+        Keycloak laterInstance = keycloakService.getInstance();
+
+        // Assert
+        assertSame(existingInstance, laterInstance);
+    }
+    @Test
+    void testGetInstance_CreatesKeycloakInstance() {
+        // Act
+        Keycloak keycloakInstance = keycloakService.getInstance();
+
+        // Assert
+        assertNotNull(keycloakInstance);
+    }
+    @Test
+    void testCreateUser_WithRole_RoleExists() {
+        // Arrange
+        userDto = UserDto.builder()
+                .username("testuser")
+                .password("password")
+                .email("testuser@example.com")
+                .role("existing-role")
+                .build();
+
+        userRepresentation = new UserRepresentation();
+        userRepresentation.setId("1");
+
+        authentication = mock(Authentication.class);
+        securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userMapper.toUserRepresentation(any(UserDto.class))).thenReturn(userRepresentation);
+        when(realmResource.users().create(any())).thenReturn(response);
+        when(response.getStatusInfo()).thenReturn(Response.Status.CREATED);
+        when(response.getLocation()).thenReturn(URI.create("/users/1"));
+
+        // Mock role handling when the role exists
+        RoleRepresentation existingRole = new RoleRepresentation();
+        existingRole.setName("existing-role");
+
+        when(rolesResource.list()).thenReturn(Collections.singletonList(existingRole));
+        when(rolesResource.get("existing-role")).thenReturn(roleResource);
+        when(roleResource.toRepresentation()).thenReturn(existingRole);
+
+        when(usersResource.get("1")).thenReturn(userResource);
+        when(userResource.roles()).thenReturn(roleMappingResource);
+        when(roleMappingResource.realmLevel()).thenReturn(roleScopeResource);
+        when(roleScopeResource.listEffective()).thenReturn(Collections.emptyList());
+
+        // Act
+        UserRepresentation createdUser = keycloakService.createUser(userDto);
+
+        // Assert
+        assertNotNull(createdUser);
+        assertEquals("1", createdUser.getId());
+        verify(realmResource.users()).create(userRepresentation);
+        verify(roleScopeResource).add(Collections.singletonList(existingRole));
+        verify(rolesResource, never()).create(any(RoleRepresentation.class));
+    }
+    @Test
+    void testCreateUser_WithRole_RoleDoesNotExist() {
+        // Arrange
+        userDto = UserDto.builder()
+                .username("testuser")
+                .password("password")
+                .email("testuser@example.com")
+                .role("new-role")
+                .build();
+
+        userRepresentation = new UserRepresentation();
+        userRepresentation.setId("1");
+
+        authentication = mock(Authentication.class);
+        securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userMapper.toUserRepresentation(any(UserDto.class))).thenReturn(userRepresentation);
+        when(realmResource.users().create(any())).thenReturn(response);
+        when(response.getStatusInfo()).thenReturn(Response.Status.CREATED);
+        when(response.getLocation()).thenReturn(URI.create("/users/1"));
+
+        // Mock role handling when the role does not exist
+        when(rolesResource.list()).thenReturn(Collections.emptyList());
+
+        RoleRepresentation newRoleToCreate = new RoleRepresentation();
+        newRoleToCreate.setName("new-role");
+
+        // Mock the behavior when retrieving the newly created role
+        RoleRepresentation newlyCreatedRole = new RoleRepresentation();
+        newlyCreatedRole.setName("new-role");
+        when(rolesResource.get("new-role")).thenReturn(roleResource);
+        when(roleResource.toRepresentation()).thenReturn(newlyCreatedRole);
+
+        when(usersResource.get("1")).thenReturn(userResource);
+        when(userResource.roles()).thenReturn(roleMappingResource);
+        when(roleMappingResource.realmLevel()).thenReturn(roleScopeResource);
+        when(roleScopeResource.listEffective()).thenReturn(Collections.emptyList());
+
+        // Act
+        UserRepresentation createdUser = keycloakService.createUser(userDto);
+
+        // Assert
+        assertNotNull(createdUser);
+        assertEquals("1", createdUser.getId());
+        verify(realmResource.users()).create(userRepresentation);
+        verify(rolesResource).create(argThat(role -> "new-role".equals(role.getName())));
+        verify(roleScopeResource).add(Collections.singletonList(newlyCreatedRole));
+    }
+    @Test
+    void testCreateUser_WithRole_RemovesDefaultRoles() {
+        // Arrange
+        userDto = UserDto.builder()
+                .username("testuser")
+                .password("password")
+                .email("testuser@example.com")
+                .role("user-role")
+                .build();
+
+        userRepresentation = new UserRepresentation();
+        userRepresentation.setId("1");
+
+        authentication = mock(Authentication.class);
+        securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userMapper.toUserRepresentation(any(UserDto.class))).thenReturn(userRepresentation);
+        when(realmResource.users().create(any())).thenReturn(response);
+        when(response.getStatusInfo()).thenReturn(Response.Status.CREATED);
+        when(response.getLocation()).thenReturn(URI.create("/users/1"));
+
+        // Mock role handling
+        RoleRepresentation userRole = new RoleRepresentation();
+        userRole.setName("user-role");
+        RoleRepresentation defaultRole1 = new RoleRepresentation();
+        defaultRole1.setName("default-role-1");
+        RoleRepresentation defaultRole2 = new RoleRepresentation();
+        defaultRole2.setName("default-role-2");
+        List<RoleRepresentation> defaultRoles = Arrays.asList(defaultRole1, defaultRole2);
+
+        when(rolesResource.list()).thenReturn(Collections.singletonList(userRole));
+        when(rolesResource.get("user-role")).thenReturn(roleResource);
+        when(roleResource.toRepresentation()).thenReturn(userRole);
+
+        when(usersResource.get("1")).thenReturn(userResource);
+        when(userResource.roles()).thenReturn(roleMappingResource);
+        when(roleMappingResource.realmLevel()).thenReturn(roleScopeResource);
+        when(roleScopeResource.listEffective()).thenReturn(defaultRoles);
+
+        // Act
+        UserRepresentation createdUser = keycloakService.createUser(userDto);
+
+        // Assert
+        assertNotNull(createdUser);
+        assertEquals("1", createdUser.getId());
+        verify(realmResource.users()).create(userRepresentation);
+        verify(roleScopeResource).remove(Collections.singletonList(defaultRole1));
+        verify(roleScopeResource).remove(Collections.singletonList(defaultRole2));
+        verify(roleScopeResource).add(Collections.singletonList(userRole));
+    }
+    @Test
+    void testCreateUser_WithoutRole() {
+        // Arrange
+        userDto = UserDto.builder()
+                .username("testuser")
+                .password("password")
+                .email("testuser@example.com")
+                .role(null)
+                .build();
+
+        userRepresentation = new UserRepresentation();
+        userRepresentation.setId("1");
+
+        authentication = mock(Authentication.class);
+        securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userMapper.toUserRepresentation(any(UserDto.class))).thenReturn(userRepresentation);
+        when(realmResource.users().create(any())).thenReturn(response);
+        when(response.getStatusInfo()).thenReturn(Response.Status.CREATED);
+        when(response.getLocation()).thenReturn(URI.create("/users/1"));
+
+        // Act
+        UserRepresentation createdUser = keycloakService.createUser(userDto);
+
+        // Assert
+        assertNotNull(createdUser);
+        assertEquals("1", createdUser.getId());
+        verify(realmResource.users()).create(userRepresentation);
+        verify(realmResource.roles(), never()).list();
+    }
+    @Test
+    void testCreateUser_WithEmptyRole() {
+        // Arrange
+        userDto = UserDto.builder()
+                .username("testuser")
+                .password("password")
+                .email("testuser@example.com")
+                .role("")
+                .build();
+
+        userRepresentation = new UserRepresentation();
+        userRepresentation.setId("1");
+
+        authentication = mock(Authentication.class);
+        securityContext = mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        when(userMapper.toUserRepresentation(any(UserDto.class))).thenReturn(userRepresentation);
+        when(realmResource.users().create(any())).thenReturn(response);
+        when(response.getStatusInfo()).thenReturn(Response.Status.CREATED);
+        when(response.getLocation()).thenReturn(URI.create("/users/1"));
+
+        // Act
+        UserRepresentation createdUser = keycloakService.createUser(userDto);
+
+        // Assert
+        assertNotNull(createdUser);
+        assertEquals("1", createdUser.getId());
+        verify(realmResource.users()).create(userRepresentation);
+        verify(realmResource.roles(), never()).list();
     }
 }
