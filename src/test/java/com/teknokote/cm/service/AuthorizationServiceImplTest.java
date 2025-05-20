@@ -1,20 +1,37 @@
 package com.teknokote.cm.service;
 
+import com.teknokote.cm.core.dao.AuthorizationDao;
+import com.teknokote.cm.core.model.EnumCeilingType;
 import com.teknokote.cm.core.service.impl.AuthorizationServiceImpl;
-import com.teknokote.cm.dto.AuthorizationDto;
+import com.teknokote.cm.core.service.interfaces.TransactionService;
+import com.teknokote.cm.dto.*;
+import com.teknokote.core.service.ESSValidationResult;
+import com.teknokote.core.service.ESSValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.math.BigDecimal;
 import java.time.format.DateTimeParseException;
+import java.util.Optional;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class AuthorizationServiceImplTest {
 
     @InjectMocks
     private AuthorizationServiceImpl authorizationService;
+    @Mock
+    private AuthorizationDao authorizationDao;
+    @Mock
+    private TransactionService transactionService;
+    @Mock
+    private ESSValidator<AuthorizationDto> validator;
 
     private AuthorizationDto authorizationDto;
 
@@ -285,5 +302,48 @@ class AuthorizationServiceImplTest {
         });
         assertEquals("Text '' could not be parsed at index 0", exception.getMessage());
     }
+    @Test
+    void findByPtsIdAndPump_ValidCase() {
+        // Arrange
+        String ptsId = "somePtsId";
+        Long pump = 1L;
+        String tag = "someTag";
+        AuthorizationDto expectedDto = AuthorizationDto.builder().build();
+        when(authorizationService.getDao().findAuthorizationByPtsIdAndPump(ptsId, pump, tag)).thenReturn(expectedDto);
 
+        // Act
+        authorizationDto = authorizationService.findByPtsIdAndPump(ptsId, pump, tag);
+
+        // Assert
+        assertNotNull(authorizationDto);
+        assertEquals(expectedDto, authorizationDto);
+    }
+    @Test
+    void authorizeIfAuthorized_LastTransactionPresent_BelowLimit() {
+        // Arrange
+        CardDto cardDto = CardDto.builder().id(1L).build();
+        CeilingDto ceilingDto = CeilingDto.builder().build();
+
+        // Set ceiling type to a valid enum value
+        ceilingDto.setCeilingType(EnumCeilingType.AMOUNT);
+        BigDecimal limit = BigDecimal.valueOf(100);
+
+        AuthorizationRequest authorizationRequest = AuthorizationRequest.builder().build();
+
+        // Mock the last transaction to be present and below the limit
+        TransactionDto lastTransaction = TransactionDto.builder().build();
+        lastTransaction.setAmount(BigDecimal.valueOf(50));
+
+        ESSValidationResult validationResultMock = mock(ESSValidationResult.class);
+        when(validator.validateOnCreate(any())).thenReturn(validationResultMock);
+
+        when(transactionService.findLastTransactionByCardId(any(), any(), any())).thenReturn(Optional.of(lastTransaction));
+
+        // Act
+        authorizationService.authorizeIfAuthorized(cardDto, ceilingDto, "generatedRef", limit, authorizationRequest);
+
+    }
+    @Test
+    void authorizeIfAuthorized_LastTransactionPresent_AboveLimit() {
+    }
 }
