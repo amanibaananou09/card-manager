@@ -1,8 +1,13 @@
 package com.teknokote.cm.service;
 
 import com.teknokote.cm.core.dao.AuthorizationDao;
+import com.teknokote.cm.core.model.EnumAuthorizationStatus;
+import com.teknokote.cm.core.model.EnumCardStatus;
 import com.teknokote.cm.core.model.EnumCeilingType;
 import com.teknokote.cm.core.service.impl.AuthorizationServiceImpl;
+import com.teknokote.cm.core.service.interfaces.CardGroupService;
+import com.teknokote.cm.core.service.interfaces.CardService;
+import com.teknokote.cm.core.service.interfaces.SupplierService;
 import com.teknokote.cm.core.service.interfaces.TransactionService;
 import com.teknokote.cm.dto.*;
 import com.teknokote.core.service.ESSValidationResult;
@@ -14,13 +19,14 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Collections;
 import java.util.Optional;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class AuthorizationServiceImplTest {
 
@@ -29,10 +35,15 @@ class AuthorizationServiceImplTest {
     @Mock
     private AuthorizationDao authorizationDao;
     @Mock
+    private CardService cardService;
+    @Mock
+    private SupplierService supplierService;
+    @Mock
+    private CardGroupService cardGroupService;
+    @Mock
     private TransactionService transactionService;
     @Mock
     private ESSValidator<AuthorizationDto> validator;
-
     private AuthorizationDto authorizationDto;
 
     @BeforeEach
@@ -345,5 +356,144 @@ class AuthorizationServiceImplTest {
     }
     @Test
     void authorizeIfAuthorized_LastTransactionPresent_AboveLimit() {
+        // Arrange
+        CardDto cardDto = createActiveCard();
+        CeilingDto ceilingDto = CeilingDto.builder().ceilingType(EnumCeilingType.AMOUNT).value(BigDecimal.valueOf(100)).build();
+
+        AuthorizationRequest authorizationRequest = AuthorizationRequest.builder()
+                .reference("A1")
+                .salePointIdentifier("sale_point_1")
+                .tag("card_tag")
+                .productName("productX")
+                .ptsId("testPtsId")
+                .pump(1L)
+                .build();
+
+        // Mock the last transaction to be present and above the limit
+        TransactionDto lastTransaction = TransactionDto.builder().availableBalance(BigDecimal.valueOf(150)).build();
+
+        when(validator.validateOnCreate(any())).thenReturn(mock(ESSValidationResult.class));
+        when(validator.validateOnCreate(any()).hasErrors()).thenReturn(false);
+        when(transactionService.findLastTransactionByCardId(any(), any(), any())).thenReturn(Optional.of(lastTransaction));
+
+        when(authorizationDao.create(any())).thenAnswer(invocation -> {
+            AuthorizationDto createdDto = AuthorizationDto.builder()
+                    .id(1L)
+                    .status(EnumAuthorizationStatus.GRANTED)
+                    .build();
+            return createdDto;
+        });
+
+        // Act
+        AuthorizationDto result = authorizationService.authorizeIfAuthorized(cardDto, ceilingDto, "generatedRef", BigDecimal.valueOf(100), authorizationRequest);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(EnumAuthorizationStatus.GRANTED, result.getStatus());
+        assertNotNull(result.getId());
+        verify(cardService).updateCardStatus(cardDto.getId(), result.getId(), null, EnumCardStatus.AUTHORIZED);
     }
+    @Test
+    void createAuthorization_ConditionMet_NoCeilings() {
+        // Arrange
+        AuthorizationRequest authorizationRequest = createAuthorizationRequest("supplier_ref", "sale_point_1", "card_tag", "productX");
+        SupplierDto supplierDto = createSupplierDto("supplier_ref");
+        SalePointDto salePointDto = SalePointDto.builder().identifier("sale_point_1").city("CityX").build();
+        supplierDto.setSalePoints(Collections.singleton(salePointDto));
+        when(supplierService.findByReference("supplier_ref")).thenReturn(supplierDto);
+
+        CardDto cardDto = createActiveCard();
+        when(cardService.findByTag("card_tag")).thenReturn(cardDto);
+
+        CardGroupDto cardGroupDto = createCardGroupWithCondition("allowedProduct == 'productX'");
+        cardGroupDto.setGroupCondition(GroupConditionDto.builder().allowedProduct("productX").build());
+        cardGroupDto.setCeilings(Collections.emptySet());
+        when(cardGroupService.checkedFindById(1L)).thenReturn(cardGroupDto);
+
+        when(authorizationDao.findLastAuthorization()).thenReturn(null);
+        when(validator.validateOnCreate(any())).thenReturn(mock(ESSValidationResult.class));
+        when(validator.validateOnCreate(any()).hasErrors()).thenReturn(false);
+
+        // Act
+        authorizationService.createAuthorization(authorizationRequest);
+
+        // Assert
+        verify(cardGroupService).findById(cardDto.getCardGroupId());
+    }
+    @Test
+    void createAuthorization_ConditionMet_WithCeilings() {
+        // Arrange
+        AuthorizationRequest authorizationRequest = createAuthorizationRequest("supplier_ref", "sale_point_1", "card_tag", "productX");
+        SupplierDto supplierDto = createSupplierDto("supplier_ref");
+        SalePointDto salePointDto = SalePointDto.builder().identifier("sale_point_1").city("CityX").build();
+        supplierDto.setSalePoints(Collections.singleton(salePointDto));
+        when(supplierService.findByReference("supplier_ref")).thenReturn(supplierDto);
+
+        CardDto cardDto = createActiveCard();
+        when(cardService.findByTag("card_tag")).thenReturn(cardDto);
+
+        CardGroupDto cardGroupDto = createCardGroupWithCondition("allowedProduct == 'productX'");
+        cardGroupDto.setGroupCondition(GroupConditionDto.builder().allowedProduct("productX").build());
+
+        CeilingDto ceilingDto = CeilingDto.builder().value(BigDecimal.TEN).build();
+        cardGroupDto.setCeilings(Collections.singleton(ceilingDto));
+        when(cardGroupService.checkedFindById(1L)).thenReturn(cardGroupDto);
+
+        when(authorizationDao.findLastAuthorization()).thenReturn(null);
+        when(validator.validateOnCreate(any())).thenReturn(mock(ESSValidationResult.class));
+        when(validator.validateOnCreate(any()).hasErrors()).thenReturn(false);
+
+        when(transactionService.findLastTransactionByCardId(any(), any(), any())).thenReturn(Optional.empty());
+        when(authorizationDao.create(any())).thenAnswer(invocation -> {
+            return AuthorizationDto.builder().id(1L).status(EnumAuthorizationStatus.GRANTED).build();
+        });
+
+        // Act
+        AuthorizationDto result = authorizationService.createAuthorization(authorizationRequest);
+
+        // Assert
+        assertEquals(EnumAuthorizationStatus.GRANTED, result.getStatus());
+        verify(cardService).updateCardStatus(cardDto.getId(), result.getId(), null, EnumCardStatus.AUTHORIZED);
+    }
+    private AuthorizationRequest createAuthorizationRequest(String reference, String salePointIdentifier, String tag, String productName) {
+        return AuthorizationRequest.builder()
+                .reference(reference)
+                .salePointIdentifier(salePointIdentifier)
+                .tag(tag)
+                .productName(productName)
+                .build();
+    }
+
+    private SupplierDto createSupplierDto(String salePointIdentifier) {
+        SalePointDto salePointDto = SalePointDto.builder()
+                .identifier(salePointIdentifier)
+                .build();
+        return SupplierDto.builder()
+                .salePoints(Collections.singleton(salePointDto))
+                .build();
+    }
+
+    private CardDto createActiveCard() {
+        return CardDto.builder()
+                .id(1L)
+                .expirationDate(LocalDate.now().plusDays(1))
+                .status(EnumCardStatus.FREE)
+                .actif(true)
+                .cardGroupId(1L)
+                .build();
+    }
+
+    private CardGroupDto createCardGroupWithCondition(String condition) {
+        GroupConditionDto groupConditionDto = GroupConditionDto.builder().build();
+        groupConditionDto.setAllowedProduct(String.valueOf(Collections.singletonList("productX")));
+        groupConditionDto.setAllowedSalePoints(String.valueOf(Collections.singletonList("sale_point_1")));
+
+        return CardGroupDto.builder()
+                .actif(true)
+                .condition(condition)
+                .groupCondition(groupConditionDto)
+                .ceilings(Collections.singleton(CeilingDto.builder().build()))
+                .build();
+    }
+
 }
