@@ -601,7 +601,60 @@ class AuthorizationServiceImplTest {
         verify(cardGroupService).checkedFindById(1L);
         verify(authorizationDao).findLastAuthorization();
     }
+    @Test
+    void createAuthorization_CardGroupNull() {
+        // Arrange
+        authorizationRequest = createAuthorizationRequest("supplier_ref", "sale_point_1", "card_tag", "productX");
+        supplierDto = createSupplierDto("sale_point_1");
+        when(supplierService.findByReference("supplier_ref")).thenReturn(supplierDto);
 
+        cardDto = createActiveCard();
+        when(cardService.findByTag("card_tag")).thenReturn(cardDto);
+
+        // Mock the card group to return null
+        when(cardGroupService.checkedFindById(1L)).thenReturn(null);
+        when(authorizationDao.findLastAuthorization()).thenReturn(null);
+        when(validator.validateOnCreate(any())).thenReturn(mock(ESSValidationResult.class));
+        when(validator.validateOnCreate(any()).hasErrors()).thenReturn(false);
+
+        // Act
+        authorizationService.createAuthorization(authorizationRequest);
+
+        // Assert
+        verify(cardGroupService).findById(cardDto.getCardGroupId());
+    }
+    @Test
+    void createAuthorization_CardGroupInactive() {
+        // Arrange
+        authorizationRequest = createAuthorizationRequest("supplier_ref", "sale_point_1", "card_tag", "productX");
+        supplierDto = createSupplierDto("sale_point_1");
+        when(supplierService.findByReference("supplier_ref")).thenReturn(supplierDto);
+
+        cardDto = createActiveCard();
+        when(cardService.findByTag("card_tag")).thenReturn(cardDto);
+
+        // Mock an inactive CardGroup
+        cardGroupDto = createInactiveCardGroup();
+        when(cardGroupService.checkedFindById(1L)).thenReturn(cardGroupDto);
+        when(authorizationDao.findLastAuthorization()).thenReturn(null);
+        when(validator.validateOnCreate(any())).thenReturn(mock(ESSValidationResult.class));
+        when(validator.validateOnCreate(any()).hasErrors()).thenReturn(false);
+
+        // Act
+        authorizationService.createAuthorization(authorizationRequest);
+
+        // Assert
+        verify(cardGroupService).findById(cardDto.getCardGroupId());
+    }
+
+    private CardGroupDto createInactiveCardGroup() {
+        CeilingDto ceilingDto = CeilingDto.builder().build();
+        return CardGroupDto.builder()
+                .actif(false)
+                .condition("allowedProduct == 'productX'")
+                .ceilings(Collections.singleton(ceilingDto))
+                .build();
+    }
     private AuthorizationRequest createAuthorizationRequest(String reference, String salePointIdentifier, String tag, String productName) {
         return AuthorizationRequest.builder()
                 .reference(reference)
