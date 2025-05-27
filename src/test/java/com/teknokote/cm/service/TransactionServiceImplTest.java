@@ -69,7 +69,6 @@ class TransactionServiceImplTest {
         cardId = 1L;
         customerId = 2L;
     }
-
     @Test
     void createTransaction_Success() {
         // Arrange
@@ -98,7 +97,6 @@ class TransactionServiceImplTest {
         assertNotNull(result);
         verify(transactionDao).create(any());
     }
-
     @Test
     void createTransaction_SupplierNotFound() {
         // Arrange
@@ -115,7 +113,6 @@ class TransactionServiceImplTest {
         // Assert
         assertNull(result);
     }
-
     @Test
     void findLastTransactionByCardId_Success() {
         // Arrange
@@ -134,7 +131,6 @@ class TransactionServiceImplTest {
         assertTrue(result.isPresent());
         assertEquals(cardId, result.get().getCardId());
     }
-
     @Test
     void chartTransaction_ThrowServiceValidationException() {
         // Arrange
@@ -147,7 +143,6 @@ class TransactionServiceImplTest {
             transactionService.chartTransaction(customerId, null, null, startDate, endDate);
         });
     }
-
     @Test
     void getTransactionChart_Success() {
         // Arrange
@@ -169,7 +164,6 @@ class TransactionServiceImplTest {
         assertNotNull(result);
         assertFalse(result.isEmpty());
     }
-
     @Test
     void findTransactionsByFilter_Success() {
         // Arrange
@@ -189,7 +183,6 @@ class TransactionServiceImplTest {
         assertNotNull(result);
         verify(transactionDao).findByCriteria(customerId, filterDto, page, size);
     }
-
     @Test
     void mapToTransactionDto_Success() {
         // Arrange
@@ -237,7 +230,6 @@ class TransactionServiceImplTest {
         assertEquals(transaction.getSalePoint().getName(), result.getSalePointName());
         assertEquals(transaction.getSalePoint().getCity(), result.getCity()); // Optional, based on your DTO structure
     }
-
     @Test
     void mapToSalePointDto_Success() {
         // Arrange
@@ -260,7 +252,6 @@ class TransactionServiceImplTest {
         assertEquals(salePoint.getCity(), result.getCity());
         assertEquals(country.getName(), result.getCountry().getName());
     }
-
     @Test
     void getDailyTransactionChart_Success() {
         // Arrange
@@ -283,7 +274,6 @@ class TransactionServiceImplTest {
         assertNotNull(result);
         assertFalse(result.isEmpty());
     }
-
     @Test
     void createTransaction_ProductNotFound() {
         // Arrange
@@ -306,7 +296,6 @@ class TransactionServiceImplTest {
         // Assert
         assertNull(result); // Expecting result to be null if product not found
     }
-
     @Test
     void findLastTransactionByCardId_NoTransactions() {
         // Arrange
@@ -322,7 +311,6 @@ class TransactionServiceImplTest {
         // Assert
         assertFalse(result.isPresent()); // Expecting no result when no transactions found
     }
-
     @Test
     void calculateAvailableBalance_FirstTransaction() {
         // Arrange
@@ -340,7 +328,6 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(new BigDecimal("900.00"), availableBalance); // Expecting ceiling value minus amount
     }
-
     @Test
     void getWeeklyTransactionChart_Success() {
         // Arrange
@@ -363,7 +350,6 @@ class TransactionServiceImplTest {
         assertNotNull(result);
         assertFalse(result.isEmpty());
     }
-
     @Test
     void calculateAvailableBalance_FirstTransaction_AmountCeilingType() {
         // Arrange
@@ -382,7 +368,6 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(new BigDecimal("900.00"), availableBalance); // 1000 - 100
     }
-
     @Test
     void calculateAvailableBalance_SubsequentTransaction_AmountCeilingType() {
         // Arrange
@@ -405,7 +390,6 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(new BigDecimal("800.00"), availableBalance); // 900 - 100
     }
-
     @Test
     void calculateAvailableBalance_FirstTransaction_VolumeCeilingType() {
         // Arrange
@@ -425,7 +409,6 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(new BigDecimal("1850.00"), availableBalance); // 2000 - 150
     }
-
     @Test
     void calculateAvailableBalance_SubsequentTransaction_VolumeCeilingType() {
         // Arrange
@@ -448,7 +431,6 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(new BigDecimal("2600.00"), availableBalance); // 2800 - 200
     }
-
     @Test
     void chartTransaction_Today_NoCardId() {
         // Arrange
@@ -461,7 +443,6 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(expectedChart, result);
     }
-
     @Test
     void chartTransaction_Today_WithCardId() {
         // Arrange
@@ -474,7 +455,6 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(expectedChart, result);
     }
-
     @Test
     void chartTransaction_Yesterday_NoCardId() {
         // Arrange
@@ -491,7 +471,6 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(expectedChart, result);
     }
-
     @Test
     void chartTransaction_Yesterday_WithCardId() {
         // Arrange
@@ -508,7 +487,6 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(expectedChart, result);
     }
-
     @Test
     void chartTransaction_Weekly_NoCardId() {
         // Arrange
@@ -521,7 +499,6 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(expectedChart, result);
     }
-
     @Test
     void chartTransaction_Weekly_WithCardId() {
         // Arrange
@@ -534,7 +511,6 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(expectedChart, result);
     }
-
     @Test
     void chartTransaction_Monthly_NoCardId() {
         // Arrange
@@ -547,7 +523,6 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(expectedChart, result);
     }
-
     @Test
     void chartTransaction_Monthly_WithCardId() {
         // Arrange
@@ -560,7 +535,6 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(expectedChart, result);
     }
-
     @Test
     void chartTransaction_NullPeriod_ThrowsException() {
         // Arrange
@@ -573,7 +547,6 @@ class TransactionServiceImplTest {
         });
         assertEquals("startDate and endDate must not be null", exception.getMessage());
     }
-
     @Test
     void chartTransaction_EmptyPeriod_ValidDates() {
         // Arrange
@@ -591,7 +564,6 @@ class TransactionServiceImplTest {
         // Assert
         assertEquals(expectedChart, result);
     }
-
     @Test
     void findLastTransactionByCardId_Monthly() {
         cardId = 1L;
@@ -611,7 +583,6 @@ class TransactionServiceImplTest {
         // Verify that the DAO method was called correctly
         verify(transactionDao).findLastTransactionByCardIdAndMonth(cardId, dateTime.getMonthValue());
     }
-
     @Test
     void findLastTransactionByCardId_Weekly() {
         cardId = 1L;
@@ -635,7 +606,6 @@ class TransactionServiceImplTest {
         // Verify that the DAO method was called correctly
         verify(transactionDao).findLastTransactionByCardIdAndWeek(cardId, startOfWeek, endOfWeek);
     }
-
     @Test
     void findLastTransactionByCardId_Today() {
         cardId = 1L;

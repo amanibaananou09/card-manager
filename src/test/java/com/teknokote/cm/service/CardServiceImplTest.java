@@ -30,16 +30,12 @@ class CardServiceImplTest {
 
     @InjectMocks
     private CardServiceImpl cardService;
-
     @Mock
     private CardDao cardDao;
-
     @Mock
     private AuthorizationDao authorizationDao;
-
     @Mock
     private CardMovementHistoryDao cardMovementHistoryDao;
-
     @Mock
     private ESSValidator<CardDto> validator;
 

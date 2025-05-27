@@ -646,6 +646,42 @@ class AuthorizationServiceImplTest {
         // Assert
         verify(cardGroupService).findById(cardDto.getCardGroupId());
     }
+    @Test
+    void createAuthorization_Success() {
+        // Arrange
+        AuthorizationRequest authorizationRequest = createAuthorizationRequest("supplier_ref",
+                "sale_point_1", "card_tag", "productX");
+
+        // Mocks setup
+        SupplierDto supplierDto = createSupplierDto("sale_point_1");
+        when(supplierService.findByReference("supplier_ref")).thenReturn(supplierDto);
+
+        CardDto cardDto = createActiveCard();
+        when(cardService.findByTag("card_tag")).thenReturn(cardDto);
+
+        CardGroupDto cardGroupDto = createCardGroupWithCondition("allowedProduct == 'productX' OR allowedSalePoints == 'sale_point_1'");
+        when(cardGroupService.findById(1L)).thenReturn(Optional.of(cardGroupDto));
+
+        CeilingDto ceilingDto = CeilingDto.builder().value(BigDecimal.TEN).build();
+        cardGroupDto.setCeilings(Collections.singleton(ceilingDto));
+
+        // Last authorization mock
+        AuthorizationDto lastAuthorization = AuthorizationDto.builder()
+                .reference("A1")
+                .status(EnumAuthorizationStatus.GRANTED)
+                .build();
+        when(authorizationDao.findLastAuthorization()).thenReturn(lastAuthorization);
+
+        ESSValidationResult validationResultMock = mock(ESSValidationResult.class);
+        when(validator.validateOnCreate(any())).thenReturn(validationResultMock);
+        when(validationResultMock.hasErrors()).thenReturn(false);
+
+        // Act
+        authorizationService.createAuthorization(authorizationRequest);
+
+        verify(supplierService).findByReference("supplier_ref");
+
+    }
 
     private CardGroupDto createInactiveCardGroup() {
         CeilingDto ceilingDto = CeilingDto.builder().build();

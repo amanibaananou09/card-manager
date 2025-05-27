@@ -7,7 +7,6 @@ import com.teknokote.cm.core.service.impl.KeycloakService;
 import com.teknokote.cm.core.service.impl.UserServiceImpl;
 import com.teknokote.cm.dto.SupplierDto;
 import com.teknokote.cm.dto.UserDto;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.keycloak.representations.idm.UserRepresentation;
@@ -31,24 +30,14 @@ class UserServiceImplTest {
 
     @InjectMocks
     private UserServiceImpl userServiceImpl;
-
     @Mock
     private UserDao userDao;
-
     @Mock
     private SupplierDao supplierDao;
-
     @Mock
     private KeycloakService keycloakService;
-
     @Mock
     private UserMapper userMapper;
-
-    @BeforeEach
-    void setUp() {
-        // Optional: Any setup logic before each test can go here.
-    }
-
     @Test
     void testUpdateLastConnection() {
         String userName = "testUser";
@@ -57,7 +46,6 @@ class UserServiceImplTest {
 
         verify(userDao, times(1)).updateLastConnection(eq(userName), any(LocalDateTime.class));
     }
-
     @Test
     void testFindBySupplier() {
         Long supplierId = 1L;
@@ -87,7 +75,6 @@ class UserServiceImplTest {
         verify(userMapper, times(1)).enrichDtoFromUserRepresentation(eq(userRepresentation1), eq(userDto1));
         verify(userMapper, times(1)).enrichDtoFromUserRepresentation(eq(userRepresentation2), eq(userDto2));
     }
-
     @Test
     void testFindByUsername() {
         String username = "testUser";

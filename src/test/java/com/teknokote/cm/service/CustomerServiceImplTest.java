@@ -24,13 +24,10 @@ class CustomerServiceImplTest {
 
     @InjectMocks
     private CustomerServiceImpl customerService;
-
     @Mock
     private CustomerDao customerDao;
-
     @Mock
     private KeycloakService keycloakService;
-
     @Mock
     private UserService userService;
 
@@ -38,7 +35,6 @@ class CustomerServiceImplTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
-
     @Test
     void findCustomerByFilter_ShouldReturnEmptyList_WhenIdentifierIsNull() {
         // Act
@@ -48,7 +44,6 @@ class CustomerServiceImplTest {
         assertTrue(result.isEmpty());
         verify(customerDao, never()).findCustomerByIdentifier(any());
     }
-
     @Test
     void findCustomerByFilter_ShouldReturnCustomers_WhenIdentifierIsProvided() {
         // Arrange
@@ -63,7 +58,6 @@ class CustomerServiceImplTest {
         assertEquals(expectedCustomers, result);
         verify(customerDao, times(1)).findCustomerByIdentifier(identifier);
     }
-
     @Test
     void findCustomerBySupplier_ShouldReturnEmptyList_WhenSupplierIdIsNull() {
         // Act
@@ -73,7 +67,6 @@ class CustomerServiceImplTest {
         assertTrue(result.isEmpty());
         verify(customerDao, never()).findCustomerBySupplier(any());
     }
-
     @Test
     void findCustomerBySupplier_ShouldReturnCustomers_WhenSupplierIdIsProvided() {
         // Arrange
@@ -88,7 +81,6 @@ class CustomerServiceImplTest {
         assertEquals(expectedCustomers, result);
         verify(customerDao, times(1)).findCustomerBySupplier(supplierId);
     }
-
     @Test
     void findByIdentifier_ShouldReturnEmpty_WhenIdentifierIsBlank() {
         // Act
@@ -98,7 +90,6 @@ class CustomerServiceImplTest {
         assertTrue(result.isEmpty());
         verify(customerDao, never()).findByIdentifier(any());
     }
-
     @Test
     void findByIdentifier_ShouldReturnCustomer_WhenIdentifierIsProvided() {
         // Arrange
@@ -113,7 +104,6 @@ class CustomerServiceImplTest {
         assertEquals(Optional.of(expectedCustomer), result);
         verify(customerDao, times(1)).findByIdentifier(identifier);
     }
-
     @Test
     void addCustomer_ShouldCallKeycloakService_WhenUsersAreNotNullOrEmpty() {
         // Arrange
@@ -129,7 +119,6 @@ class CustomerServiceImplTest {
         assertEquals(customerDto, result);
         verify(keycloakService, times(1)).createUser(any(UserDto.class));
     }
-
     @Test
     void addCustomer_ShouldNotCallKeycloakService_WhenUsersAreEmpty() {
         // Arrange
@@ -145,7 +134,6 @@ class CustomerServiceImplTest {
         assertEquals(customerDto, result);
         verify(keycloakService, never()).createUser(any());
     }
-
     @Test
     void update_ShouldUpdateUserInKeycloak_WhenUserIsPresent() {
         // Arrange
@@ -163,7 +151,6 @@ class CustomerServiceImplTest {
         assertEquals(customerDto, result);
         verify(keycloakService, times(1)).updateUser(eq(customerDto.getIdentifier()), any(UserDto.class));
     }
-
     @Test
     void update_ShouldNotUpdateUserInKeycloak_WhenUserNotFound() {
         // Arrange
@@ -181,7 +168,6 @@ class CustomerServiceImplTest {
         assertEquals(customerDto, result);
         verify(keycloakService, never()).updateUser(any(), any());
     }
-
     @Test
     void generateIdentifierSuggestions_ShouldReturnEmptyList_WhenIdentifierIsNull() {
         // Act
@@ -191,7 +177,6 @@ class CustomerServiceImplTest {
         assertTrue(result.isEmpty());
         verify(customerDao, never()).generateIdentiferSuggestions(any());
     }
-
     @Test
     void generateIdentifierSuggestions_ShouldReturnEmptyList_WhenIdentifierIsEmpty() {
         // Act
@@ -201,7 +186,6 @@ class CustomerServiceImplTest {
         assertTrue(result.isEmpty());
         verify(customerDao, never()).generateIdentiferSuggestions(any());
     }
-
     @Test
     void generateIdentifierSuggestions_ShouldReturnSuggestions_WhenIdentifierIsProvided() {
         // Arrange

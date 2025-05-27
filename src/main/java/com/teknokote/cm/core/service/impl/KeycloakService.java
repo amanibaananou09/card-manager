@@ -86,7 +86,7 @@ public class KeycloakService {
 
     public UserRepresentation createUser(@RequestBody UserDto createUserRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String loggedInUsername = authentication.getName();
+        authentication.getName();
         // Create the user in Keycloak
         Keycloak keycloak = this.getInstance();
         UserRepresentation user = userMapper.toUserRepresentation(createUserRequest);

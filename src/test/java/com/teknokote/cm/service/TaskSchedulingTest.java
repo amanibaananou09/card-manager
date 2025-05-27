@@ -21,10 +21,8 @@ class TaskSchedulingTest {
 
     @Mock
     private CardService cardService;
-
     @InjectMocks
     private TaskScheduling taskScheduling;
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -57,7 +55,6 @@ class TaskSchedulingTest {
         verify(cardService).updateCardStatus(eq(card1.getId()), isNull(), isNull(), eq(EnumCardStatus.FREE));
         verify(cardService, never()).updateCardStatus(eq(card2.getId()), any(), any(), any()); // card2 should not be updated
     }
-
     @Test
     void checkAndFreeStaleCards_noStaleCards() {
         // Arrange

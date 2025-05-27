@@ -32,19 +32,14 @@ class SupplierServiceImplTest {
 
     @InjectMocks
     private SupplierServiceImpl supplierService;
-
     @Mock
     private SupplierDao supplierDao;
-
     @Mock
     private SalePointDao salePointDao;
-
     @Mock
     private UserDao userDao;
-
     @Mock
     private ProductDao productDao;
-
     @Mock
     private ESSValidator<SupplierDto> validator;
 

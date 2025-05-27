@@ -3,7 +3,6 @@ package com.teknokote.cm.service;
 import com.teknokote.cm.core.dao.ProductDao;
 import com.teknokote.cm.core.service.impl.ProductServiceImpl;
 import com.teknokote.cm.dto.ProductDto;
-import com.teknokote.core.service.ESSValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -19,12 +18,8 @@ class ProductServiceImplTest {
 
     @InjectMocks
     private ProductServiceImpl productService;
-
     @Mock
     private ProductDao productDao;
-
-    @Mock
-    private ESSValidator<ProductDto> validator;
 
     @BeforeEach
     void setUp() {
@@ -48,7 +43,6 @@ class ProductServiceImplTest {
         // Assert
         assertEquals(expectedProducts, actualProducts);
     }
-
     @Test
     void testFindBySupplierAndName() {
         // Arrange

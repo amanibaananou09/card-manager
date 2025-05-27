@@ -34,6 +34,8 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
     @Autowired
     private ProductDao productDao;
 
+    public static final String SUPPLIER_NOT_EXIST = "supplier not existing on card manager !!!";
+
     @Override
     public SupplierDto findByReference(String reference) {
         return getDao().findAllByReference(reference);
@@ -53,7 +55,7 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
             supplierDto.setId(supplier.getId());
             return update(supplierDto);
         } else {
-            throw new ServiceValidationException("supplier not existing on card manager !!!");
+            throw new ServiceValidationException(SUPPLIER_NOT_EXIST);
         }
     }
 
@@ -75,7 +77,7 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
             salePointDto.setSupplierId(supplier.getId());
             return salePointDao.create(salePointDto);
         }else {
-            throw new ServiceValidationException("supplier not existing on card manager !!!");
+            throw new ServiceValidationException(SUPPLIER_NOT_EXIST);
         }
     }
 
@@ -98,7 +100,7 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
     public UserDto createUser(Long supplierId, UserDto userDto) {
         SupplierDto supplier = checkedFindById(supplierId);
         if (supplier == null) {
-            throw new ServiceValidationException("supplier not existing on card manager !!!");
+            throw new ServiceValidationException(SUPPLIER_NOT_EXIST);
         }
 
         Set<UserDto> existingUsers = supplier.getUsers();
@@ -148,7 +150,7 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
             }
             return productDao.create(productDto);
         }else {
-            throw new ServiceValidationException("supplier not existing on card manager !!!");
+            throw new ServiceValidationException(SUPPLIER_NOT_EXIST);
         }
     }
 }
