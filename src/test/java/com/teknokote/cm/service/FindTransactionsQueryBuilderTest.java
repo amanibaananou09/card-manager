@@ -24,7 +24,6 @@ public class FindTransactionsQueryBuilderTest {
     private EntityManager entityManager;
     private TypedQuery<Transaction> mockQuery;
     private TypedQuery<Long> mockCountQuery;
-
     @BeforeEach
     public void setUp() {
         entityManager = mock(EntityManager.class);

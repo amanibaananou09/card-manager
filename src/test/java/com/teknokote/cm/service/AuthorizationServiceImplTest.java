@@ -33,17 +33,18 @@ class AuthorizationServiceImplTest {
     @InjectMocks
     private AuthorizationServiceImpl authorizationService;
     @Mock
-    private AuthorizationDao authorizationDao;
-    @Mock
-    private CardService cardService;
-    @Mock
-    private SupplierService supplierService;
-    @Mock
-    private CardGroupService cardGroupService;
+    private ESSValidator<AuthorizationDto> validator;
     @Mock
     private TransactionService transactionService;
     @Mock
-    private ESSValidator<AuthorizationDto> validator;
+    private AuthorizationDao authorizationDao;
+    @Mock
+    private CardGroupService cardGroupService;
+    @Mock
+    private SupplierService supplierService;
+    @Mock
+    private CardService cardService;
+
     private AuthorizationRequest authorizationRequest;
     private AuthorizationDto authorizationDto;
     private CardGroupDto cardGroupDto;
