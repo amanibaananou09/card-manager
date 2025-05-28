@@ -682,7 +682,65 @@ class AuthorizationServiceImplTest {
         verify(supplierService).findByReference("supplier_ref");
 
     }
+    @Test
+    void createAuthorization_CardExpired() {
+        // Arrange
+        AuthorizationRequest authorizationRequest = createAuthorizationRequest("supplier_ref", "sale_point_1", "card_tag", "productX");
+        SupplierDto supplierDto = createSupplierDto("sale_point_1");
+        CardDto cardDto = createExpiredCard();
 
+        when(supplierService.findByReference("supplier_ref")).thenReturn(supplierDto);
+        when(cardService.findByTag("card_tag")).thenReturn(cardDto);
+
+        when(authorizationDao.findLastAuthorization()).thenReturn(null);
+        when(validator.validateOnCreate(any())).thenReturn(mock(ESSValidationResult.class));
+        when(validator.validateOnCreate(any()).hasErrors()).thenReturn(false);
+
+        // Act
+        authorizationService.createAuthorization(authorizationRequest);
+
+        // Assert
+        verify(supplierService).findByReference("supplier_ref");
+        verify(cardService).findByTag("card_tag");
+    }
+    @Test
+    void createAuthorization_CardInactive() {
+        // Arrange
+        AuthorizationRequest authorizationRequest = createAuthorizationRequest("supplier_ref", "sale_point_1", "card_tag", "productX");
+        SupplierDto supplierDto = createSupplierDto("sale_point_1");
+        CardDto cardDto = createInactiveCard();
+
+        when(supplierService.findByReference("supplier_ref")).thenReturn(supplierDto);
+        when(cardService.findByTag("card_tag")).thenReturn(cardDto);
+        when(authorizationDao.findLastAuthorization()).thenReturn(null);
+        when(validator.validateOnCreate(any())).thenReturn(mock(ESSValidationResult.class));
+        when(validator.validateOnCreate(any()).hasErrors()).thenReturn(false);
+
+        // Act
+        authorizationService.createAuthorization(authorizationRequest);
+
+        verify(supplierService).findByReference("supplier_ref");
+        verify(cardService).findByTag("card_tag");
+    }
+
+    private CardDto createExpiredCard() {
+        return CardDto.builder()
+                .id(1L)
+                .expirationDate(LocalDate.now().minusDays(1))
+                .status(EnumCardStatus.FREE)
+                .actif(true)
+                .cardGroupId(1L)
+                .build();
+    }
+    private CardDto createInactiveCard() {
+        return CardDto.builder()
+                .id(1L)
+                .expirationDate(LocalDate.now().plusDays(1))
+                .status(EnumCardStatus.FREE)
+                .actif(false)
+                .cardGroupId(1L)
+                .build();
+    }
     private CardGroupDto createInactiveCardGroup() {
         CeilingDto ceilingDto = CeilingDto.builder().build();
         return CardGroupDto.builder()
