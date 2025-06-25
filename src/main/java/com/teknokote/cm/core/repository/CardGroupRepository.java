@@ -1,9 +1,7 @@
 package com.teknokote.cm.core.repository;
 
 import com.teknokote.cm.core.model.CardGroup;
-import com.teknokote.cm.dto.CardGroupDto;
 import com.teknokote.core.dao.JpaActivatableRepository;
-import org.springframework.beans.PropertyValues;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 

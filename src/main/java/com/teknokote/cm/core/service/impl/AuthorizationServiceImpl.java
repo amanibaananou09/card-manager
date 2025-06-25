@@ -4,7 +4,7 @@ import com.teknokote.cm.core.dao.AuthorizationDao;
 import com.teknokote.cm.core.model.EnumAuthorizationStatus;
 import com.teknokote.cm.core.model.EnumCardStatus;
 import com.teknokote.cm.core.model.EnumCeilingType;
-import com.teknokote.cm.core.service.*;
+import com.teknokote.cm.core.service.interfaces.*;
 import com.teknokote.cm.dto.*;
 import com.teknokote.core.service.ESSValidator;
 import com.teknokote.core.service.GenericCheckedService;
@@ -57,10 +57,13 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
                         boolean isAuthorized = evaluateCondition(condition, authorizationRequest.getProductName(),
                                 authorizationRequest.getSalePointName(), LocalDate.now().getDayOfWeek().toString(), salePoint.getCity());
                         if (isAuthorized) {
-                            CeilingDto ceilingDto = cardGroupDto.getCeilings().stream().findFirst().get();
-                            return authorizeIfAuthorized(cardDto, ceilingDto, generatedReference, cardLimit, authorizationRequest);
-                        } else {
-                            return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), cardLimit, authorizationRequest);
+                            Optional<CeilingDto> optionalCeiling = cardGroupDto.getCeilings().stream().findFirst();
+                            if (optionalCeiling.isPresent()) {
+                                CeilingDto ceilingDto = optionalCeiling.get();
+                                return authorizeIfAuthorized(cardDto, ceilingDto, generatedReference, cardLimit, authorizationRequest);
+                            } else {
+                                return createAuthorizationDto(generatedReference, EnumAuthorizationStatus.REFUSED, cardDto.getId(), BigDecimal.ZERO, authorizationRequest);
+                            }
                         }
                     }
                 }else{
@@ -96,7 +99,7 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
         return "A" + nextNumber;
     }
 
-    private boolean evaluateCondition(String condition, String productName, String salePointName, String day, String city) {
+    public boolean evaluateCondition(String condition, String productName, String salePointName, String day, String city) {
         // Split the condition into individual parts based on logical operators
         String[] orParts = condition.split("(?i)\\bOR\\b");
         // Evaluate each part separately
@@ -111,7 +114,7 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
         return false;
     }
 
-    private boolean evaluateOrPart(String orPart, String productName, String salePointName, String day, String city) {
+    public boolean evaluateOrPart(String orPart, String productName, String salePointName, String day, String city) {
         // Split the OR part into individual parts based on "AND"
         String[] andParts = orPart.split("(?i)\\bAND\\b");
         // Evaluate each part separately
@@ -126,7 +129,7 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
         return true;
     }
 
-    private boolean evaluateAndPart(String andPart, String productName, String salePointName, String day, String city) {
+    public boolean evaluateAndPart(String andPart, String productName, String salePointName, String day, String city) {
         // Split the AND part into property and value
         String[] parts = andPart.split("==");
         if (parts.length != 2) {
@@ -166,7 +169,7 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
         return result;
     }
 
-    private boolean evaluateTimeSlot(String value) {
+    public boolean evaluateTimeSlot(String value) {
         String[] timeSlots = value.split("or");
         for (String slot : timeSlots) {
             String[] times = slot.split("to");
@@ -184,7 +187,7 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
         return false; // Return false if current time is not within any time slot
     }
 
-    private BigDecimal calculateCardLimit(CardDto cardDto) {
+    public BigDecimal calculateCardLimit(CardDto cardDto) {
         if (cardDto != null) {
             CardGroupDto cardGroupDto = cardGroupService.findById(cardDto.getCardGroupId()).orElse(null);
             if (cardGroupDto != null) {
@@ -198,9 +201,9 @@ public class AuthorizationServiceImpl extends GenericCheckedService<Long, Author
         return null;
     }
 
-    private AuthorizationDto authorizeIfAuthorized(CardDto cardDto, CeilingDto ceilingDto, String generatedReference, BigDecimal cardLimit, AuthorizationRequest authorizationRequest) {
+    public AuthorizationDto authorizeIfAuthorized(CardDto cardDto, CeilingDto ceilingDto, String generatedReference, BigDecimal cardLimit, AuthorizationRequest authorizationRequest) {
         Optional<TransactionDto> lastTransaction = transactionService.findLastTransactionByCardId(cardDto.getId(), ceilingDto.getLimitType(), LocalDateTime.now());
-        BigDecimal availableAmountVolume = BigDecimal.ZERO;
+        BigDecimal availableAmountVolume;
         if (lastTransaction.isPresent()) {
             if (ceilingDto.getCeilingType().equals(EnumCeilingType.AMOUNT)) {
                 availableAmountVolume = lastTransaction.get().getAvailableBalance();

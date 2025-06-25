@@ -1,7 +1,7 @@
 package com.teknokote.cm.controller.front;
 
 import com.teknokote.cm.controller.EndPoints;
-import com.teknokote.cm.core.service.CeilingService;
+import com.teknokote.cm.core.service.interfaces.CeilingService;
 import com.teknokote.cm.dto.CeilingDto;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

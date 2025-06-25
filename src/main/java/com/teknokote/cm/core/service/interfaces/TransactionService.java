@@ -1,4 +1,4 @@
-package com.teknokote.cm.core.service;
+package com.teknokote.cm.core.service.interfaces;
 
 import com.teknokote.cm.core.model.EnumCeilingLimitType;
 import com.teknokote.cm.core.model.Transaction;

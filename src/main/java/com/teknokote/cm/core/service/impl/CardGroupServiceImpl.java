@@ -2,7 +2,7 @@ package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.CardDao;
 import com.teknokote.cm.core.dao.CardGroupDao;
-import com.teknokote.cm.core.service.CardGroupService;
+import com.teknokote.cm.core.service.interfaces.CardGroupService;
 import com.teknokote.cm.dto.CardDto;
 import com.teknokote.cm.dto.CardGroupDto;
 import com.teknokote.cm.dto.CeilingDto;
@@ -72,7 +72,7 @@ public class CardGroupServiceImpl extends ActivatableGenericCheckedService<Long,
 
     @Override
     public CardGroupDto updateCardGroup(CardGroupDto dto) {
-        CardGroupDto cardGroup = checkedFindById(dto.getId());
+        checkedFindById(dto.getId());
         List<CardGroupDto> cardGroups = getDao().findAllByCustomer(dto.getCustomerId()).stream().filter(cardGroupDto->!cardGroupDto.getId().equals(dto.getId())).toList();
         for (CardGroupDto cardGroupDto : cardGroups){
             if (cardGroupDto.getName().equals(dto.getName())){

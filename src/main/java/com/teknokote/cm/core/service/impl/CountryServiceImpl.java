@@ -1,7 +1,7 @@
 package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.CountryDao;
-import com.teknokote.cm.core.service.CountryService;
+import com.teknokote.cm.core.service.interfaces.CountryService;
 import com.teknokote.cm.dto.CountryDto;
 import com.teknokote.core.service.ESSValidator;
 import com.teknokote.core.service.GenericCheckedService;

@@ -1,9 +1,8 @@
 package com.teknokote.cm.core.service.impl.validators;
 
 import com.teknokote.cm.core.dao.CardMovementHistoryDao;
-import com.teknokote.cm.core.service.CardMovementHistoryService;
-import com.teknokote.cm.core.service.CardService;
-import com.teknokote.cm.dto.CardDto;
+import com.teknokote.cm.core.service.interfaces.CardMovementHistoryService;
+import com.teknokote.cm.core.service.interfaces.CardService;
 import com.teknokote.cm.dto.CardMovementHistoryDto;
 import com.teknokote.core.service.ESSValidator;
 import com.teknokote.core.service.GenericCheckedService;

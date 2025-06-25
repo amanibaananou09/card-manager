@@ -2,7 +2,7 @@ package com.teknokote.cm.http;
 
 import com.teknokote.cm.core.model.EnumActivityType;
 import com.teknokote.cm.core.model.User;
-import com.teknokote.cm.core.service.UserHistoryService;
+import com.teknokote.cm.core.service.interfaces.UserHistoryService;
 import com.teknokote.cm.dto.UserHistoryDto;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

@@ -5,10 +5,8 @@ import com.teknokote.cm.authentification.model.LoginResponse;
 import com.teknokote.cm.core.dao.CustomerDao;
 import com.teknokote.cm.core.dao.SupplierDao;
 import com.teknokote.cm.core.dao.UserDao;
-import com.teknokote.cm.core.model.Customer;
-import com.teknokote.cm.core.model.Supplier;
 import com.teknokote.cm.core.model.User;
-import com.teknokote.cm.core.service.UserService;
+import com.teknokote.cm.core.service.interfaces.UserService;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -55,16 +53,23 @@ public class LoginService {
     private final RestTemplate restTemplate;
 
     @Autowired
-    public LoginService(RestTemplate restTemplate) {
+    public LoginService(RestTemplate restTemplate,UserDao userDao, UserService userService,SupplierDao supplierDao, CustomerDao customerDao) {
         this.restTemplate = restTemplate;
+        this.userDao = userDao;
+        this.userService = userService;
+        this.supplierDao = supplierDao;
+        this.customerDao = customerDao;
     }
 
     public LoginResponse login(LoginRequest loginrequest, boolean doCheckUser) {
         if (doCheckUser) {
-            if (Objects.isNull(loginrequest.getUsername()))
+            if (Objects.isNull(loginrequest.getUsername())) {
                 throw new BadCredentialsException("username or password mismatch");
+            }
             final Optional<User> user = getUserDao().getRepository().findAllByUsernameIgnoreCase(loginrequest.getUsername());
-            if (user.isEmpty()) throw new BadCredentialsException("username or password mismatch");
+            if (user.isEmpty()) {
+                throw new BadCredentialsException("username or password mismatch");
+            }
         }
 
         HttpHeaders headers = new HttpHeaders();
@@ -77,31 +82,45 @@ public class LoginService {
         map.add("username", loginrequest.getUsername());
         map.add("password", loginrequest.getPassword());
 
-
         HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(map, headers);
 
         log.info("Trying to log in: {}", loginrequest.getUsername());
         ResponseEntity<LoginResponse> response = restTemplate.postForEntity(tokenEndpoint, httpEntity, LoginResponse.class);
-        if (response.hasBody()) {
-            userService.updateLastConnection(loginrequest.getUsername());
-            log.info("{} -> logged in", loginrequest.getUsername());
-            final Optional<User> optionalUser = getUserDao().getRepository().findAllByUsernameIgnoreCase(loginrequest.getUsername());
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                Optional<Supplier> optionalSupplier = getSupplierDao().getRepository().findSupplierByUser(user.getUsername());
-                if (optionalSupplier.isPresent()) {
-                    response.getBody().setSupplierId(optionalSupplier.get().getId());
-                }
-                Optional<Customer> optionalCustomer = getCustomerDao().getRepository().findCustomerByUser(user.getUsername());
-                if (optionalCustomer.isPresent()) {
-                    response.getBody().setCustomerId(optionalCustomer.get().getId());
-                    response.getBody().setSupplierId(optionalCustomer.get().getSupplaierId());
-                }
-            }
-        } else {
-            log.info("{} -> Failed to log in, result:{}", loginrequest.getUsername(), response.getBody());
-        }
-        return response.getBody();
 
+        if (!response.getStatusCode().is2xxSuccessful() || !response.hasBody()) {
+            log.error("Login failed for user: {}, Status: {}", loginrequest.getUsername(), response.getStatusCode());
+            throw new BadCredentialsException("Invalid login response");
+        }
+
+        LoginResponse loginResponse = Objects.requireNonNull(response.getBody(),
+                "Login response body cannot be null");
+
+        userService.updateLastConnection(loginrequest.getUsername());
+        log.info("{} -> logged in successfully", loginrequest.getUsername());
+
+        handleUserRelationships(loginrequest.getUsername(), loginResponse);
+        return loginResponse;
+    }
+
+    private void handleUserRelationships(String username, LoginResponse loginResponse) {
+        getUserDao().getRepository().findAllByUsernameIgnoreCase(username)
+                .ifPresent(user -> {
+                    processSupplierRelationships(user.getUsername(), loginResponse);
+                    processCustomerRelationships(user.getUsername(), loginResponse);
+                });
+    }
+
+    private void processSupplierRelationships(String username, LoginResponse loginResponse) {
+        getSupplierDao().getRepository().findSupplierByUser(username)
+                .ifPresent(supplier -> loginResponse.setSupplierId(supplier.getId()));
+    }
+
+    private void processCustomerRelationships(String username, LoginResponse loginResponse) {
+        getCustomerDao().getRepository().findCustomerByUser(username)
+                .ifPresent(customer -> {
+                    loginResponse.setCustomerId(customer.getId());
+                    Optional.ofNullable(customer.getSupplaierId())
+                            .ifPresent(loginResponse::setSupplierId);
+                });
     }
 }

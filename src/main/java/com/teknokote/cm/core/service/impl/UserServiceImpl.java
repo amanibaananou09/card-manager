@@ -3,7 +3,7 @@ package com.teknokote.cm.core.service.impl;
 import com.teknokote.cm.core.dao.SupplierDao;
 import com.teknokote.cm.core.dao.UserDao;
 import com.teknokote.cm.core.dao.mappers.UserMapper;
-import com.teknokote.cm.core.service.UserService;
+import com.teknokote.cm.core.service.interfaces.UserService;
 import com.teknokote.cm.dto.SupplierDto;
 import com.teknokote.cm.dto.UserDto;
 import com.teknokote.core.service.ESSValidator;

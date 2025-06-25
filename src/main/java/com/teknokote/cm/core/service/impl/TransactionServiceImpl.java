@@ -2,7 +2,7 @@ package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.TransactionDao;
 import com.teknokote.cm.core.model.*;
-import com.teknokote.cm.core.service.*;
+import com.teknokote.cm.core.service.interfaces.*;
 import com.teknokote.cm.dto.*;
 import com.teknokote.core.exceptions.ServiceValidationException;
 import com.teknokote.core.service.ESSValidator;
@@ -46,19 +46,27 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
             if (productDto != null) {
                 dto.setProductId(productDto.getId());
             }
-            List<SalePointDto> salePoints = supplierDto.getSalePoints().stream().filter(salePointDto -> salePointDto.getName().equals(dto.getSalePointName())).toList();
+            List<SalePointDto> salePoints = supplierDto.getSalePoints().stream()
+                    .filter(salePointDto -> salePointDto.getName().equals(dto.getSalePointName()))
+                    .toList();
             if (salePoints != null && !salePoints.isEmpty()) {
                 dto.setSalePointId(salePoints.get(0).getId());
             }
         }
         CardDto card = cardService.checkedFindById(dto.getCardId());
-        CardGroupDto cardGroupDto = cardGroupService.checkedFindById(card.getCardGroupId());
-        CeilingDto ceilingDto = cardGroupDto.getCeilings().stream().findFirst().get();
-        BigDecimal availableBalance = calculateAvailableBalance(dto, dto.getCardId(), ceilingDto, cardGroupDto);
-        if (ceilingDto.getCeilingType().equals(EnumCeilingType.AMOUNT)) {
-            dto.setAvailableBalance(availableBalance);
-        } else {
-            dto.setAvailableVolume(availableBalance);
+        if (card != null) {
+            CardGroupDto cardGroupDto = cardGroupService.checkedFindById(card.getCardGroupId());
+            if (cardGroupDto != null) {
+                CeilingDto ceilingDto = cardGroupDto.getCeilings().stream().findFirst().orElse(null);
+                if (ceilingDto != null) {
+                    BigDecimal availableBalance = calculateAvailableBalance(dto, dto.getCardId(), ceilingDto, cardGroupDto);
+                    if (ceilingDto.getCeilingType().equals(EnumCeilingType.AMOUNT)) {
+                        dto.setAvailableBalance(availableBalance);
+                    } else {
+                        dto.setAvailableVolume(availableBalance);
+                    }
+                }
+            }
         }
         return create(dto);
     }
@@ -76,7 +84,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         }
     }
 
-    private BigDecimal calculateAvailableBalance(TransactionDto transactionDto, Long cardId, CeilingDto ceilingDto, CardGroupDto groupDto) {
+    public BigDecimal calculateAvailableBalance(TransactionDto transactionDto, Long cardId, CeilingDto ceilingDto, CardGroupDto groupDto) {
         Optional<TransactionDto> lastTransaction = this.findLastTransactionByCardId(cardId, ceilingDto.getLimitType(), LocalDateTime.now());
         BigDecimal valueToSubtract;
         if (lastTransaction.isEmpty()) {
@@ -181,7 +189,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
         return remainingBalancePerProduct;
     }
 
-    private SalePointDto mapToSalePointDto(SalePoint salePoint) {
+    public SalePointDto mapToSalePointDto(SalePoint salePoint) {
         CountryDto countryDto = mapToCountryDto(salePoint.getCountry());
         return SalePointDto.builder()
                 .id(salePoint.getId())
@@ -191,7 +199,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
                 .build();
     }
 
-    private CountryDto mapToCountryDto(Country salePoint) {
+    public CountryDto mapToCountryDto(Country salePoint) {
         return CountryDto.builder()
                 .id(salePoint.getId())
                 .name(salePoint.getName())
@@ -277,7 +285,7 @@ public class TransactionServiceImpl extends GenericCheckedService<Long, Transact
 
     @Override
     public List<TransactionChart> getTransactionChart(Long customerId, Long cardId, String period, LocalDateTime startDate, LocalDateTime endDate) {
-        List<DailyTransactionChart> dailyTransactionCharts = chartTransaction(customerId,cardId,period,startDate,endDate);
+        List<DailyTransactionChart> dailyTransactionCharts = chartTransaction(customerId, cardId, period, startDate, endDate);
 
         // Group by fuelGrade and cardIdentifier for TransactionChart
         Map<String, TransactionChart> transactionChartMap = new HashMap<>();

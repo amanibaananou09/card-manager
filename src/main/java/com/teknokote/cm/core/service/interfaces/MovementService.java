@@ -1,4 +1,4 @@
-package com.teknokote.cm.core.service;
+package com.teknokote.cm.core.service.interfaces;
 
 import com.teknokote.cm.dto.MovementDto;
 import com.teknokote.core.service.BaseService;

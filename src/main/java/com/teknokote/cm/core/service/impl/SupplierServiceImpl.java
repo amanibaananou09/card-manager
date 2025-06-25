@@ -4,7 +4,7 @@ import com.teknokote.cm.core.dao.ProductDao;
 import com.teknokote.cm.core.dao.SalePointDao;
 import com.teknokote.cm.core.dao.SupplierDao;
 import com.teknokote.cm.core.dao.UserDao;
-import com.teknokote.cm.core.service.SupplierService;
+import com.teknokote.cm.core.service.interfaces.SupplierService;
 import com.teknokote.cm.dto.ProductDto;
 import com.teknokote.cm.dto.SalePointDto;
 import com.teknokote.cm.dto.SupplierDto;
@@ -34,6 +34,8 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
     @Autowired
     private ProductDao productDao;
 
+    public static final String SUPPLIER_NOT_EXIST = "supplier not existing on card manager !!!";
+
     @Override
     public SupplierDto findByReference(String reference) {
         return getDao().findAllByReference(reference);
@@ -53,7 +55,7 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
             supplierDto.setId(supplier.getId());
             return update(supplierDto);
         } else {
-            throw new ServiceValidationException("supplier not existing on card manager !!!");
+            throw new ServiceValidationException(SUPPLIER_NOT_EXIST);
         }
     }
 
@@ -75,7 +77,7 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
             salePointDto.setSupplierId(supplier.getId());
             return salePointDao.create(salePointDto);
         }else {
-            throw new ServiceValidationException("supplier not existing on card manager !!!");
+            throw new ServiceValidationException(SUPPLIER_NOT_EXIST);
         }
     }
 
@@ -95,23 +97,27 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
     }
 
     @Override
-    public UserDto createUser(Long supplierId,UserDto userDto) {
+    public UserDto createUser(Long supplierId, UserDto userDto) {
         SupplierDto supplier = checkedFindById(supplierId);
+        if (supplier == null) {
+            throw new ServiceValidationException(SUPPLIER_NOT_EXIST);
+        }
+
         Set<UserDto> existingUsers = supplier.getUsers();
-        if (supplier != null) {
-            supplier.getUsers().add(userDto);
-            SupplierDto supplierDto=dao.update(supplier);
-            for (UserDto existingUser : existingUsers.stream().filter(userDto1 -> userDto1.getId()!=null).toList()) {
-                if (!supplierDto.getUsers().contains(existingUser)) {
-                    supplier.getUsers().remove(existingUser);
-                    userDao.deleteById(existingUser.getId());
-                }
-            }
-            }else{
-                throw new ServiceValidationException("supplier not existing on card manager !!!");
-            }
+        supplier.getUsers().add(userDto);
+        SupplierDto supplierDto = dao.update(supplier);
+
+        // Cleanup des users deleted
+        existingUsers.stream()
+                .filter(user -> user.getId() != null && !supplierDto.getUsers().contains(user))
+                .forEach(user -> {
+                    supplier.getUsers().remove(user);
+                    userDao.deleteById(user.getId());
+                });
+
         return userDto;
     }
+
 
     @Override
     @Transactional
@@ -144,7 +150,7 @@ public class SupplierServiceImpl extends ActivatableGenericCheckedService<Long, 
             }
             return productDao.create(productDto);
         }else {
-            throw new ServiceValidationException("supplier not existing on card manager !!!");
+            throw new ServiceValidationException(SUPPLIER_NOT_EXIST);
         }
     }
 }

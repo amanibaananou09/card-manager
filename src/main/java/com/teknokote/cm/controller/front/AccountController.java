@@ -1,7 +1,7 @@
 package com.teknokote.cm.controller.front;
 
 import com.teknokote.cm.controller.EndPoints;
-import com.teknokote.cm.core.service.AccountService;
+import com.teknokote.cm.core.service.interfaces.AccountService;
 import com.teknokote.cm.dto.AccountDto;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

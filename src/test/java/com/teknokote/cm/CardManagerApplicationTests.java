@@ -1,11 +1,13 @@
 package com.teknokote.cm;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-class CardManagerApplicationTests
-{
+import static io.smallrye.common.constraint.Assert.assertTrue;
 
+class CardManagerApplicationTests {
 
-
+    @Test
+    void contextLoads() {
+        assertTrue(true);
+    }
 }

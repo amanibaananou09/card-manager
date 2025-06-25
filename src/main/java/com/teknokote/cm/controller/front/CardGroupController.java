@@ -1,7 +1,7 @@
 package com.teknokote.cm.controller.front;
 
 import com.teknokote.cm.controller.EndPoints;
-import com.teknokote.cm.core.service.CardGroupService;
+import com.teknokote.cm.core.service.interfaces.CardGroupService;
 import com.teknokote.cm.dto.CardGroupDto;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

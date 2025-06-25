@@ -1,7 +1,7 @@
 package com.teknokote.cm.authentification.config;
 
 import com.teknokote.cm.core.model.User;
-import com.teknokote.cm.core.service.UserService;
+import com.teknokote.cm.core.service.interfaces.UserService;
 import com.teknokote.core.exceptions.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;

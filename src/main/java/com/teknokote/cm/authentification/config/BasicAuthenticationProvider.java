@@ -5,7 +5,7 @@ package com.teknokote.cm.authentification.config;
 import com.teknokote.cm.authentification.model.LoginRequest;
 import com.teknokote.cm.authentification.model.LoginResponse;
 import com.teknokote.cm.core.model.User;
-import com.teknokote.cm.core.service.UserService;
+import com.teknokote.cm.core.service.interfaces.UserService;
 import com.teknokote.cm.core.service.authentication.LoginService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

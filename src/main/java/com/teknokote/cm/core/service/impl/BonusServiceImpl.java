@@ -1,7 +1,7 @@
 package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.BonusDao;
-import com.teknokote.cm.core.service.BonusService;
+import com.teknokote.cm.core.service.interfaces.BonusService;
 import com.teknokote.cm.dto.BonusDto;
 import com.teknokote.core.service.ESSValidator;
 import com.teknokote.core.service.GenericCheckedService;

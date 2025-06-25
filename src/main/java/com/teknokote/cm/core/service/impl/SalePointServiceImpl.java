@@ -1,7 +1,7 @@
 package com.teknokote.cm.core.service.impl;
 
 import com.teknokote.cm.core.dao.SalePointDao;
-import com.teknokote.cm.core.service.SalePointService;
+import com.teknokote.cm.core.service.interfaces.SalePointService;
 import com.teknokote.cm.dto.SalePointDto;
 import com.teknokote.core.service.ESSValidator;
 import com.teknokote.core.service.GenericCheckedService;
