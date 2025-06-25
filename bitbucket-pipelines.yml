@@ -8,6 +8,15 @@
 image: maven:3.9.0
 
 definitions:
+  services:
+    custom-docker:
+      image:
+        name: docker.teknoword.com/dind
+        username: $REPOSITORY_USERNAME
+        password: $REPOSITORY_PASSWORD
+      type: docker
+      variables:
+        INSECURE_REGISTRY: 192.168.1.65:8082
   steps:
     - step: &build-and-test
         name: Build and Test
@@ -65,9 +74,10 @@ definitions:
         caches:
           - docker
         services:
-          - docker
+          - custom-docker
         script:
-          - docker login ${DOCKER_REGISTRY_URL} --username=${REPOSITORY_USERNAME} --password=${REPOSITORY_PASSWORD}
+          - export DOCKER_BUILDKIT=0
+          - docker login -u ${REPOSITORY_USERNAME} -p ${REPOSITORY_PASSWORD} ${DOCKER_REGISTRY_URL}
           - docker build -f ./deployments/Dockerfile -t ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}:${BITBUCKET_BRANCH-${BITBUCKET_TAG}} .
           - docker push ${DOCKER_REGISTRY_URL}/${PROJECT_NAME}:${BITBUCKET_BRANCH-${BITBUCKET_TAG}}
 
